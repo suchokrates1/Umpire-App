@@ -1,18 +1,20 @@
 package pl.vestmedia.tennisreferee.ui.match
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.*
 
 /**
  * ViewModel zarządzający logiką meczu tenisowego
  */
-class MatchViewModel : ViewModel() {
+class MatchViewModel(application: Application) : AndroidViewModel(application) {
     
     private val _matchState = MutableLiveData<MatchState>()
     val matchState: LiveData<MatchState> = _matchState
@@ -27,6 +29,7 @@ class MatchViewModel : ViewModel() {
     val undoMessage: LiveData<String?> = _undoMessage
     
     private val apiService = RetrofitClient.apiService
+    private val matchHistoryRepository = (application as TennisRefereeApp).matchHistoryRepository
     
     /**
      * Inicjalizuje nowy mecz
@@ -377,6 +380,7 @@ class MatchViewModel : ViewModel() {
                         state.isMatchFinished = true
                         state.matchDuration = System.currentTimeMillis() - state.matchStartTime
                         _matchState.value = state
+                        saveMatchToDatabase(state)
                         _currentView.value = MatchView.MATCH_FINISHED
                         return
                     }
@@ -434,6 +438,9 @@ class MatchViewModel : ViewModel() {
                         state.isMatchFinished = true
                         state.matchDuration = System.currentTimeMillis() - state.matchStartTime
                         _matchState.value = state
+                        
+                        // Zapisz mecz do bazy danych
+                        saveMatchToDatabase(state)
                         
                         // Log match end event
                         logMatchEvent("match_end")
@@ -524,6 +531,20 @@ class MatchViewModel : ViewModel() {
             } catch (e: Exception) {
                 println("Error logging match event: ${e.message}")
                 // Nie przerywamy działania aplikacji przy błędzie logowania
+            }
+        }
+    }
+    
+    /**
+     * Zapisuje zakończony mecz do bazy danych
+     */
+    private fun saveMatchToDatabase(state: MatchState) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                matchHistoryRepository.saveMatch(state)
+            } catch (e: Exception) {
+                println("Error saving match to database: ${e.message}")
+                // Nie przerywamy działania aplikacji przy błędzie zapisu
             }
         }
     }

@@ -3,6 +3,8 @@ package pl.vestmedia.tennisreferee.ui.courtselection
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -20,6 +22,7 @@ import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
+import pl.vestmedia.tennisreferee.ui.history.MatchHistoryActivity
 
 /**
  * Activity do wyboru kortu
@@ -162,6 +165,22 @@ class CourtSelectionActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+        }
+    }
+    
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_court_selection, menu)
+        return true
+    }
+    
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_match_history -> {
+                val intent = Intent(this, MatchHistoryActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

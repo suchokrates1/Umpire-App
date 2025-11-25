@@ -87,4 +87,19 @@
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    
+    <!-- Match History -->
+    <string name="match_history_title">Match History</string>
+    <string name="match_history">Match History</string>
+    <string name="no_matches_saved">No matches saved yet</string>
+    <string name="match_score_format">%1$d : %2$d</string>
+    <string name="winner_format">Winner: %1$s</string>
+    <string name="delete_match">Delete match</string>
+    <string name="delete_all_matches">Delete All</string>
+    <string name="confirm_delete_match">Delete this match?</string>
+    <string name="confirm_delete_all_matches">Delete all matches from history?</string>
+    <string name="match_deleted">Match deleted</string>
+    <string name="all_matches_deleted">All matches deleted</string>
+    <string name="match_details">Match Details</string>
+    <string name="match_details_placeholder">Match details will be displayed here</string>
 </resources>
