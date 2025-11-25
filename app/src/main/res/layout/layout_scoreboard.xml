@@ -17,6 +17,20 @@
         android:padding="12dp"
         android:background="@color/score_background">
 
+        <!-- Timer meczu -->
+        <TextView
+            android:id="@+id/textMatchTimer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="01:23:45"/>
+
         <!-- Tryb gry (Tiebreak/Super Tiebreak) -->
         <TextView
             android:id="@+id/textGameMode"

@@ -2,6 +2,8 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -28,6 +30,9 @@ class MatchActivity : AppCompatActivity() {
     private lateinit var rallyBinding: LayoutRallyBinding
     private lateinit var matchFinishedBinding: LayoutMatchFinishedBinding
     private val viewModel: MatchViewModel by viewModels()
+    
+    private val timerHandler = Handler(Looper.getMainLooper())
+    private var timerRunnable: Runnable? = null
     
     companion object {
         const val EXTRA_MATCH_STATE = "match_state"
@@ -68,6 +73,7 @@ class MatchActivity : AppCompatActivity() {
             updatePlayerNames(state)
             updateServerSelectionButtons(state)
             updateServeView(state)
+            updateTimer(state)
         }
         
         viewModel.currentView.observe(this) { view ->
@@ -568,4 +574,70 @@ class MatchActivity : AppCompatActivity() {
         matchFinishedBinding.textDoubleFaultsPlayer1.text = state.player1Stats.doubleFaults.toString()
         matchFinishedBinding.textDoubleFaultsPlayer2.text = state.player2Stats.doubleFaults.toString()
     }
+    
+    /**
+     * Aktualizuje wyświetlacz timera meczu
+     */
+    private fun updateTimer(state: MatchState) {
+        if (state.matchStartTime > 0 && !state.isMatchFinished) {
+            scoreboardBinding.textMatchTimer.visibility = View.VISIBLE
+            startTimerUpdates()
+        } else if (state.isMatchFinished) {
+            stopTimerUpdates()
+            // Pokaż końcowy czas meczu
+            scoreboardBinding.textMatchTimer.text = formatDuration(state.matchDuration)
+            scoreboardBinding.textMatchTimer.visibility = View.VISIBLE
+        }
+    }
+    
+    /**
+     * Rozpoczyna okresowe aktualizacje timera
+     */
+    private fun startTimerUpdates() {
+        if (timerRunnable != null) return // już działa
+        
+        timerRunnable = object : Runnable {
+            override fun run() {
+                viewModel.matchState.value?.let { state ->
+                    if (state.matchStartTime > 0 && !state.isMatchFinished) {
+                        val elapsed = System.currentTimeMillis() - state.matchStartTime
+                        scoreboardBinding.textMatchTimer.text = formatDuration(elapsed)
+                        timerHandler.postDelayed(this, 1000) // Aktualizuj co sekundę
+                    }
+                }
+            }
+        }
+        timerHandler.post(timerRunnable!!)
+    }
+    
+    /**
+     * Zatrzymuje okresowe aktualizacje timera
+     */
+    private fun stopTimerUpdates() {
+        timerRunnable?.let {
+            timerHandler.removeCallbacks(it)
+            timerRunnable = null
+        }
+    }
+    
+    /**
+     * Formatuje czas trwania na format HH:MM:SS lub MM:SS
+     */
+    private fun formatDuration(durationMs: Long): String {
+        val seconds = (durationMs / 1000) % 60
+        val minutes = (durationMs / (1000 * 60)) % 60
+        val hours = (durationMs / (1000 * 60 * 60))
+        
+        return if (hours > 0) {
+            String.format("%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            String.format("%02d:%02d", minutes, seconds)
+        }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        stopTimerUpdates()
+    }
 }
+
