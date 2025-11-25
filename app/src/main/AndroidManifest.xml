@@ -45,6 +45,20 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.playerselection.PlayerSelectionActivity"/>
         
+        <!-- Match History -->
+        <activity
+            android:name=".ui.history.MatchHistoryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.courtselection.CourtSelectionActivity"/>
+        
+        <!-- Match Detail -->
+        <activity
+            android:name=".ui.history.MatchDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.history.MatchHistoryActivity"/>
+        
     </application>
 
 </manifest>
