@@ -75,4 +75,11 @@ interface TennisApiService {
      */
     @POST("api/match-events")
     suspend fun logMatchEvent(@Body event: MatchEvent): Response<MatchEventResponse>
+    
+    /**
+     * Wysyła statystyki meczu do serwera
+     */
+    @POST("api/match-statistics")
+    suspend fun sendMatchStatistics(@Body statistics: MatchStatisticsRequest): Response<Unit>
 }
+
