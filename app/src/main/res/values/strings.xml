@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tennis Referee</string>
+    
+    <!-- Language Selection -->
+    <string name="select_language">Select Language</string>
+    <string name="language_selected">Language selected</string>
+    
+    <!-- Court Selection -->
+    <string name="select_court">Select Court</string>
+    <string name="refresh">Refresh</string>
+    <string name="no_courts_available">No courts available</string>
+    <string name="court_name">Court %1$s</string>
+    <string name="court_available">Available</string>
+    <string name="court_occupied">Occupied</string>
+    <string name="court_pin_title">Court Authorization</string>
+    <string name="court_pin_message">Enter PIN for court: %1$s</string>
+    <string name="pin_hint">Enter PIN</string>
+    <string name="pin_empty">PIN cannot be empty</string>
+    <string name="pin_invalid">Invalid PIN: %1$s</string>
+    
+    <!-- Player Selection -->
+    <string name="select_players">Select Players</string>
+    <string name="court_label">Court: %1$s</string>
+    <string name="doubles_checkbox">Doubles</string>
+    <string name="game_type_singles">Singles (2 players)</string>
+    <string name="game_type_doubles">Doubles (4 players)</string>
+    <string name="selected_info">Selected: %1$d/%2$d</string>
+    <string name="add_new_player">+ Add new player</string>
+    <string name="player_name_hint">Player name</string>
+    <string name="country_code_hint">Country code (e.g. US)</string>
+    <string name="search_players">Search players</string>
+    <string name="add_player">+ Add new player</string>
+    <string name="player_not_found">Player not found</string>
+    <string name="doubles">Doubles</string>
+    <string name="singles">Singles (2 players)</string>
+    <string name="doubles_mode">Doubles (4 players)</string>
+    <string name="no_players_available">No players available</string>
+    <string name="selected_count">Selected: %1$d/%2$d</string>
+    <string name="next">Next</string>
+    <string name="back">Back</string>
+    
+    <!-- Match -->
+    <string name="undo">Undo</string>
+    <string name="who_serves_first">Who serves first?</string>
+    <string name="swap_sides">⇄ Swap Sides</string>
+    <string name="player_serves">%1$s\nServes</string>
+    <string name="first_serve">1st Serve</string>
+    <string name="second_serve">1st serve  >  2nd serve</string>
+    <string name="serve">Serve</string>
+    <string name="ace">ACE</string>
+    <string name="fault">FAULT</string>
+    <string name="ball_in_play">BALL IN PLAY</string>
+    <string name="winner">WINNER</string>
+    <string name="forced_error">FORCED ERROR</string>
+    <string name="unforced_error">UNFORCED ERROR</string>
+    <string name="match_finished">Match Finished</string>
+    <string name="winner_label">Winner: %1$s</string>
+    <string name="finish">Finish</string>
+    <string name="finish_match">Finish Match</string>
+    <string name="new_match">New Match</string>
+    
+    <!-- Scoreboard -->
+    <string name="scoreboard_player">Player</string>
+    <string name="scoreboard_points">Points</string>
+    <string name="scoreboard_set1">Set 1</string>
+    <string name="scoreboard_set2">Set 2</string>
+    <string name="player_name">Name</string>
+    <string name="points">Points</string>
+    <string name="set">Set %1$d</string>
+    <string name="tiebreak">Tie-break (to %1$d)</string>
+    <string name="super_tiebreak">Super tie-break (to %1$d)</string>
+    <string name="match_finished_title">Match Finished!</string>
+    <string name="statistics">Statistics</string>
+    <string name="aces">Aces</string>
+    <string name="double_faults">Double Faults</string>
+    <string name="player_serves_short">Serves</string>
+    
+    <!-- Errors -->
+    <string name="error_loading_courts">Error loading courts</string>
+    <string name="error_loading_players">Error loading players</string>
+    <string name="error_network">Network connection error</string>
+    <string name="error_unknown">Unknown error</string>
+    
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+</resources>

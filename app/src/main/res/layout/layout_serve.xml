@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Informacja o serwisie -->
+    <TextView
+        android:id="@+id/textServeInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="1. Serwis"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Nagłówki z nazwiskami (bez flag i ikony serwisu) -->
+    <TextView
+        android:id="@+id/textPlayerLeftName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Player 1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toBottomOf="@id/textServeInfo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/textPlayerRightName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Player 2"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toBottomOf="@id/textServeInfo"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- LEWA STRONA - Gracz 1 serwuje -->
+    <LinearLayout
+        android:id="@+id/layoutServeLeft"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerLeftName"
+        app:layout_constraintBottom_toTopOf="@id/buttonBallInPlay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonAceLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="ACE"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/primary"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonFaultLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="FAULT"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#F44336"/>
+
+    </LinearLayout>
+
+    <!-- PRAWA STRONA - Gracz 2 serwuje -->
+    <LinearLayout
+        android:id="@+id/layoutServeRight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerRightName"
+        app:layout_constraintBottom_toTopOf="@id/buttonBallInPlay"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonAceRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="ACE"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/primary"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonFaultRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="FAULT"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#F44336"/>
+
+    </LinearLayout>
+
+    <!-- Ball in Play - pełna szerokość (dotyczy obu graczy) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonBallInPlay"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="BALL IN PLAY"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        android:layout_margin="8dp"
+        android:padding="32dp"
+        android:backgroundTint="@color/accent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Guideline dla podziału na pół -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

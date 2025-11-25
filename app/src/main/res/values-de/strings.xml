@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tennis Schiedsrichter</string>
+    
+    <!-- Language Selection -->
+    <string name="select_language">Sprache auswählen</string>
+    <string name="language_selected">Sprache ausgewählt</string>
+    
+    <!-- Court Selection -->
+    <string name="select_court">Platz auswählen</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="no_courts_available">Keine Plätze verfügbar</string>
+    <string name="court_name">Platz %1$s</string>
+    <string name="court_available">Verfügbar</string>
+    <string name="court_occupied">Belegt</string>
+    <string name="court_pin_title">Platzautorisierung</string>
+    <string name="court_pin_message">PIN für Platz eingeben: %1$s</string>
+    <string name="pin_hint">PIN eingeben</string>
+    <string name="pin_empty">PIN darf nicht leer sein</string>
+    <string name="pin_invalid">Ungültige PIN: %1$s</string>
+    
+    <!-- Player Selection -->
+    <string name="select_players">Spieler auswählen</string>
+    <string name="court_label">Platz: %1$s</string>
+    <string name="doubles_checkbox">Doppel</string>
+    <string name="game_type_singles">Einzel (2 Spieler)</string>
+    <string name="game_type_doubles">Doppel (4 Spieler)</string>
+    <string name="selected_info">Ausgewählt: %1$d/%2$d</string>
+    <string name="add_new_player">+ Neuen Spieler hinzufügen</string>
+    <string name="player_name_hint">Spielername</string>
+    <string name="country_code_hint">Ländercode (z.B. DE)</string>
+    <string name="search_players">Spieler suchen</string>
+    <string name="add_player">+ Neuen Spieler hinzufügen</string>
+    <string name="player_not_found">Spieler nicht gefunden</string>
+    <string name="doubles">Doppel</string>
+    <string name="singles">Einzel (2 Spieler)</string>
+    <string name="doubles_mode">Doppel (4 Spieler)</string>
+    <string name="no_players_available">Keine Spieler verfügbar</string>
+    <string name="selected_count">Ausgewählt: %1$d/%2$d</string>
+    <string name="next">Weiter</string>
+    <string name="back">Zurück</string>
+    
+    <!-- Match -->
+    <string name="undo">Rückgängig</string>
+    <string name="who_serves_first">Wer schlägt zuerst auf?</string>
+    <string name="swap_sides">⇄ Seiten wechseln</string>
+    <string name="player_serves">%1$s\nSchlägt auf</string>
+    <string name="first_serve">1. Aufschlag</string>
+    <string name="second_serve">1. Aufschlag  >  2. Aufschlag</string>
+    <string name="serve">Aufschlag</string>
+    <string name="ace">ASS</string>
+    <string name="fault">FEHLER</string>
+    <string name="ball_in_play">BALL IM SPIEL</string>
+    <string name="winner">WINNER</string>
+    <string name="forced_error">ERZWUNGENER FEHLER</string>
+    <string name="unforced_error">UNERZWUNGENER FEHLER</string>
+    <string name="match_finished">Spiel beendet</string>
+    <string name="winner_label">Gewinner: %1$s</string>
+    <string name="finish">Beenden</string>
+    <string name="finish_match">Spiel beenden</string>
+    <string name="new_match">Neues Spiel</string>
+    
+    <!-- Scoreboard -->
+    <string name="scoreboard_player">Spieler</string>
+    <string name="scoreboard_points">Punkte</string>
+    <string name="scoreboard_set1">Satz 1</string>
+    <string name="scoreboard_set2">Satz 2</string>
+    <string name="player_name">Name</string>
+    <string name="points">Punkte</string>
+    <string name="set">Satz %1$d</string>
+    <string name="tiebreak">Tie-break (bis %1$d)</string>
+    <string name="super_tiebreak">Super Tie-Break (bis %1$d)</string>
+    <string name="match_finished_title">Match beendet!</string>
+    <string name="statistics">Statistiken</string>
+    <string name="aces">Asse</string>
+    <string name="double_faults">Doppelfehler</string>
+    <string name="player_serves_short">Aufschlag</string>
+    
+    <!-- Errors -->
+    <string name="error_loading_courts">Fehler beim Laden der Plätze</string>
+    <string name="error_loading_players">Fehler beim Laden der Spieler</string>
+    <string name="error_network">Netzwerkverbindungsfehler</string>
+    <string name="error_unknown">Unbekannter Fehler</string>
+    
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+</resources>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.match.MatchActivity">
+
+    <!-- SCOREBOARD - widoczny w większości widoków -->
+    <include
+        android:id="@+id/layoutScoreboard"
+        layout="@layout/layout_scoreboard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- WIDOK 3: Wybór pierwszego serwującego -->
+    <include
+        android:id="@+id/layoutServerSelection"
+        layout="@layout/layout_server_selection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutScoreboard"
+        app:layout_constraintBottom_toTopOf="@id/buttonUndo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- WIDOK 4: Serwis (Ace/Fault/Ball in play) -->
+    <include
+        android:id="@+id/layoutServe"
+        layout="@layout/layout_serve"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutScoreboard"
+        app:layout_constraintBottom_toTopOf="@id/buttonUndo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- WIDOK: Rally (Winner/Forced/Unforced) -->
+    <include
+        android:id="@+id/layoutRally"
+        layout="@layout/layout_rally"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutScoreboard"
+        app:layout_constraintBottom_toTopOf="@id/buttonUndo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- WIDOK: Koniec meczu -->
+    <include
+        android:id="@+id/layoutMatchFinished"
+        layout="@layout/layout_match_finished"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutScoreboard"
+        app:layout_constraintBottom_toTopOf="@id/buttonUndo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Przycisk Cofnij (UNDO) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonUndo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="↶ Cofnij"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:enabled="false"
+        android:visibility="gone"
+        android:backgroundTint="#FF9800"
+        app:icon="@android:drawable/ic_menu_revert"
+        app:iconGravity="start"
+        style="@style/Widget.MaterialComponents.Button"
+        app:layout_constraintBottom_toTopOf="@id/buttonBack"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Przycisk powrotu (zawsze na dole) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonBack"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/finish_match"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
