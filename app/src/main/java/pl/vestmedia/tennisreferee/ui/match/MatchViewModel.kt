@@ -381,6 +381,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         state.matchDuration = System.currentTimeMillis() - state.matchStartTime
                         _matchState.value = state
                         saveMatchToDatabase(state)
+                        finishMatchOnServer()
                         _currentView.value = MatchView.MATCH_FINISHED
                         return
                     }
@@ -442,6 +443,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         // Zapisz mecz do bazy danych
                         saveMatchToDatabase(state)
                         
+                        // Zakończ mecz na serwerze
+                        finishMatchOnServer()
+                        
                         // Log match end event
                         logMatchEvent("match_end")
                         
@@ -470,6 +474,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 
                 _matchState.value = state
                 _currentView.value = MatchView.SERVE
+                
+                // Synchronizuj wynik z serwerem po każdym gemie
+                syncMatchWithServer()
             } else {
                 // Gem trwa dalej
                 _currentView.value = MatchView.SERVE
@@ -545,6 +552,61 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 println("Error saving match to database: ${e.message}")
                 // Nie przerywamy działania aplikacji przy błędzie zapisu
+            }
+        }
+    }
+    
+    /**
+     * Synchronizuje aktualny stan meczu z serwerem
+     */
+    fun syncMatchWithServer() {
+        _matchState.value?.let { state ->
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    if (state.matchId == null) {
+                        // Pierwszy sync - utwórz mecz na serwerze
+                        val match = state.toMatch()
+                        val response = apiService.createMatch(match)
+                        
+                        if (response.isSuccessful && response.body() != null) {
+                            state.matchId = response.body()!!.id
+                            println("Match created on server with ID: ${state.matchId}")
+                        } else {
+                            println("Failed to create match on server: ${response.code()}")
+                        }
+                    } else {
+                        // Aktualizuj istniejący mecz
+                        val match = state.toMatch()
+                        val response = apiService.updateMatch(state.matchId!!, match)
+                        
+                        if (!response.isSuccessful) {
+                            println("Failed to update match on server: ${response.code()}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    println("Error syncing match with server: ${e.message}")
+                    // Nie przerywamy działania aplikacji przy błędzie synchronizacji
+                }
+            }
+        }
+    }
+    
+    /**
+     * Kończy mecz na serwerze
+     */
+    fun finishMatchOnServer() {
+        _matchState.value?.let { state ->
+            state.matchId?.let { matchId ->
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        val response = apiService.finishMatch(matchId)
+                        if (!response.isSuccessful) {
+                            println("Failed to finish match on server: ${response.code()}")
+                        }
+                    } catch (e: Exception) {
+                        println("Error finishing match on server: ${e.message}")
+                    }
+                }
             }
         }
     }

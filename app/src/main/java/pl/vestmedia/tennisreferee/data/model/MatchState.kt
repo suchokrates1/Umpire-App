@@ -9,6 +9,9 @@ import kotlinx.parcelize.RawValue
  */
 @Parcelize
 data class MatchState(
+    // Identyfikator meczu na serwerze
+    var matchId: Int? = null,
+    
     // Wybrani gracze
     val player1: Player,
     val player2: Player,
@@ -138,4 +141,33 @@ data class MatchState(
     fun shouldEndMatch(): Boolean {
         return player1Sets == 2 || player2Sets == 2
     }
+    
+    /**
+     * Konwertuje stan meczu na obiekt Match dla API
+     */
+    fun toMatch(): Match {
+        return Match(
+            id = matchId ?: 0,
+            courtId = courtId,
+            player1Name = player1.getDisplayName(),
+            player2Name = player2.getDisplayName(),
+            score = Score(
+                player1Sets = player1Sets,
+                player2Sets = player2Sets,
+                player1Games = player1Games,
+                player2Games = player2Games,
+                player1Points = player1Points,
+                player2Points = player2Points,
+                setsHistory = setsHistory.toList()
+            ),
+            status = when {
+                isMatchFinished -> MatchStatus.FINISHED
+                matchStartTime > 0 -> MatchStatus.IN_PROGRESS
+                else -> MatchStatus.NOT_STARTED
+            },
+            createdAt = null,
+            updatedAt = null
+        )
+    }
 }
+
