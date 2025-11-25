@@ -382,6 +382,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         _matchState.value = state
                         saveMatchToDatabase(state)
                         finishMatchOnServer()
+                        sendMatchStatistics()
                         _currentView.value = MatchView.MATCH_FINISHED
                         return
                     }
@@ -445,6 +446,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         
                         // Zakończ mecz na serwerze
                         finishMatchOnServer()
+                        
+                        // Wyślij statystyki do API
+                        sendMatchStatistics()
                         
                         // Log match end event
                         logMatchEvent("match_end")
@@ -605,6 +609,29 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     } catch (e: Exception) {
                         println("Error finishing match on server: ${e.message}")
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Wysyła statystyki meczu do API
+     */
+    fun sendMatchStatistics() {
+        _matchState.value?.let { state ->
+            val statisticsRequest = state.toMatchStatisticsRequest()
+            if (statisticsRequest != null) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        val response = apiService.sendMatchStatistics(statisticsRequest)
+                        if (response.isSuccessful) {
+                            println("Match statistics sent successfully")
+                        } else {
+                            println("Failed to send match statistics: ${response.code()}")
+                        }
+                    } catch (e: Exception) {
+                        println("Error sending match statistics: ${e.message}")
                     }
                 }
             }

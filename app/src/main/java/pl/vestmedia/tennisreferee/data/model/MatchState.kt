@@ -169,5 +169,46 @@ data class MatchState(
             updatedAt = null
         )
     }
+    
+    /**
+     * Konwertuje statystyki meczu na obiekt dla API
+     */
+    fun toMatchStatisticsRequest(): MatchStatisticsRequest? {
+        if (matchId == null || !isMatchFinished) return null
+        
+        val winner = when {
+            player1Sets > player2Sets -> player1.getDisplayName()
+            player2Sets > player1Sets -> player2.getDisplayName()
+            else -> null
+        }
+        
+        return MatchStatisticsRequest(
+            matchId = matchId!!,
+            player1Name = player1.getDisplayName(),
+            player2Name = player2.getDisplayName(),
+            player1Stats = PlayerStats(
+                aces = player1Stats.aces,
+                doubleFaults = player1Stats.doubleFaults,
+                winners = player1Stats.winners,
+                forcedErrors = player1Stats.forcedErrors,
+                unforcedErrors = player1Stats.unforcedErrors,
+                firstServes = player1Stats.firstServes,
+                firstServesIn = player1Stats.firstServesIn,
+                firstServePercentage = player1Stats.getFirstServePercentage()
+            ),
+            player2Stats = PlayerStats(
+                aces = player2Stats.aces,
+                doubleFaults = player2Stats.doubleFaults,
+                winners = player2Stats.winners,
+                forcedErrors = player2Stats.forcedErrors,
+                unforcedErrors = player2Stats.unforcedErrors,
+                firstServes = player2Stats.firstServes,
+                firstServesIn = player2Stats.firstServesIn,
+                firstServePercentage = player2Stats.getFirstServePercentage()
+            ),
+            matchDurationMs = matchDuration,
+            winner = winner
+        )
+    }
 }
 
