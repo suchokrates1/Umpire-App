@@ -1,0 +1,172 @@
+11-18 18:53:01.429 19989 20003 I TestRunner: started: testUndoButton(pl.vestmedia.tennisreferee.ui.MatchPlayUITest)
+11-18 18:53:01.431  1601  1601 D RecentsView: onTaskRemoved: 43, not handling task stack changes
+11-18 18:53:01.432  1601  1601 D RecentsView: onTaskRemoved: 43, not handling task stack changes
+11-18 18:53:01.434  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:01.434  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:01.434  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:01.434  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:01.434  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:01.434  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:01.434 19989 20003 W Settings: Setting always_finish_activities has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-18 18:53:01.438   811  2044 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@29024257 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+11-18 18:53:01.442   636   684 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for descriptor: '(not cached)'
+11-18 18:53:01.447  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_deferred_resumed|state_window_focused] -[state_user_active]
+11-18 18:53:01.447  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_window_focused] -[state_resumed|state_deferred_resumed]
+11-18 18:53:01.447  1601  1601 W SplitSelectStateCtor: Missing session instanceIds
+11-18 18:53:01.447  1601  1601 D StatsLog: LAUNCHER_SPLIT_SELECTION_EXIT_INTERRUPTED
+11-18 18:53:01.455  1312  1451 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@d427a62
+11-18 18:53:01.456  1601  1601 D RecentsView: onTaskDisplayChanged: 45, new displayId = 0
+11-18 18:53:01.456  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:01.456  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:01.456  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:01.457   681   769 W libbinder.IPCThreadState: Sending oneway calls to frozen process.
+11-18 18:53:01.462 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c in: PRE_ON_CREATE
+11-18 18:53:01.462 19989 19989 V ActivityScenario: Activity lifecycle changed event received but ignored because the reported transition was not ON_CREATE while the last known transition was PRE_ON_CREATE
+11-18 18:53:01.479 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c in: CREATED
+11-18 18:53:01.480 19989 19989 V ActivityScenario: Update currentActivityStage to CREATED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c
+11-18 18:53:01.482 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c in: STARTED
+11-18 18:53:01.482 19989 19989 V ActivityScenario: Update currentActivityStage to STARTED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c
+11-18 18:53:01.483 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c in: RESUMED
+11-18 18:53:01.483 19989 19989 V ActivityScenario: Update currentActivityStage to RESUMED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c
+11-18 18:53:01.491 19989 19989 D VRI[LanguageSelectionActivity]: WindowInsets changed: 1080x2400 statusBars:[0,63,0,0] navigationBars:[0,0,0,63] mandatorySystemGestures:[0,63,0,84]
+11-18 18:53:01.491 19989 19989 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@42e20a2
+11-18 18:53:01.585  1601  1601 D BaseActivity: Launcher flags updated: [state_started] -[state_window_focused]
+11-18 18:53:01.657   811   830 I ActivityTaskManager: Displayed pl.vestmedia.tennisreferee/.ui.language.LanguageSelectionActivity for user 0: +220ms
+11-18 18:53:01.719  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:01.721   811   956 I ImeTracker: pl.vestmedia.tennisreferee:7ba61366: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+11-18 18:53:01.729  7270  7270 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():2057
+11-18 18:53:01.730   811  1977 I ImeTracker: system_server:c1c27b83: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false
+11-18 18:53:01.731  7270  7270 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes = 0, locked = false
+11-18 18:53:01.731   811   833 I ImeTracker: system_server:c1c27b83: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-18 18:53:01.732  7270  7270 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1318 onStartInput(EditorInfo{EditorInfo{packageName=pl.vestmedia.tennisreferee, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+11-18 18:53:01.732  7270  7270 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes = 1, locked = false
+11-18 18:53:01.742 19989 19989 I ImeTracker: pl.vestmedia.tennisreferee:7ba61366: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+11-18 18:53:01.758  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:01.794  1601  1601 W FrameTracker: Missed App frame:UNKNOWN: 3, 417713, 64444402, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.794  1601  1601 W FrameTracker: Missed SF frame:UNKNOWN: 3, 417713, 64444402, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.794  1601  1601 W FrameTracker: Missed SF frame:JANK_COMPOSER, 417729, 51019670, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:JANK_APPLICATION, 417744, 51367704, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:UNKNOWN: 3, 417766, 68234938, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed SF frame:UNKNOWN: 3, 417766, 68234938, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:JANK_APPLICATION, 417788, 88965872, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:JANK_APPLICATION, 417833, 86563374, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:JANK_APPLICATION, 417848, 86899308, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed SF frame:JANK_COMPOSER, 417879, 43873210, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:JANK_APPLICATION, 417894, 69790944, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed SF frame:JANK_COMPOSER, 417932, 35178346, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed SF frame:JANK_COMPOSER, 417940, 34673480, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:UNKNOWN: 3, 417955, 35174014, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed SF frame:UNKNOWN: 3, 417955, 35174014, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:UNKNOWN: 3, 417970, 85310348, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed SF frame:UNKNOWN: 3, 417970, 85310348, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed App frame:UNKNOWN: 3, 417985, 129572182, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.795  1601  1601 W FrameTracker: Missed SF frame:UNKNOWN: 3, 417985, 129572182, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME_FALLBACK>
+11-18 18:53:01.874   811  1220 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+11-18 18:53:01.878   811  1220 D InetDiagMessage: Destroyed 2 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+11-18 18:53:01.878   811  1220 D InetDiagMessage: Destroyed live tcp sockets for uids={10145} in 4ms
+11-18 18:53:01.941  1601  1601 D VRI[NexusLauncherActivity]: visibilityChanged oldVisibility=true newVisibility=false
+11-18 18:53:01.942  1312  1620 D WallpaperService: onVisibilityChanged(false): com.android.systemui.wallpapers.ImageWallpaper$CanvasEngine@338d082
+11-18 18:53:01.972  1601  1601 D NexusLauncherModelDelegate: notifySmartspaceEvent: SmartspaceTargetEvent{mSmartspaceTarget=null, mSmartspaceActionId='null', mEventType=7}
+11-18 18:53:01.995  1601  1601 D BaseActivity: Launcher flags updated: [] -[state_started]
+11-18 18:53:01.995  1601  1601 D BaseDepthController: setSurface:
+11-18 18:53:01.995  1601  1601 D BaseDepthController: 	mWaitingOnSurfaceValidity: false
+11-18 18:53:01.995  1601  1601 D BaseDepthController: 	mBaseSurface: null
+11-18 18:53:01.995  1601  1601 D BaseDepthController: mSurface is null and mCurrentBlur is: 0
+11-18 18:53:01.996  1601  1601 D LauncherStateManager: StateManager.goToState: fromState: Normal, toState: Normal, partial trace:
+11-18 18:53:01.996  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StateManager.moveToRestState(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:6)
+11-18 18:53:01.996  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StateManager.moveToRestState(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:2)
+11-18 18:53:01.996  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StatefulActivity.onStop(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:32)
+11-18 18:53:01.996  1601  1601 D LauncherStateManager: StateManager.onRepeatStateSetAborted: state: Normal
+11-18 18:53:01.996  1601  1601 D ActivityContext: hideKeyboard
+11-18 18:53:01.996  1601  1601 D ActivityContext: isImeShown: false
+11-18 18:53:01.996  1601  1601 D StatsLog: LAUNCHER_ONSTOP
+11-18 18:53:01.996  1601  8458 D GmsPlayProvider: Shutdown the binder channel gracefully.
+11-18 18:53:01.997  1601  8458 D GmsPlayProvider: Binder channel is terminated gracefully.
+11-18 18:53:01.997  1601  1601 D StatsLog: LAUNCHER_GOOGLE_SEARCH_RESTORE_LIST_SIZE_AFTER_ACTIVITY_RESTART
+11-18 18:53:02.015   681   769 W libbinder.IPCThreadState: Sending oneway calls to frozen process.
+11-18 18:53:02.060  1312  1451 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): null
+11-18 18:53:02.067   811   821 I system_server: Background young concurrent mark compact GC freed 20MB AllocSpace bytes, 18(604KB) LOS objects, 41% free, 33MB/57MB, paused 1.776ms,1.904ms total 120.118ms
+11-18 18:53:03.770 19989 20003 D EventInjectionStrategy: Creating injection strategy with input manager.
+11-18 18:53:03.770 19989 20003 I System.out: No courts available: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []
+11-18 18:53:03.775   811  2947 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@2ab71af6 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+11-18 18:53:03.782   636   783 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for descriptor: '(not cached)'
+11-18 18:53:03.786  1601  1601 D RecentsView: onTaskDisplayChanged: 46, new displayId = 0
+11-18 18:53:03.788   681   769 W libbinder.IPCThreadState: Sending oneway calls to frozen process.
+11-18 18:53:03.789 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c in: PAUSED
+11-18 18:53:03.789 19989 19989 V ActivityScenario: Update currentActivityStage to PAUSED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c
+11-18 18:53:03.789  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:03.790  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:03.793  1312  1451 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@f3750a4
+11-18 18:53:03.798 20020 20034 I GFXSTREAM: [eglDisplay.cpp(297)] Opening libGLESv1_CM_emulation.so
+11-18 18:53:03.799 20020 20034 I GFXSTREAM: [eglDisplay.cpp(297)] Opening libGLESv2_emulation.so
+11-18 18:53:03.822 20020 20034 W HWUI    : Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+11-18 18:53:03.823 20020 20034 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
+11-18 18:53:03.914 12644 12644 I Finsky  : [2] SCH: job service start with id 9436.
+11-18 18:53:03.935  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:03.949   811  1214 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+11-18 18:53:03.956 12644 19865 I Finsky  : [340] SCH: Satisfied jobs for 9436 are: 12-1
+11-18 18:53:03.961 12644 20066 I Finsky  : [350] SCH: Job 12-1 starting
+11-18 18:53:03.962 12644 12644 I Finsky  : [2] WM::SCH: Logging work start for 12-1
+11-18 18:53:03.973 12644 12644 I Finsky  : [2] [ContentSync] job started
+11-18 18:53:04.095  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:04.110 20020 20020 D VRI[InstrumentationActivityInvoker$EmptyActivity]: WindowInsets changed: 1080x2400 statusBars:[0,63,0,0] navigationBars:[0,0,0,63] mandatorySystemGestures:[0,63,0,84]
+11-18 18:53:04.110 20020 20020 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@6f4f52f
+11-18 18:53:04.113  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:04.139 12644 20067 I Finsky  : [351] App states replicator found 6 unowned apps
+11-18 18:53:04.141   636   683 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for descriptor: '(not cached)'
+11-18 18:53:04.155 12644 12726 I Finsky  : [86] Completed 0 account content syncs with 0 successful.
+11-18 18:53:04.158 12644 12644 I Finsky  : [2] [ContentSync] Installation state replication succeeded.
+11-18 18:53:04.158 12644 12644 I Finsky  : [2] SCH: jobFinished: 12-1. TimeElapsed: 197ms.
+11-18 18:53:04.158 12644 12644 I Finsky  : [2] WM::SCH: Logging work end for 12-1
+11-18 18:53:04.194 12644 12726 I Finsky  : [86] SCH: Scheduling phonesky job Id: 1-1337, CT: 1763491643294, Constraints: [{ L: 14399997, D: 52553651, C: CHARGING_NONE, I: IDLE_NONE, N: NET_ANY, B: BATTERY_ANY }]
+11-18 18:53:04.194 12644 12726 I Finsky  : [86] SCH: Scheduling phonesky job Id: 10-26, CT: 1763491642595, Constraints: [{ L: 600000, D: 86400000, C: CHARGING_NONE, I: IDLE_NONE, N: NET_ANY, B: BATTERY_ANY }]
+11-18 18:53:04.205 12644 12725 I Finsky  : [85] SCH: Scheduling 1 system job(s)
+11-18 18:53:04.206 12644 12725 I Finsky  : [85] SCH: Scheduling system job Id: 9440, L: 258390, D: 52212740, C: false, I: false, N: 1
+11-18 18:53:04.217 12644 20066 I Finsky  : [350] SCH: job service finished with id 9436.
+11-18 18:53:04.238  1601  1601 D ViewRootImpl: Skipping stats log for color mode
+11-18 18:53:04.238  1601  1601 D BaseActivity: Launcher flags updated: [state_started] +[state_started]
+11-18 18:53:04.239  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_user_active] +[state_resumed|state_user_active]
+11-18 18:53:04.239 12644 12644 I Finsky  : [2] Memory trim requested to level 40
+11-18 18:53:04.239 12644 12644 I Finsky  : [2] Flushing in-memory image cache
+11-18 18:53:04.242  1601  1601 D NexusLauncherModelDelegate: notifySmartspaceEvent: SmartspaceTargetEvent{mSmartspaceTarget=null, mSmartspaceActionId='null', mEventType=6}
+11-18 18:53:04.249  1601  1601 D BaseDepthController: setSurface:
+11-18 18:53:04.249  1601  1601 D BaseDepthController: 	mWaitingOnSurfaceValidity: false
+11-18 18:53:04.249  1601  1601 D BaseDepthController: 	mBaseSurface: Surface(name=com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#2172)/@0x9f915d6
+11-18 18:53:04.249  1601  1601 V BaseDepthController: Applying blur: 0 to Surface(name=com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#2172)/@0x9f915d6 applyImmediately: false
+11-18 18:53:04.250  1601  1601 D BaseDepthController: shouldBlurWorkspace: false targetState: Normal currentStableState: Normal mCurrentBlur: 0 mLauncher.getDepthBlurTargets(): [com.android.launcher3.Workspace{d39b057 V.ED..... .......D 0,0-1080,2400 #7f0a049d app:id/workspace}, com.android.launcher3.Hotseat{f94c744 V.ED..... .......D 0,1905-1080,2400 #7f0a01ee app:id/hotseat}]
+11-18 18:53:04.257  1312  1620 D WallpaperService: onVisibilityChanged(true): com.android.systemui.wallpapers.ImageWallpaper$CanvasEngine@338d082
+11-18 18:53:04.351  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_deferred_resumed|state_user_active] +[state_deferred_resumed]
+11-18 18:53:04.351  1601  1601 D StatsLog: LAUNCHER_ONRESUME
+11-18 18:53:04.358  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:04.364  1939  2211 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+11-18 18:53:04.366  1601  1655 D QuickstepModelDelegate: notifyAppTargetEvent action=1 launchLocation=workspace/0/[-1,-1]/[1,1]
+11-18 18:53:04.366  1939  2211 I AiAiEcho: EchoTargets:
+11-18 18:53:04.366  1939  2211 I AiAiEcho: Filtered by AiAi flag check:
+11-18 18:53:04.366  1939  2211 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+11-18 18:53:04.367  1939  2211 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+11-18 18:53:04.369  1939  2211 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+11-18 18:53:04.390  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:04.390  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:04.390  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:04.390  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:04.390  1601  1601 I SsBaseTemplateCard: Secondary card pane is null
+11-18 18:53:04.453 19989 19989 D VRI[LanguageSelectionActivity]: visibilityChanged oldVisibility=true newVisibility=false
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: StateManager.cancelAnimation: animation ongoing: false, partial trace:
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StateManager.setCurrentAnimation(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:18)
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: 	at com.android.launcher3.QuickstepTransitionManager.createWallpaperOpenAnimations(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:646)
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: 	at com.android.launcher3.QuickstepTransitionManager$WallpaperOpenLauncherAnimationRunner.onAnimationStart(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:96)
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: StateManager.createAtomicAnimation: fromState: Normal, toState: Normal, partial trace:
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: 	at com.android.quickstep.util.WorkspaceRevealAnim.prepareToAnimate(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:20)
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: 	at com.android.quickstep.util.WorkspaceRevealAnim.<init>(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:11)
+11-18 18:53:04.459  1601  1601 D LauncherStateManager: 	at com.android.launcher3.QuickstepTransitionManager.createWallpaperOpenAnimations(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:683)
+11-18 18:53:04.461  1601  1601 D AllAppsTransitionController: shouldProtectHeader: false skipScrim: true state: Normal stateManager.getState(): Normal
+11-18 18:53:04.462  1601  1601 D KeyboardInsetsHandler: removePendingImeController: pendingImeController=null
+11-18 18:53:04.463  1601  1601 D b/311077782: LauncherAnimationRunner.setAnimation
+11-18 18:53:04.486  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_deferred_resumed|state_window_focused|state_user_active] +[state_window_focused]
+11-18 18:53:04.490   811   956 I ImeTracker: com.google.android.apps.nexuslauncher:e21ed023: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+11-18 18:53:04.500  1601  1601 I ImeTracker: com.google.android.apps.nexuslauncher:e21ed023: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+11-18 18:53:04.510 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c in: STOPPED
+11-18 18:53:04.511 19989 19989 V ActivityScenario: Update currentActivityStage to STOPPED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c
+11-18 18:53:04.511 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@2a9778c in: DESTROYED
+11-18 18:53:04.511 19989 19989 V ActivityScenario: Update currentActivityStage to DESTROYED, currentActivity=null
+11-18 18:53:04.512 19989 20003 I TestRunner: finished: testUndoButton(pl.vestmedia.tennisreferee.ui.MatchPlayUITest)

@@ -1,0 +1,173 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="pl.vestmedia.tennisreferee"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:4:5-67
+11-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:4:22-64
+12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+12-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:5:5-79
+12-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:5:22-76
+13
+14    <permission
+14-->[androidx.core:core:1.12.0] C:\Users\sucho\.gradle\caches\8.13\transforms\1b10c6d0880bab3a5d812e550e358b0c\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+15        android:name="pl.vestmedia.tennisreferee.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+15-->[androidx.core:core:1.12.0] C:\Users\sucho\.gradle\caches\8.13\transforms\1b10c6d0880bab3a5d812e550e358b0c\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+16        android:protectionLevel="signature" />
+16-->[androidx.core:core:1.12.0] C:\Users\sucho\.gradle\caches\8.13\transforms\1b10c6d0880bab3a5d812e550e358b0c\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+17
+18    <uses-permission android:name="pl.vestmedia.tennisreferee.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+18-->[androidx.core:core:1.12.0] C:\Users\sucho\.gradle\caches\8.13\transforms\1b10c6d0880bab3a5d812e550e358b0c\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+18-->[androidx.core:core:1.12.0] C:\Users\sucho\.gradle\caches\8.13\transforms\1b10c6d0880bab3a5d812e550e358b0c\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+19
+20    <application
+20-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:7:5-48:19
+21        android:name="pl.vestmedia.tennisreferee.TennisRefereeApp"
+21-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:8:9-41
+22        android:allowBackup="true"
+22-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:9:9-35
+23        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+23-->[androidx.core:core:1.12.0] C:\Users\sucho\.gradle\caches\8.13\transforms\1b10c6d0880bab3a5d812e550e358b0c\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+24        android:extractNativeLibs="false"
+25        android:icon="@mipmap/ic_launcher"
+25-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:10:9-43
+26        android:label="@string/app_name"
+26-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:11:9-41
+27        android:roundIcon="@mipmap/ic_launcher_round"
+27-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:12:9-54
+28        android:supportsRtl="true"
+28-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:13:9-35
+29        android:theme="@style/Theme.TennisReferee"
+29-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:14:9-51
+30        android:usesCleartextTraffic="true" >
+30-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:15:9-44
+31
+32        <!-- Language Selection - ekran startowy -->
+33        <activity
+33-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:18:9-26:20
+34            android:name="pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity"
+34-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:19:13-66
+35            android:exported="true"
+35-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:20:13-36
+36            android:screenOrientation="portrait" >
+36-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:21:13-49
+37            <intent-filter>
+37-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:22:13-25:29
+38                <action android:name="android.intent.action.MAIN" />
+38-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:23:17-69
+38-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:23:25-66
+39
+40                <category android:name="android.intent.category.LAUNCHER" />
+40-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:24:17-77
+40-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:24:27-74
+41            </intent-filter>
+42        </activity>
+43
+44        <!-- Court Selection -->
+45        <activity
+45-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:29:9-32:51
+46            android:name="pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity"
+46-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:30:13-69
+47            android:exported="false"
+47-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:31:13-37
+48            android:screenOrientation="portrait" />
+48-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:32:13-49
+49
+50        <!-- Player Selection -->
+51        <activity
+51-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:35:9-39:85
+52            android:name="pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity"
+52-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:36:13-71
+53            android:exported="false"
+53-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:37:13-37
+54            android:parentActivityName="pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity"
+54-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:39:13-83
+55            android:screenOrientation="portrait" />
+55-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:38:13-49
+56
+57        <!-- Match -->
+58        <activity
+58-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:42:9-46:87
+59            android:name="pl.vestmedia.tennisreferee.ui.match.MatchActivity"
+59-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:43:13-51
+60            android:exported="false"
+60-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:44:13-37
+61            android:parentActivityName="pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity"
+61-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:46:13-85
+62            android:screenOrientation="portrait" />
+62-->C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\AndroidManifest.xml:45:13-49
+63
+64        <provider
+64-->[androidx.emoji2:emoji2:1.2.0] C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+65            android:name="androidx.startup.InitializationProvider"
+65-->[androidx.emoji2:emoji2:1.2.0] C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+66            android:authorities="pl.vestmedia.tennisreferee.androidx-startup"
+66-->[androidx.emoji2:emoji2:1.2.0] C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+67            android:exported="false" >
+67-->[androidx.emoji2:emoji2:1.2.0] C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+68            <meta-data
+68-->[androidx.emoji2:emoji2:1.2.0] C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+69                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+69-->[androidx.emoji2:emoji2:1.2.0] C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+70                android:value="androidx.startup" />
+70-->[androidx.emoji2:emoji2:1.2.0] C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+71            <meta-data
+71-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\sucho\.gradle\caches\8.13\transforms\70eecba3ce6b621cd28920e12589ca86\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+72                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+72-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\sucho\.gradle\caches\8.13\transforms\70eecba3ce6b621cd28920e12589ca86\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+73                android:value="androidx.startup" />
+73-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\sucho\.gradle\caches\8.13\transforms\70eecba3ce6b621cd28920e12589ca86\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+74            <meta-data
+74-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+75                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+75-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+76                android:value="androidx.startup" />
+76-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+77        </provider>
+78
+79        <receiver
+79-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+80            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+80-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+81            android:directBootAware="false"
+81-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+82            android:enabled="true"
+82-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+83            android:exported="true"
+83-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+84            android:permission="android.permission.DUMP" >
+84-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+85            <intent-filter>
+85-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+86                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+86-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+86-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+87            </intent-filter>
+88            <intent-filter>
+88-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+89                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+89-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+89-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+90            </intent-filter>
+91            <intent-filter>
+91-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+92                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+92-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+92-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+93            </intent-filter>
+94            <intent-filter>
+94-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+95                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+95-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+95-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+96            </intent-filter>
+97        </receiver>
+98    </application>
+99
+100</manifest>

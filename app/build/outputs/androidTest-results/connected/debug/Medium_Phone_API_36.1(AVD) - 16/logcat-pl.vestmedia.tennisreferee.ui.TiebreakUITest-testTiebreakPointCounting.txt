@@ -1,0 +1,211 @@
+11-18 18:53:20.557 19989 20003 I TestRunner: started: testTiebreakPointCounting(pl.vestmedia.tennisreferee.ui.TiebreakUITest)
+11-18 18:53:20.567  1601  1601 D RecentsView: onTaskRemoved: 56, not handling task stack changes
+11-18 18:53:20.569  1601  1601 D RecentsView: onTaskRemoved: 56, not handling task stack changes
+11-18 18:53:20.570  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:20.570  1601  1601 D RecentsView: onTaskRemoved: 55, not handling task stack changes
+11-18 18:53:20.570  1601  1601 D RecentsView: onTaskRemoved: 55, not handling task stack changes
+11-18 18:53:20.575 19989 20003 W Settings: Setting always_finish_activities has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-18 18:53:20.579  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:20.585   811  1977 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@29024257 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+11-18 18:53:20.593   636   684 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for descriptor: '(not cached)'
+11-18 18:53:20.601   681  8978 W libbinder.IPCThreadState: Sending oneway calls to frozen process.
+11-18 18:53:20.606  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_deferred_resumed|state_window_focused] -[state_user_active]
+11-18 18:53:20.606  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_window_focused] -[state_resumed|state_deferred_resumed]
+11-18 18:53:20.607  1601  1601 W SplitSelectStateCtor: Missing session instanceIds
+11-18 18:53:20.607  1601  1601 D StatsLog: LAUNCHER_SPLIT_SELECTION_EXIT_INTERRUPTED
+11-18 18:53:20.607  1312  1451 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@a5b8a42
+11-18 18:53:20.617  1601  1601 D RecentsView: onTaskDisplayChanged: 57, new displayId = 0
+11-18 18:53:20.617  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:20.617  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:20.629 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc in: PRE_ON_CREATE
+11-18 18:53:20.629 19989 19989 V ActivityScenario: Activity lifecycle changed event received but ignored because the reported transition was not ON_CREATE while the last known transition was PRE_ON_CREATE
+11-18 18:53:20.636   811  8509 I GFXSTREAM: [eglDisplay.cpp(297)] Opening libGLESv1_CM_emulation.so
+11-18 18:53:20.643   811  8509 I GFXSTREAM: [eglDisplay.cpp(297)] Opening libGLESv2_emulation.so
+11-18 18:53:20.643 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc in: CREATED
+11-18 18:53:20.643 19989 19989 V ActivityScenario: Update currentActivityStage to CREATED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc
+11-18 18:53:20.645 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc in: STARTED
+11-18 18:53:20.645 19989 19989 V ActivityScenario: Update currentActivityStage to STARTED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc
+11-18 18:53:20.647 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc in: RESUMED
+11-18 18:53:20.647 19989 19989 V ActivityScenario: Update currentActivityStage to RESUMED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc
+11-18 18:53:20.656   811  8509 W HWUI    : Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+11-18 18:53:20.656   811  8509 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
+11-18 18:53:20.658 19989 19989 D VRI[LanguageSelectionActivity]: WindowInsets changed: 1080x2400 statusBars:[0,63,0,0] navigationBars:[0,0,0,63] mandatorySystemGestures:[0,63,0,84]
+11-18 18:53:20.658 19989 19989 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@b436206
+11-18 18:53:20.846  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:20.850  1601  1601 D BaseActivity: Launcher flags updated: [state_started] -[state_window_focused]
+11-18 18:53:20.860   811   830 I ActivityTaskManager: Displayed pl.vestmedia.tennisreferee/.ui.language.LanguageSelectionActivity for user 0: +262ms
+11-18 18:53:20.941   811   956 I ImeTracker: pl.vestmedia.tennisreferee:57e15e2f: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+11-18 18:53:20.942 19989 19989 I ImeTracker: pl.vestmedia.tennisreferee:57e15e2f: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+11-18 18:53:20.947  7270  7270 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():2057
+11-18 18:53:20.949  7270  7270 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes = 0, locked = false
+11-18 18:53:20.951  7270  7270 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1318 onStartInput(EditorInfo{EditorInfo{packageName=pl.vestmedia.tennisreferee, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+11-18 18:53:20.952  7270  7270 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes = 1, locked = false
+11-18 18:53:20.956   811  2667 I ImeTracker: system_server:ea8f0e49: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false
+11-18 18:53:20.958   811   833 I ImeTracker: system_server:ea8f0e49: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-18 18:53:20.969  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:21.191  1601  1601 D VRI[NexusLauncherActivity]: visibilityChanged oldVisibility=true newVisibility=false
+11-18 18:53:21.192  1312  1620 D WallpaperService: onVisibilityChanged(false): com.android.systemui.wallpapers.ImageWallpaper$CanvasEngine@338d082
+11-18 18:53:21.205  1601  1601 D NexusLauncherModelDelegate: notifySmartspaceEvent: SmartspaceTargetEvent{mSmartspaceTarget=null, mSmartspaceActionId='null', mEventType=7}
+11-18 18:53:21.222  1601  1601 D BaseActivity: Launcher flags updated: [] -[state_started]
+11-18 18:53:21.222  1601  1601 D BaseDepthController: setSurface:
+11-18 18:53:21.222  1601  1601 D BaseDepthController: 	mWaitingOnSurfaceValidity: false
+11-18 18:53:21.222  1601  1601 D BaseDepthController: 	mBaseSurface: null
+11-18 18:53:21.222  1601  1601 D BaseDepthController: mSurface is null and mCurrentBlur is: 0
+11-18 18:53:21.222  1601  1601 D LauncherStateManager: StateManager.goToState: fromState: Normal, toState: Normal, partial trace:
+11-18 18:53:21.222  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StateManager.moveToRestState(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:6)
+11-18 18:53:21.222  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StateManager.moveToRestState(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:2)
+11-18 18:53:21.222  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StatefulActivity.onStop(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:32)
+11-18 18:53:21.224  1601  1601 D LauncherStateManager: StateManager.onRepeatStateSetAborted: state: Normal
+11-18 18:53:21.225  1601  1601 D ActivityContext: hideKeyboard
+11-18 18:53:21.225  1601  1601 D ActivityContext: isImeShown: false
+11-18 18:53:21.225  1601  1601 D StatsLog: LAUNCHER_ONSTOP
+11-18 18:53:21.225  1601  8458 D GmsPlayProvider: Shutdown the binder channel gracefully.
+11-18 18:53:21.225  1601  8458 D GmsPlayProvider: Binder channel is terminated gracefully.
+11-18 18:53:21.229  1601  1601 D StatsLog: LAUNCHER_GOOGLE_SEARCH_RESTORE_LIST_SIZE_AFTER_ACTIVITY_RESTART
+11-18 18:53:21.234   681  8978 W libbinder.IPCThreadState: Sending oneway calls to frozen process.
+11-18 18:53:21.260  1312  1451 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): null
+11-18 18:53:21.464 19989 20003 I System.out: === TIEBREAK POINT COUNTING TEST ===
+11-18 18:53:21.990   811  1214 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+11-18 18:53:22.967 19989 20003 D EventInjectionStrategy: Creating injection strategy with input manager.
+11-18 18:53:22.967 19989 20003 I System.out: Setup error: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []
+11-18 18:53:22.969 19989 20003 W System.err: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []
+11-18 18:53:22.970 19989 20003 W System.err: 	at androidx.test.espresso.base.InputManagerEventInjectionStrategy.initialize(InputManagerEventInjectionStrategy.java:28)
+11-18 18:53:22.970 19989 20003 W System.err: 	at androidx.test.espresso.base.BaseLayerModule.provideEventInjector(BaseLayerModule.java:4)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.base.BaseLayerModule_ProvideEventInjectorFactory.provideEventInjector(BaseLayerModule_ProvideEventInjectorFactory.java:1)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.base.BaseLayerModule_ProvideEventInjectorFactory.get(BaseLayerModule_ProvideEventInjectorFactory.java:1)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.base.BaseLayerModule_ProvideEventInjectorFactory.get(BaseLayerModule_ProvideEventInjectorFactory.java:2)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.core.internal.deps.dagger.internal.DoubleCheck.get(DoubleCheck.java:6)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.base.UiControllerImpl_Factory.get(UiControllerImpl_Factory.java:1)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.base.UiControllerImpl_Factory.get(UiControllerImpl_Factory.java:2)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.core.internal.deps.dagger.internal.DoubleCheck.get(DoubleCheck.java:6)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.base.UiControllerModule_ProvideUiControllerFactory.get(UiControllerModule_ProvideUiControllerFactory.java:1)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.base.UiControllerModule_ProvideUiControllerFactory.get(UiControllerModule_ProvideUiControllerFactory.java:2)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.core.internal.deps.dagger.internal.DoubleCheck.get(DoubleCheck.java:6)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.DaggerBaseLayerComponent$ViewInteractionComponentImpl.viewInteraction(DaggerBaseLayerComponent.java:1)
+11-18 18:53:22.971 19989 20003 W System.err: 	at androidx.test.espresso.Espresso.onView(Espresso.java:3)
+11-18 18:53:22.971 19989 20003 W System.err: 	at pl.vestmedia.tennisreferee.ui.TiebreakUITest.setupMatch(TiebreakUITest.kt:213)
+11-18 18:53:22.971 19989 20003 W System.err: 	at pl.vestmedia.tennisreferee.ui.TiebreakUITest.testTiebreakPointCounting(TiebreakUITest.kt:178)
+11-18 18:53:22.971 19989 20003 W System.err: 	at java.lang.reflect.Method.invoke(Native Method)
+11-18 18:53:22.971 19989 20003 W System.err: 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+11-18 18:53:22.971 19989 20003 W System.err: 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+11-18 18:53:22.972 19989 20003 W System.err: 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+11-18 18:53:22.972 19989 20003 W System.err: 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+11-18 18:53:22.972 19989 20003 W System.err: 	at org.junit.rules.ExternalResource$1.evaluate(ExternalResource.java:54)
+11-18 18:53:22.972 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-18 18:53:22.973 19989 20003 W System.err: 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+11-18 18:53:22.973 19989 20003 W System.err: 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+11-18 18:53:22.973 19989 20003 W System.err: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+11-18 18:53:22.973 19989 20003 W System.err: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+11-18 18:53:22.973 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-18 18:53:22.973 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-18 18:53:22.973 19989 20003 W System.err: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-18 18:53:22.974 19989 20003 W System.err: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-18 18:53:22.974 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-18 18:53:22.974 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-18 18:53:22.974 19989 20003 W System.err: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-18 18:53:22.974 19989 20003 W System.err: 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+11-18 18:53:22.974 19989 20003 W System.err: 	at org.junit.runners.Suite.runChild(Suite.java:128)
+11-18 18:53:22.975 19989 20003 W System.err: 	at org.junit.runners.Suite.runChild(Suite.java:27)
+11-18 18:53:22.975 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-18 18:53:22.975 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-18 18:53:22.975 19989 20003 W System.err: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-18 18:53:22.975 19989 20003 W System.err: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-18 18:53:22.975 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-18 18:53:22.976 19989 20003 W System.err: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-18 18:53:22.976 19989 20003 W System.err: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-18 18:53:22.976 19989 20003 W System.err: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+11-18 18:53:22.976 19989 20003 W System.err: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+11-18 18:53:22.976 19989 20003 W System.err: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:67)
+11-18 18:53:22.976 19989 20003 W System.err: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:58)
+11-18 18:53:22.976 19989 20003 W System.err: 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:446)
+11-18 18:53:22.976 19989 20003 W System.err: 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2627)
+11-18 18:53:22.977 19989 20003 W System.err: Caused by: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []
+11-18 18:53:22.977 19989 20003 W System.err: 	at java.lang.Class.getMethod(Class.java:2934)
+11-18 18:53:22.977 19989 20003 W System.err: 	at java.lang.Class.getDeclaredMethod(Class.java:2913)
+11-18 18:53:22.977 19989 20003 W System.err: 	at androidx.test.espresso.base.InputManagerEventInjectionStrategy.initialize(InputManagerEventInjectionStrategy.java:5)
+11-18 18:53:22.977 19989 20003 W System.err: 	... 49 more
+11-18 18:53:22.981   811  2667 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@2ab71af6 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+11-18 18:53:22.985   636   684 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for descriptor: '(not cached)'
+11-18 18:53:22.988   681  8978 W libbinder.IPCThreadState: Sending oneway calls to frozen process.
+11-18 18:53:22.990  1601  1601 D RecentsView: onTaskDisplayChanged: 58, new displayId = 0
+11-18 18:53:22.996  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:22.996 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc in: PAUSED
+11-18 18:53:22.996  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:22.996 19989 19989 V ActivityScenario: Update currentActivityStage to PAUSED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc
+11-18 18:53:23.004 20020 20034 I GFXSTREAM: [eglDisplay.cpp(297)] Opening libGLESv1_CM_emulation.so
+11-18 18:53:23.004 20020 20034 I GFXSTREAM: [eglDisplay.cpp(297)] Opening libGLESv2_emulation.so
+11-18 18:53:23.017  1312  1451 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@cff1584
+11-18 18:53:23.022 20020 20034 W HWUI    : Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+11-18 18:53:23.022 20020 20034 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
+11-18 18:53:23.033  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:23.033  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:23.033  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:23.033  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:23.033  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:23.033  1601  1614 W System  : A resource failed to call release.
+11-18 18:53:23.123  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:23.138 20020 20020 D VRI[InstrumentationActivityInvoker$EmptyActivity]: WindowInsets changed: 1080x2400 statusBars:[0,63,0,0] navigationBars:[0,0,0,63] mandatorySystemGestures:[0,63,0,84]
+11-18 18:53:23.138 20020 20020 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.view.ViewRootImpl$$ExternalSyntheticLambda12@e4e6e23
+11-18 18:53:23.141  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:23.231  1601  1601 D ViewRootImpl: Skipping stats log for color mode
+11-18 18:53:23.231  1601  1601 D BaseActivity: Launcher flags updated: [state_started] +[state_started]
+11-18 18:53:23.231  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_user_active] +[state_resumed|state_user_active]
+11-18 18:53:23.233  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_deferred_resumed|state_user_active] +[state_deferred_resumed]
+11-18 18:53:23.233  1601  1601 D StatsLog: LAUNCHER_ONRESUME
+11-18 18:53:23.245  1601  1655 D QuickstepModelDelegate: notifyAppTargetEvent action=1 launchLocation=workspace/0/[-1,-1]/[1,1]
+11-18 18:53:23.250  1939  2211 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+11-18 18:53:23.251  1939  2211 I AiAiEcho: EchoTargets:
+11-18 18:53:23.251  1939  2211 I AiAiEcho: Filtered by AiAi flag check:
+11-18 18:53:23.251  1939  2211 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+11-18 18:53:23.251  1939  2211 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+11-18 18:53:23.251  1939  2211 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+11-18 18:53:23.272  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:23.272  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:23.272  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:23.272  1601  1601 D SsBaseTemplateCard: Passed-in item info is null
+11-18 18:53:23.272  1601  1601 I SsBaseTemplateCard: Secondary card pane is null
+11-18 18:53:23.274  1601  1601 D VRI[NexusLauncherActivity]: visibilityChanged oldVisibility=false newVisibility=true
+11-18 18:53:23.289  1601  1601 D NexusLauncherModelDelegate: notifySmartspaceEvent: SmartspaceTargetEvent{mSmartspaceTarget=null, mSmartspaceActionId='null', mEventType=6}
+11-18 18:53:23.297  1601  1601 D BaseDepthController: setSurface:
+11-18 18:53:23.297  1601  1601 D BaseDepthController: 	mWaitingOnSurfaceValidity: false
+11-18 18:53:23.297  1601  1601 D BaseDepthController: 	mBaseSurface: Surface(name=com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#2356)/@0x9f915d6
+11-18 18:53:23.297  1601  1601 V BaseDepthController: Applying blur: 0 to Surface(name=com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#2356)/@0x9f915d6 applyImmediately: false
+11-18 18:53:23.297  1601  1601 D BaseDepthController: shouldBlurWorkspace: false targetState: Normal currentStableState: Normal mCurrentBlur: 0 mLauncher.getDepthBlurTargets(): [com.android.launcher3.Workspace{d39b057 V.ED..... ......ID 0,0-1080,2400 #7f0a049d app:id/workspace}, com.android.launcher3.Hotseat{f94c744 V.ED..... .......D 0,1905-1080,2400 #7f0a01ee app:id/hotseat}]
+11-18 18:53:23.306  1312  1620 D WallpaperService: onVisibilityChanged(true): com.android.systemui.wallpapers.ImageWallpaper$CanvasEngine@338d082
+11-18 18:53:23.406  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: StateManager.cancelAnimation: animation ongoing: false, partial trace:
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: 	at com.android.launcher3.statemanager.StateManager.setCurrentAnimation(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:18)
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: 	at com.android.launcher3.QuickstepTransitionManager.createWallpaperOpenAnimations(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:646)
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: 	at com.android.launcher3.QuickstepTransitionManager$WallpaperOpenLauncherAnimationRunner.onAnimationStart(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:96)
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: StateManager.createAtomicAnimation: fromState: Normal, toState: Normal, partial trace:
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: 	at com.android.quickstep.util.WorkspaceRevealAnim.prepareToAnimate(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:20)
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: 	at com.android.quickstep.util.WorkspaceRevealAnim.<init>(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:11)
+11-18 18:53:23.413  1601  1601 D LauncherStateManager: 	at com.android.launcher3.QuickstepTransitionManager.createWallpaperOpenAnimations(go/retraceme 7101499b44b219b757f6885b35ae099b24fc769225595efcaaacae5b0f94500b:683)
+11-18 18:53:23.413  1601  1601 D AllAppsTransitionController: shouldProtectHeader: false skipScrim: true state: Normal stateManager.getState(): Normal
+11-18 18:53:23.414  1601  1601 D KeyboardInsetsHandler: removePendingImeController: pendingImeController=null
+11-18 18:53:23.414  1601  1601 D b/311077782: LauncherAnimationRunner.setAnimation
+11-18 18:53:23.465  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:23.465  1601  1601 D BaseActivity: Launcher flags updated: [state_started|state_resumed|state_deferred_resumed|state_window_focused|state_user_active] +[state_window_focused]
+11-18 18:53:23.468   811   956 I ImeTracker: com.google.android.apps.nexuslauncher:4a744c2e: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+11-18 18:53:23.470  1601  1601 I ImeTracker: com.google.android.apps.nexuslauncher:4a744c2e: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+11-18 18:53:23.473  7270  7270 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():2057
+11-18 18:53:23.474  7270  7270 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes = 0, locked = false
+11-18 18:53:23.476   811  2667 I ImeTracker: system_server:cd4334fb: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false
+11-18 18:53:23.476  7270  7270 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1318 onStartInput(EditorInfo{EditorInfo{packageName=com.google.android.apps.nexuslauncher, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+11-18 18:53:23.477  7270  7270 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes = 1, locked = false
+11-18 18:53:23.477   811   833 I ImeTracker: system_server:cd4334fb: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-18 18:53:23.758   681   769 W libbinder.IPCThreadState: Sending oneway calls to frozen process.
+11-18 18:53:23.764  1312  1451 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): null
+11-18 18:53:23.771  1601  1601 D WorkspaceRevealAnim: onAnimationEnd: workspace alpha = 1.0
+11-18 18:53:23.777 19989 19989 D VRI[LanguageSelectionActivity]: visibilityChanged oldVisibility=true newVisibility=false
+11-18 18:53:23.786   811  1290 W ImageReader_JNI: Unable to acquire a buffer item, very likely client tried to acquire more than maxImages buffers
+11-18 18:53:23.809 20020 20020 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): null
+11-18 18:53:23.816 20020 20020 D ViewRootImpl: Skipping stats log for color mode
+11-18 18:53:23.823  1601  1601 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+11-18 18:53:23.824  1601  1601 D RecentsView: onTaskRemoved: 58, not handling task stack changes
+11-18 18:53:23.824  1601  1601 D RecentsView: onTaskRemoved: 58, not handling task stack changes
+11-18 18:53:23.830 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc in: STOPPED
+11-18 18:53:23.830 19989 19989 V ActivityScenario: Update currentActivityStage to STOPPED, currentActivity=pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc
+11-18 18:53:23.835 19989 19989 D LifecycleMonitor: Lifecycle status change: pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity@552bbfc in: DESTROYED
+11-18 18:53:23.835 19989 19989 V ActivityScenario: Update currentActivityStage to DESTROYED, currentActivity=null
+11-18 18:53:23.837 19989 20003 I TestRunner: finished: testTiebreakPointCounting(pl.vestmedia.tennisreferee.ui.TiebreakUITest)

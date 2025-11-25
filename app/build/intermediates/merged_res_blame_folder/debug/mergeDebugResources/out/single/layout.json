@@ -1,0 +1,58 @@
+[
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\activity_player_selection.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\activity_player_selection.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\layout_scoreboard.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\layout_scoreboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\activity_language_selection.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\activity_language_selection.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\layout_rally.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\layout_rally.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\layout_serve.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\layout_serve.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\dialog_add_player.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\dialog_add_player.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\activity_court_selection.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\activity_court_selection.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\item_player.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\item_player.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\layout_server_selection.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\layout_server_selection.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\activity_match.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\activity_match.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeDebugResources-36:/layout/layout_match_finished.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-39:/layout/layout_match_finished.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\layout_match_finished.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\layout_match_finished.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\item_court.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\item_court.xml"
+    },
+    {
+        "merged": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-mergeDebugResources-36:\\layout\\item_language.xml",
+        "source": "C:\\Users\\sucho\\.gradle\\daemon\\8.13\\pl.vestmedia.tennisreferee.app-main-39:\\layout\\item_language.xml"
+    }
+]

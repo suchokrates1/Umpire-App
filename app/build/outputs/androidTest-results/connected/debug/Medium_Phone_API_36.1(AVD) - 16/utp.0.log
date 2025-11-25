@@ -1,0 +1,53 @@
+INFO: Constructing runner from config.
+INFO: Configuring Android Instrumentation driver: android_instrumentation_runtime {
+  instrumentation_info {
+    app_package: "pl.vestmedia.tennisreferee"
+    test_package: "pl.vestmedia.tennisreferee.test"
+    test_runner_class: "androidx.test.runner.AndroidJUnitRunner"
+  }
+  instrumentation_args {
+    args_map {
+      key: "additionalTestOutputDir"
+      value: "/sdcard/Android/media/pl.vestmedia.tennisreferee/additional_test_output"
+    }
+  }
+}
+am_instrument_timeout: 31536000
+
+INFO: Configuring AndroidTestApkInstallerPlugin: apks_to_install {
+  apk_paths: "C:\\Users\\sucho\\Vest Tennis\\android-tennis-referee\\app\\build\\outputs\\apk\\debug\\app-debug.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+apks_to_install {
+  apk_paths: "C:\\Users\\sucho\\Vest Tennis\\android-tennis-referee\\app\\build\\outputs\\apk\\androidTest\\debug\\app-debug-androidTest.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+instrumentation_target_package_id: "pl.vestmedia.tennisreferee"
+
+INFO: No installables found in test fixture. Nothing to install.
+INFO: Installing [C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\outputs\apk\debug\app-debug.apk] on device emulator-5554.
+INFO: Installing [C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\outputs\apk\androidTest\debug\app-debug-androidTest.apk] on device emulator-5554.
+INFO: Start logcat streaming.
+INFO: Running Android Instrumentation driver.
+INFO: Copying files from device to host: /sdcard/Android/media/pl.vestmedia.tennisreferee/additional_test_output to C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\outputs\connected_android_test_additional_output\debugAndroidTest\connected\Medium_Phone_API_36.1(AVD) - 16
+INFO: Stop logcat streaming.
+INFO: Uninstalling pl.vestmedia.tennisreferee for device emulator-5554.
+INFO: Uninstalling pl.vestmedia.tennisreferee.test for device emulator-5554.
+INFO: Execute pl.vestmedia.tennisreferee.ui.MatchPlayUITest.testNormalGameScoring: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.MatchPlayUITest.testSideSwapping: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.MatchPlayUITest.testDeuceAndAdvantage: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.MatchPlayUITest.testUndoButton: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.MatchPlayUITest.testTiebreakScoring: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest.testDoublesPlayerSelection: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest.testSinglesPlayerSelection: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest.testPlayerSearch: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest.testBackButton: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.TiebreakUITest.testTiebreakPointCounting: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.TiebreakUITest.testTiebreakInterfaceDemo: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.TiebreakUITest.testSuperTiebreakEndsMatch: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.TiebreakUITest.testTiebreakSideChanges: PASSED
+INFO: Execute pl.vestmedia.tennisreferee.ui.TiebreakUITest.testTiebreakServeSwitching: PASSED

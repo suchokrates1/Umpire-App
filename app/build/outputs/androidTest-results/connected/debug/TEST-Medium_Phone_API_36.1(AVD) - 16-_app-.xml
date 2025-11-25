@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="pl.vestmedia.tennisreferee.ui.MatchPlayUITest" tests="14" failures="0" errors="0" skipped="0" time="46.951" timestamp="2025-11-18T18:53:39" hostname="localhost">
+  <properties>
+    <property name="device" value="Medium_Phone_API_36.1(AVD) - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="testNormalGameScoring" classname="pl.vestmedia.tennisreferee.ui.MatchPlayUITest" time="3.982" />
+  <testcase name="testSideSwapping" classname="pl.vestmedia.tennisreferee.ui.MatchPlayUITest" time="3.38" />
+  <testcase name="testDeuceAndAdvantage" classname="pl.vestmedia.tennisreferee.ui.MatchPlayUITest" time="3.197" />
+  <testcase name="testUndoButton" classname="pl.vestmedia.tennisreferee.ui.MatchPlayUITest" time="2.783" />
+  <testcase name="testTiebreakScoring" classname="pl.vestmedia.tennisreferee.ui.MatchPlayUITest" time="3.468" />
+  <testcase name="testDoublesPlayerSelection" classname="pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest" time="3.882" />
+  <testcase name="testSinglesPlayerSelection" classname="pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest" time="3.218" />
+  <testcase name="testPlayerSearch" classname="pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest" time="2.686" />
+  <testcase name="testBackButton" classname="pl.vestmedia.tennisreferee.ui.PlayerSelectionUITest" time="2.704" />
+  <testcase name="testTiebreakPointCounting" classname="pl.vestmedia.tennisreferee.ui.TiebreakUITest" time="3.272" />
+  <testcase name="testTiebreakInterfaceDemo" classname="pl.vestmedia.tennisreferee.ui.TiebreakUITest" time="3.14" />
+  <testcase name="testSuperTiebreakEndsMatch" classname="pl.vestmedia.tennisreferee.ui.TiebreakUITest" time="3.229" />
+  <testcase name="testTiebreakSideChanges" classname="pl.vestmedia.tennisreferee.ui.TiebreakUITest" time="3.014" />
+  <testcase name="testTiebreakServeSwitching" classname="pl.vestmedia.tennisreferee.ui.TiebreakUITest" time="3.42" />
+</testsuite>

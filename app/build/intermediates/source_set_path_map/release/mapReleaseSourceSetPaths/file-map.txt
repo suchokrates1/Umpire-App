@@ -1,0 +1,41 @@
+pl.vestmedia.tennisreferee.app-lifecycle-viewmodel-savedstate-2.7.0-0 C:\Users\sucho\.gradle\caches\8.13\transforms\098c072f1e43944fe099426655a0c050\transformed\lifecycle-viewmodel-savedstate-2.7.0\res
+pl.vestmedia.tennisreferee.app-annotation-experimental-1.3.0-1 C:\Users\sucho\.gradle\caches\8.13\transforms\12baba3db831ab02385f9b484b815f1a\transformed\annotation-experimental-1.3.0\res
+pl.vestmedia.tennisreferee.app-lifecycle-runtime-2.7.0-2 C:\Users\sucho\.gradle\caches\8.13\transforms\135838d6b4894a6d39912615da9f0d59\transformed\lifecycle-runtime-2.7.0\res
+pl.vestmedia.tennisreferee.app-transition-1.2.0-3 C:\Users\sucho\.gradle\caches\8.13\transforms\15062f88b6de10538c9b11c1eed026ab\transformed\transition-1.2.0\res
+pl.vestmedia.tennisreferee.app-lifecycle-viewmodel-ktx-2.7.0-4 C:\Users\sucho\.gradle\caches\8.13\transforms\1a9337cdbb7ebe63b127760489d31cf4\transformed\lifecycle-viewmodel-ktx-2.7.0\res
+pl.vestmedia.tennisreferee.app-core-1.12.0-5 C:\Users\sucho\.gradle\caches\8.13\transforms\1b10c6d0880bab3a5d812e550e358b0c\transformed\core-1.12.0\res
+pl.vestmedia.tennisreferee.app-activity-1.8.2-6 C:\Users\sucho\.gradle\caches\8.13\transforms\2aa5001c43ec0ebca50224e316667ff1\transformed\activity-1.8.2\res
+pl.vestmedia.tennisreferee.app-viewpager2-1.0.0-7 C:\Users\sucho\.gradle\caches\8.13\transforms\2eca8fd6c6db55dc300bfc0c12f3f7bf\transformed\viewpager2-1.0.0\res
+pl.vestmedia.tennisreferee.app-lifecycle-runtime-ktx-2.7.0-8 C:\Users\sucho\.gradle\caches\8.13\transforms\48d6f8816f42155223f3c301d82c971f\transformed\lifecycle-runtime-ktx-2.7.0\res
+pl.vestmedia.tennisreferee.app-core-ktx-1.12.0-9 C:\Users\sucho\.gradle\caches\8.13\transforms\51cf075c99ea2fab3c81f3556d4a0373\transformed\core-ktx-1.12.0\res
+pl.vestmedia.tennisreferee.app-appcompat-1.6.1-10 C:\Users\sucho\.gradle\caches\8.13\transforms\56d6ccbfeb9d73a3ae967a8b3f0615cf\transformed\appcompat-1.6.1\res
+pl.vestmedia.tennisreferee.app-cardview-1.0.0-11 C:\Users\sucho\.gradle\caches\8.13\transforms\6a9b8b01532f55d41e63bae1d5f00cbb\transformed\cardview-1.0.0\res
+pl.vestmedia.tennisreferee.app-startup-runtime-1.1.1-12 C:\Users\sucho\.gradle\caches\8.13\transforms\6b566b7e90a8fa637ca1da5bbc05a91d\transformed\startup-runtime-1.1.1\res
+pl.vestmedia.tennisreferee.app-lifecycle-livedata-core-ktx-2.7.0-13 C:\Users\sucho\.gradle\caches\8.13\transforms\7005d44adb2728d1f48e9cf927ee4e0c\transformed\lifecycle-livedata-core-ktx-2.7.0\res
+pl.vestmedia.tennisreferee.app-lifecycle-process-2.7.0-14 C:\Users\sucho\.gradle\caches\8.13\transforms\70eecba3ce6b621cd28920e12589ca86\transformed\lifecycle-process-2.7.0\res
+pl.vestmedia.tennisreferee.app-material-1.11.0-15 C:\Users\sucho\.gradle\caches\8.13\transforms\75658eebeaed9cb40b2e5797a27a78ed\transformed\material-1.11.0\res
+pl.vestmedia.tennisreferee.app-recyclerview-1.1.0-16 C:\Users\sucho\.gradle\caches\8.13\transforms\7980aabf9baef8df0c758547cf5c64ce\transformed\recyclerview-1.1.0\res
+pl.vestmedia.tennisreferee.app-lifecycle-livedata-core-2.7.0-17 C:\Users\sucho\.gradle\caches\8.13\transforms\7a6bbdefb05bb1ed2b18c122ce487ae1\transformed\lifecycle-livedata-core-2.7.0\res
+pl.vestmedia.tennisreferee.app-emoji2-1.2.0-18 C:\Users\sucho\.gradle\caches\8.13\transforms\8368b64cc61b8bceed35402e27698360\transformed\emoji2-1.2.0\res
+pl.vestmedia.tennisreferee.app-emoji2-views-helper-1.2.0-19 C:\Users\sucho\.gradle\caches\8.13\transforms\9a88b394cc240cecbcff124e513ec3ff\transformed\emoji2-views-helper-1.2.0\res
+pl.vestmedia.tennisreferee.app-fragment-1.3.6-20 C:\Users\sucho\.gradle\caches\8.13\transforms\a7986a622a3f19b799cab27499a5ec57\transformed\fragment-1.3.6\res
+pl.vestmedia.tennisreferee.app-constraintlayout-2.1.4-21 C:\Users\sucho\.gradle\caches\8.13\transforms\af5c99229352ddd900731615e2e701a5\transformed\constraintlayout-2.1.4\res
+pl.vestmedia.tennisreferee.app-drawerlayout-1.1.1-22 C:\Users\sucho\.gradle\caches\8.13\transforms\b3196030ee5c2dd48b5104823005703a\transformed\drawerlayout-1.1.1\res
+pl.vestmedia.tennisreferee.app-savedstate-ktx-1.2.1-23 C:\Users\sucho\.gradle\caches\8.13\transforms\b4141c431952b514b52020e0b4464c1c\transformed\savedstate-ktx-1.2.1\res
+pl.vestmedia.tennisreferee.app-profileinstaller-1.3.0-24 C:\Users\sucho\.gradle\caches\8.13\transforms\b4dc722c8512b69adf54bda1cf7224d7\transformed\profileinstaller-1.3.0\res
+pl.vestmedia.tennisreferee.app-appcompat-resources-1.6.1-25 C:\Users\sucho\.gradle\caches\8.13\transforms\b7d7b401fd6dd08d8b80f90b26682420\transformed\appcompat-resources-1.6.1\res
+pl.vestmedia.tennisreferee.app-coordinatorlayout-1.1.0-26 C:\Users\sucho\.gradle\caches\8.13\transforms\cb9f4f0e2c70f3802d27e6eb1055299d\transformed\coordinatorlayout-1.1.0\res
+pl.vestmedia.tennisreferee.app-activity-ktx-1.8.2-27 C:\Users\sucho\.gradle\caches\8.13\transforms\d27dc26ebd073568648a19ecf67390b5\transformed\activity-ktx-1.8.2\res
+pl.vestmedia.tennisreferee.app-lifecycle-viewmodel-2.7.0-28 C:\Users\sucho\.gradle\caches\8.13\transforms\d6a8127371164b08624ce099e6ab9edf\transformed\lifecycle-viewmodel-2.7.0\res
+pl.vestmedia.tennisreferee.app-lifecycle-livedata-ktx-2.7.0-29 C:\Users\sucho\.gradle\caches\8.13\transforms\d922f4c794b87e10950fa38f8f6fafab\transformed\lifecycle-livedata-ktx-2.7.0\res
+pl.vestmedia.tennisreferee.app-lifecycle-livedata-2.7.0-30 C:\Users\sucho\.gradle\caches\8.13\transforms\db5ca1b568086afc462444472ec4f3fe\transformed\lifecycle-livedata-2.7.0\res
+pl.vestmedia.tennisreferee.app-core-runtime-2.2.0-31 C:\Users\sucho\.gradle\caches\8.13\transforms\e619f422260f9d5d59cba03428d4afbc\transformed\core-runtime-2.2.0\res
+pl.vestmedia.tennisreferee.app-savedstate-1.2.1-32 C:\Users\sucho\.gradle\caches\8.13\transforms\e875c0db3c863281dad4b64d05f62e0d\transformed\savedstate-1.2.1\res
+pl.vestmedia.tennisreferee.app-pngs-33 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\generated\res\pngs\release
+pl.vestmedia.tennisreferee.app-resValues-34 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\generated\res\resValues\release
+pl.vestmedia.tennisreferee.app-updated_navigation_xml-35 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\generated\updated_navigation_xml\release
+pl.vestmedia.tennisreferee.app-packageReleaseResources-36 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\intermediates\incremental\release\packageReleaseResources\merged.dir
+pl.vestmedia.tennisreferee.app-packageReleaseResources-37 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\intermediates\incremental\release\packageReleaseResources\stripped.dir
+pl.vestmedia.tennisreferee.app-release-38 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\build\intermediates\merged_res\release\mergeReleaseResources
+pl.vestmedia.tennisreferee.app-main-39 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\main\res
+pl.vestmedia.tennisreferee.app-release-40 C:\Users\sucho\Vest Tennis\android-tennis-referee\app\src\release\res

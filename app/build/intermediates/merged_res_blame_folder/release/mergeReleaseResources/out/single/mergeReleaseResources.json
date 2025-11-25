@@ -1,0 +1,110 @@
+[
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-xxhdpi_ic_launcher_round.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-xxhdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-hdpi_ic_launcher_round.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-hdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_activity_match.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_match.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-xxhdpi_ic_launcher.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-xxhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-xhdpi_ic_launcher.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-xhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_item_language.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/item_language.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_item_player.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/item_player.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_activity_player_selection.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_player_selection.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_layout_serve.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_serve.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-xhdpi_ic_launcher_round.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-xhdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-mdpi_ic_launcher.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-mdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-mdpi_ic_launcher_round.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-mdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_layout_server_selection.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_server_selection.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_layout_match_finished.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_match_finished.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-anydpi-v26_ic_launcher_foreground.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-anydpi-v26/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-xxxhdpi_ic_launcher_round.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-xxxhdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_dialog_add_player.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/dialog_add_player.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_layout_scoreboard.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_scoreboard.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-xxxhdpi_ic_launcher.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-xxxhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_activity_court_selection.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_court_selection.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_layout_rally.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_rally.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_item_court.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/item_court.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/drawable_serve_indicator.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/drawable/serve_indicator.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/mipmap-hdpi_ic_launcher.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/mipmap-hdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-release-37:/layout_activity_language_selection.xml.flat",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_language_selection.xml"
+    }
+]

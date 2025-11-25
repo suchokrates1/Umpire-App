@@ -1,0 +1,54 @@
+[
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/activity_player_selection.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_player_selection.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/activity_match.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_match.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/layout_rally.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_rally.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/layout_serve.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_serve.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/item_court.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/item_court.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/activity_language_selection.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_language_selection.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/layout_match_finished.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_match_finished.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/item_player.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/item_player.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/dialog_add_player.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/dialog_add_player.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/item_language.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/item_language.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/activity_court_selection.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/activity_court_selection.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/layout_server_selection.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_server_selection.xml"
+    },
+    {
+        "merged": "pl.vestmedia.tennisreferee.app-mergeReleaseResources-36:/layout/layout_scoreboard.xml",
+        "source": "pl.vestmedia.tennisreferee.app-main-38:/layout/layout_scoreboard.xml"
+    }
+]

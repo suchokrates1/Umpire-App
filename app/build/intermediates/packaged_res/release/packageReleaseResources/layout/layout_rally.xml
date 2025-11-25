@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Nagłówki z nazwiskami (bez flag) -->
+    <TextView
+        android:id="@+id/textPlayerLeftName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Player 1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/textPlayerRightName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Player 2"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- LEWA STRONA - Gracz 1 -->
+    <LinearLayout
+        android:id="@+id/layoutRallyLeft"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerLeftName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonWinnerLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="WINNER"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/primary"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonForcedErrorLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="FORCED\nERROR"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#FF9800"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonUnforcedErrorLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="UNFORCED\nERROR"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#F44336"/>
+
+    </LinearLayout>
+
+    <!-- PRAWA STRONA - Gracz 2 -->
+    <LinearLayout
+        android:id="@+id/layoutRallyRight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerRightName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonWinnerRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="WINNER"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/primary"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonForcedErrorRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="FORCED\nERROR"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#FF9800"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonUnforcedErrorRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="UNFORCED\nERROR"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#F44336"/>
+
+    </LinearLayout>
+
+    <!-- Guideline dla podziału na pół -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
