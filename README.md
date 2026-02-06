@@ -15,19 +15,25 @@ Aplikacja Android umożliwiająca sędziom tenisowym wprowadzanie wyników mecz�
 - ✅ **Logika tenisowa** - 0-15-30-40, Deuce, Advantage
 - ✅ **Tie-break** - Standardowy (do 7) i Super tie-break (do 10)
 - ✅ **Statystyki** - Aces, Double Faults, Winners, Errors, % 1st serve
-- ✅ Komunikacja z API (score.vestmedia.pl)
-- ✅ Architektura MVVM z Repository pattern
-- ✅ Obsługa błędów i loading states
-- ✅ Nawigacja między ekranami z przekazywaniem danych
+- ✅ **Komunikacja z API** - (score.vestmedia.pl)
+- ✅ **Architektura MVVM** - Repository pattern
+- ✅ **Obsługa błędów** - Loading states
+- ✅ **Real-time sync** - WebSocket/SSE updates
+- ✅ **Room Database** - Lokalne zapisywanie meczów
+- ✅ **Historia meczów** - Przeglądanie zakończonych meczów
+- ✅ **Undo** - Cofanie ostatniego punktu
+- ✅ **Timer meczu** - Wyświetlanie czasu trwania meczu
+- ✅ **Obsługa debla** - 4 graczy z rotacją serwisu (1→2→3→4→1)
+- ✅ **Dark Mode** - Pełne wsparcie ciemnego motywu (Jasny/Ciemny/Systemowy)
 
-### Do zaimplementowania
-- ⏳ Real-time aktualizacja wyników na serwerze (WebSocket/REST)
-- ⏳ Wysyłanie statystyk do API po zakończeniu meczu
-- ⏳ Zapisywanie meczu lokalnie (Room database)
-- ⏳ Historia meczów
-- ⏳ Możliwość cofnięcia ostatniego punktu
-- ⏳ Timer meczu
-- ⏳ Obsługa debla (4 graczy)
+### Do zaimplementowania (opcjonalne)
+- ⏳ Tryb offline z synchronizacją po powrocie połączenia
+- ⏳ Eksport statystyk do PDF/CSV
+- ⏳ Multi-language - więcej języków
+- ⏳ Notyfikacje push
+- ⏳ Coaching timer
+- ⏳ Medical/Injury timeouts
+- ⏳ Challenge system (symulacja Hawk-Eye)
 
 ## 🏗️ Architektura
 

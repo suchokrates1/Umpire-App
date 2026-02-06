@@ -47,17 +47,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Przycisk dodania zawodnika (obok search bar) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonAddPlayerTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/add_player"
+        android:src="@android:drawable/ic_input_add"
+        app:fabSize="mini"
+        app:backgroundTint="@color/primary"
+        app:tint="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/checkboxDoubles"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/searchLayout"/>
+
     <!-- Search Bar -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
         android:hint="@string/search_players"
         app:boxBackgroundMode="outline"
         app:startIconDrawable="@android:drawable/ic_menu_search"
         app:layout_constraintTop_toBottomOf="@id/checkboxDoubles"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonAddPlayerTop"
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -137,17 +154,37 @@
         tools:listitem="@layout/item_player"/>
 
     <!-- Empty View -->
-    <TextView
-        android:id="@+id/emptyView"
+    <LinearLayout
+        android:id="@+id/emptyViewContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Brak dostępnych zawodników"
-        android:textSize="16sp"
+        android:orientation="vertical"
+        android:gravity="center"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textSelectedPlayers"
+        app:layout_constraintBottom_toTopOf="@id/buttonAddPlayer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <TextView
+            android:id="@+id/emptyView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_players_available"
+            android:textSize="16sp"
+            android:gravity="center"/>
+            
+        <TextView
+            android:id="@+id/textAddPlayerHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/tap_plus_to_add"
+            android:textSize="14sp"
+            android:textColor="@color/primary"
+            android:visibility="gone"
+            android:gravity="center"/>
+    </LinearLayout>
 
     <!-- Przycisk dodaj zawodnika -->
     <com.google.android.material.button.MaterialButton

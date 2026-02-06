@@ -71,9 +71,9 @@ data class MatchEntity(
         val hours = minutes / 60
         
         return if (hours > 0) {
-            String.format("%d:%02d:%02d", hours, minutes % 60, seconds % 60)
+            String.format(java.util.Locale.US, "%d:%02d:%02d", hours, minutes % 60, seconds % 60)
         } else {
-            String.format("%d:%02d", minutes, seconds % 60)
+            String.format(java.util.Locale.US, "%d:%02d", minutes, seconds % 60)
         }
     }
     

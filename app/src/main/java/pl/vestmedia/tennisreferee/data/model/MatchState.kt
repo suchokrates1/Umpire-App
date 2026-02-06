@@ -15,8 +15,16 @@ data class MatchState(
     // Wybrani gracze
     val player1: Player,
     val player2: Player,
+    val player3: Player? = null,  // Dla debla - partner gracza 1
+    val player4: Player? = null,  // Dla debla - partner gracza 2
     val courtId: String,
     val courtName: String,
+    
+    // Debel
+    val isDoubles: Boolean = false,
+    val team1Name: String? = null,
+    val team2Name: String? = null,
+    var currentServer: Int = 1, // 1-4, aktualny serwujący w deblu
     
     // Wyniki
     var player1Sets: Int = 0,
@@ -49,6 +57,45 @@ data class MatchState(
     // Historia akcji (do cofania)
     val actionsHistory: @RawValue MutableList<MatchAction> = mutableListOf()
 ) : Parcelable {
+    
+    /**
+     * Zwraca nazwę zespołu 1 (dla debla) lub imię gracza 1
+     */
+    fun getTeam1DisplayName(): String {
+        return if (isDoubles && !team1Name.isNullOrEmpty()) {
+            team1Name
+        } else if (isDoubles && player3 != null) {
+            "${player1.getDisplayName()} / ${player3.getDisplayName()}"
+        } else {
+            player1.getDisplayName()
+        }
+    }
+    
+    /**
+     * Zwraca nazwę zespołu 2 (dla debla) lub imię gracza 2
+     */
+    fun getTeam2DisplayName(): String {
+        return if (isDoubles && !team2Name.isNullOrEmpty()) {
+            team2Name
+        } else if (isDoubles && player4 != null) {
+            "${player2.getDisplayName()} / ${player4.getDisplayName()}"
+        } else {
+            player2.getDisplayName()
+        }
+    }
+    
+    /**
+     * Zwraca nazwę aktualnie serwującego gracza (dla debla)
+     */
+    fun getCurrentServerName(): String {
+        return when (currentServer) {
+            1 -> player1.getDisplayName()
+            2 -> player2.getDisplayName()
+            3 -> player3?.getDisplayName() ?: player1.getDisplayName()
+            4 -> player4?.getDisplayName() ?: player2.getDisplayName()
+            else -> player1.getDisplayName()
+        }
+    }
     
     /**
      * Zwraca punkty w formacie tenisowym (0, 15, 30, 40, ADV)
@@ -149,8 +196,8 @@ data class MatchState(
         return Match(
             id = matchId ?: 0,
             courtId = courtId,
-            player1Name = player1.getDisplayName(),
-            player2Name = player2.getDisplayName(),
+            player1Name = if (isDoubles) getTeam1DisplayName() else player1.getDisplayName(),
+            player2Name = if (isDoubles) getTeam2DisplayName() else player2.getDisplayName(),
             score = Score(
                 player1Sets = player1Sets,
                 player2Sets = player2Sets,
@@ -192,9 +239,9 @@ data class MatchState(
                 winners = player1Stats.winners,
                 forcedErrors = player1Stats.forcedErrors,
                 unforcedErrors = player1Stats.unforcedErrors,
-                firstServes = player1Stats.firstServes,
+                firstServes = player1Stats.firstServesTotal,
                 firstServesIn = player1Stats.firstServesIn,
-                firstServePercentage = player1Stats.getFirstServePercentage()
+                firstServePercentage = player1Stats.getFirstServePercentage().toDouble()
             ),
             player2Stats = PlayerStats(
                 aces = player2Stats.aces,
@@ -202,9 +249,9 @@ data class MatchState(
                 winners = player2Stats.winners,
                 forcedErrors = player2Stats.forcedErrors,
                 unforcedErrors = player2Stats.unforcedErrors,
-                firstServes = player2Stats.firstServes,
+                firstServes = player2Stats.firstServesTotal,
                 firstServesIn = player2Stats.firstServesIn,
-                firstServePercentage = player2Stats.getFirstServePercentage()
+                firstServePercentage = player2Stats.getFirstServePercentage().toDouble()
             ),
             matchDurationMs = matchDuration,
             winner = winner

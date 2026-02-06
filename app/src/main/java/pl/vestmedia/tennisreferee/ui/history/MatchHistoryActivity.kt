@@ -71,8 +71,8 @@ class MatchHistoryActivity : AppCompatActivity() {
     private fun showDeleteConfirmation(match: pl.vestmedia.tennisreferee.data.database.MatchEntity) {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete_match)
-            .setMessage(R.string.delete_match_confirmation)
-            .setPositiveButton(R.string.delete) { _, _ ->
+            .setMessage(R.string.confirm_delete_match)
+            .setPositiveButton(R.string.yes) { _, _ ->
                 viewModel.deleteMatch(match)
             }
             .setNegativeButton(R.string.cancel, null)
@@ -101,8 +101,8 @@ class MatchHistoryActivity : AppCompatActivity() {
     private fun showDeleteAllConfirmation() {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete_all_matches)
-            .setMessage(R.string.delete_all_matches_confirmation)
-            .setPositiveButton(R.string.delete) { _, _ ->
+            .setMessage(R.string.confirm_delete_all_matches)
+            .setPositiveButton(R.string.yes) { _, _ ->
                 viewModel.deleteAllMatches()
             }
             .setNegativeButton(R.string.cancel, null)

@@ -21,8 +21,12 @@ interface MatchDao {
     @Query("SELECT * FROM matches WHERE courtId = :courtId ORDER BY matchStartTime DESC")
     fun getMatchesByCourt(courtId: Int): Flow<List<MatchEntity>>
     
-    @Query("SELECT * FROM matches WHERE player1.id = :playerId OR player2.id = :playerId ORDER BY matchStartTime DESC")
-    fun getMatchesByPlayer(playerId: Int): Flow<List<MatchEntity>>
+    /**
+     * Pobiera mecze gracza - wymaga filtrowania po stronie aplikacji
+     * ponieważ player1 i player2 są przechowywane jako JSON
+     */
+    @Query("SELECT * FROM matches ORDER BY matchStartTime DESC")
+    fun getAllMatchesForPlayerFilter(): Flow<List<MatchEntity>>
     
     @Query("SELECT COUNT(*) FROM matches")
     suspend fun getMatchCount(): Int

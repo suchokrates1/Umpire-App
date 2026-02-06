@@ -10,20 +10,21 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Player(
     @SerializedName("id")
-    val id: Int,
+    val id: Int,  // API v1 zwraca Int
     
-    @SerializedName("name")
+    // Obsługuje różne formaty z API
+    @SerializedName(value = "name", alternate = ["surname", "full_name"])
     val name: String,
-    
-    @SerializedName("flag")
+
+    @SerializedName(value = "flag", alternate = ["country_code"])
     val flag: String? = null,
-    
-    @SerializedName("flagUrl")
+
+    @SerializedName(value = "flagUrl", alternate = ["flag_url"])
     val flagUrl: String? = null,
-    
-    @SerializedName("group")
+
+    @SerializedName(value = "group", alternate = ["category"])
     val group: String? = null,
-    
+
     @SerializedName("list")
     val list: String? = null
 ) : Parcelable {

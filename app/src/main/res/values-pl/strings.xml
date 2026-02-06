@@ -32,6 +32,11 @@
     <string name="search_players">Szukaj zawodników</string>
     <string name="add_player">+ Dodaj nowego gracza</string>
     <string name="player_not_found">Nie znaleziono zawodnika</string>
+    <string name="tap_plus_to_add">Naciśnij + aby dodać nowego gracza</string>
+    <string name="player_first_name">Imię</string>
+    <string name="player_last_name">Nazwisko</string>
+    <string name="player_country">Kraj</string>
+    <string name="player_category">Kategoria</string>
     <string name="doubles">Debel</string>
     <string name="singles">Singiel (2 graczy)</string>
     <string name="doubles_mode">Debel (4 graczy)</string>
@@ -42,6 +47,9 @@
     
     <!-- Match -->
     <string name="undo">Cofnij</string>
+    <string name="undo_with_icon">↶ Cofnij</string>
+    <string name="confirm_undo">Cofnąć ostatnią akcję?</string>
+    <string name="confirm_finish_match">Czy na pewno chcesz zakończyć mecz?</string>
     <string name="who_serves_first">Kto serwuje pierwszy?</string>
     <string name="swap_sides">⇄ Zamień strony</string>
     <string name="player_serves">%1$s\nSerwuje</string>
@@ -49,11 +57,11 @@
     <string name="second_serve">1. serwis  >  2. serwis</string>
     <string name="serve">Serwis</string>
     <string name="ace">AS</string>
-    <string name="fault">FAULT</string>
+    <string name="fault">BŁĄD</string>
     <string name="ball_in_play">PIŁKA W GRZE</string>
-    <string name="winner">WINNER</string>
-    <string name="forced_error">WYMUSZONY BŁĄD</string>
-    <string name="unforced_error">NIEWYMUSZONY BŁĄD</string>
+    <string name="winner">WYGRANY</string>
+    <string name="forced_error">WYMUSZONY\nBŁĄD</string>
+    <string name="unforced_error">NIEWYMUSZONY\nBŁĄD</string>
     <string name="match_finished">Mecz zakończony</string>
     <string name="winner_label">Zwycięzca: %1$s</string>
     <string name="finish">Zakończ</string>
@@ -87,4 +95,31 @@
     <string name="cancel">Anuluj</string>
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
+    
+    <!-- Match History -->
+    <string name="match_history_title">Historia meczów</string>
+    <string name="match_history">Historia meczów</string>
+    <string name="no_matches_saved">Brak zapisanych meczów</string>
+    <string name="match_score_format">%1$d : %2$d</string>
+    <string name="winner_format">Zwycięzca: %1$s</string>
+    <string name="delete_match">Usuń mecz</string>
+    <string name="delete_all_matches">Usuń wszystkie</string>
+    <string name="confirm_delete_match">Usunąć ten mecz?</string>
+    <string name="confirm_delete_all_matches">Usunąć wszystkie mecze z historii?</string>
+    <string name="match_deleted">Mecz usunięty</string>
+    <string name="all_matches_deleted">Wszystkie mecze usunięte</string>
+    <string name="match_details">Szczegóły meczu</string>
+    <string name="match_details_placeholder">Szczegóły meczu będą wyświetlone tutaj</string>
+    
+    <!-- Settings -->
+    <string name="settings">Ustawienia</string>
+    <string name="appearance">Wygląd</string>
+    <string name="theme">Motyw</string>
+    <string name="theme_light">Jasny</string>
+    <string name="theme_dark">Ciemny</string>
+    <string name="theme_system">Systemowy</string>
+    <string name="about">Informacje</string>
+    <string name="app_description">Profesjonalna aplikacja dla sędziów tenisowych do prowadzenia wyników w czasie rzeczywistym</string>
+    <string name="version_format">Wersja %1$s</string>
+    <string name="version_unknown">Wersja nieznana</string>
 </resources>

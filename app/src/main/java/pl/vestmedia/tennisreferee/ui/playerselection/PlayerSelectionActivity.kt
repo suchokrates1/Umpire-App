@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -31,10 +33,12 @@ class PlayerSelectionActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_COURT_ID = "court_id"
         const val EXTRA_COURT_NAME = "court_name"
+        const val EXTRA_COURT_PIN = "court_pin"
     }
     
     private var courtId: String = ""
     private var courtName: String = ""
+    private var courtPin: String = ""
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +48,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         // Pobierz dane kortu z Intent
         courtId = intent.getStringExtra(EXTRA_COURT_ID) ?: ""
         courtName = intent.getStringExtra(EXTRA_COURT_NAME) ?: ""
+        courtPin = intent.getStringExtra(EXTRA_COURT_PIN) ?: ""
         
         if (courtId.isEmpty()) {
             Toast.makeText(this, "Błąd: Brak danych kortu", Toast.LENGTH_LONG).show()
@@ -93,10 +98,11 @@ class PlayerSelectionActivity : AppCompatActivity() {
             
             // Pokaż odpowiedni widok
             if (players.isEmpty()) {
-                binding.emptyView.visibility = View.VISIBLE
+                binding.emptyViewContainer.visibility = View.VISIBLE
+                binding.textAddPlayerHint.visibility = View.VISIBLE
                 binding.recyclerViewPlayers.visibility = View.GONE
             } else {
-                binding.emptyView.visibility = View.GONE
+                binding.emptyViewContainer.visibility = View.GONE
                 binding.recyclerViewPlayers.visibility = View.VISIBLE
             }
         }
@@ -135,6 +141,27 @@ class PlayerSelectionActivity : AppCompatActivity() {
         viewModel.canProceed.observe(this) { canProceed ->
             binding.buttonNext.isEnabled = canProceed
         }
+        
+        // Obserwuj nowo dodanego gracza i przewiń listę do niego
+        viewModel.newlyAddedPlayer.observe(this) { newPlayer ->
+            newPlayer?.let { player ->
+                // Wyczyść wyszukiwanie żeby pokazać całą listę
+                binding.editTextSearch.setText("")
+                currentSearchQuery = ""
+                filterPlayers("")
+                
+                // Przewiń do nowego gracza z opóźnieniem (żeby lista się odświeżyła)
+                binding.recyclerViewPlayers.postDelayed({
+                    val position = allPlayers.indexOf(player)
+                    if (position >= 0) {
+                        // Przewiń do gracza wyśrodkowując go
+                        val layoutManager = binding.recyclerViewPlayers.layoutManager as LinearLayoutManager
+                        layoutManager.scrollToPositionWithOffset(position, binding.recyclerViewPlayers.height / 3)
+                    }
+                    viewModel.clearNewlyAddedPlayer()
+                }, 200)
+            }
+        }
     }
     
     private fun setupListeners() {
@@ -154,6 +181,12 @@ class PlayerSelectionActivity : AppCompatActivity() {
             viewModel.setDoubles(isChecked)
         }
         
+        // Przycisk "+" obok pola wyszukiwania
+        binding.buttonAddPlayerTop.setOnClickListener {
+            showAddPlayerDialog()
+        }
+        
+        // Przycisk dodawania przy braku wyników (zachowany dla kompatybilności)
         binding.buttonAddPlayer.setOnClickListener {
             showAddPlayerDialog()
         }
@@ -203,18 +236,34 @@ class PlayerSelectionActivity : AppCompatActivity() {
         val isDoublesMatch = viewModel.isDoubles.value ?: false
         
         // Utwórz stan meczu
-        val matchState = MatchState(
-            player1 = selectedPlayers[0],
-            player2 = selectedPlayers[1],
-            courtId = courtId,
-            courtName = courtName
-        )
+        val matchState = if (isDoublesMatch && selectedPlayers.size == 4) {
+            // Debel - 4 graczy
+            MatchState(
+                player1 = selectedPlayers[0],
+                player2 = selectedPlayers[1],
+                player3 = selectedPlayers[2],
+                player4 = selectedPlayers[3],
+                courtId = courtId,
+                courtName = courtName,
+                isDoubles = true,
+                currentServer = 1
+            )
+        } else {
+            // Singiel - 2 graczy
+            MatchState(
+                player1 = selectedPlayers[0],
+                player2 = selectedPlayers[1],
+                courtId = courtId,
+                courtName = courtName,
+                isDoubles = false
+            )
+        }
         
         // Przejdź do ekranu meczu
         val intent = Intent(this, MatchActivity::class.java).apply {
             putExtra(MatchActivity.EXTRA_MATCH_STATE, matchState)
             
-            // Przekaż kolory drużyn dla debla
+            // Przekaż informację o deblu
             if (isDoublesMatch) {
                 putExtra(MatchActivity.EXTRA_IS_DOUBLES, true)
                 putExtra(MatchActivity.EXTRA_TEAM1_COLOR, R.color.team1_color)
@@ -242,45 +291,79 @@ class PlayerSelectionActivity : AppCompatActivity() {
         // Aktualizuj widoczność innych elementów
         if (hasNoResults) {
             binding.emptyView.text = getString(R.string.player_not_found)
-            binding.emptyView.visibility = View.VISIBLE
+            binding.textAddPlayerHint.visibility = View.VISIBLE
+            binding.emptyViewContainer.visibility = View.VISIBLE
             binding.recyclerViewPlayers.visibility = View.GONE
         } else if (filteredPlayers.isEmpty() && query.isEmpty()) {
             // Brak zawodników w ogóle
-            binding.emptyView.visibility = View.VISIBLE
+            binding.emptyView.text = getString(R.string.no_players_available)
+            binding.textAddPlayerHint.visibility = View.VISIBLE
+            binding.emptyViewContainer.visibility = View.VISIBLE
             binding.recyclerViewPlayers.visibility = View.GONE
         } else {
             // Są wyniki
-            binding.emptyView.visibility = View.GONE
+            binding.emptyViewContainer.visibility = View.GONE
             binding.recyclerViewPlayers.visibility = View.VISIBLE
         }
     }
     
     private fun showAddPlayerDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_player, null)
-        val editName = dialogView.findViewById<TextInputEditText>(R.id.editPlayerName)
-        val editFlag = dialogView.findViewById<TextInputEditText>(R.id.editPlayerFlag)
+        val editFirstName = dialogView.findViewById<TextInputEditText>(R.id.editPlayerFirstName)
+        val editLastName = dialogView.findViewById<TextInputEditText>(R.id.editPlayerLastName)
+        val spinnerCountry = dialogView.findViewById<AutoCompleteTextView>(R.id.spinnerCountry)
+        val spinnerCategory = dialogView.findViewById<AutoCompleteTextView>(R.id.spinnerCategory)
         
-        // Wypełnij nazwę z aktualnego wyszukiwania
-        editName.setText(currentSearchQuery)
+        // Wypełnij nazwisko z aktualnego wyszukiwania
+        if (currentSearchQuery.contains(" ")) {
+            val parts = currentSearchQuery.split(" ", limit = 2)
+            editFirstName.setText(parts[0])
+            editLastName.setText(parts[1])
+        } else {
+            editLastName.setText(currentSearchQuery)
+        }
+        
+        // Setup dropdowns
+        val countries = resources.getStringArray(R.array.countries)
+        val countryCodes = resources.getStringArray(R.array.country_codes)
+        val categories = resources.getStringArray(R.array.player_categories)
+        
+        val countryAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, countries)
+        spinnerCountry.setAdapter(countryAdapter)
+        spinnerCountry.setText(countries[0], false) // Default: Poland
+        
+        val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, categories)
+        spinnerCategory.setAdapter(categoryAdapter)
+        spinnerCategory.setText(categories[0], false) // Default: Open
         
         AlertDialog.Builder(this)
             .setTitle(R.string.add_player)
             .setView(dialogView)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                val name = editName.text.toString().trim()
-                val flagCode = editFlag.text.toString().trim().uppercase()
+                val firstName = editFirstName.text.toString().trim()
+                val lastName = editLastName.text.toString().trim()
+                val selectedCountry = spinnerCountry.text.toString()
+                val selectedCategory = spinnerCategory.text.toString()
                 
-                if (name.isEmpty()) {
+                if (firstName.isEmpty()) {
+                    Toast.makeText(this, "Wprowadź imię zawodnika", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                
+                if (lastName.isEmpty()) {
                     Toast.makeText(this, "Wprowadź nazwisko zawodnika", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
                 
-                if (flagCode.isEmpty() || flagCode.length != 2) {
-                    Toast.makeText(this, "Wprowadź prawidłowy kod flagi (2 litery)", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
+                // Pobierz kod kraju z wybranej pozycji
+                val countryIndex = countries.indexOf(selectedCountry)
+                val flagCode = if (countryIndex >= 0) countryCodes[countryIndex] else "PL"
                 
-                viewModel.addPlayer(courtId, name, flagCode)
+                // Połącz imię i nazwisko
+                val fullName = "$firstName $lastName"
+                
+                // Dodaj zawodnika do serwera (automatycznie zaznaczy i przewinie)
+                viewModel.addPlayer(fullName, flagCode, selectedCategory, courtId, courtPin)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()

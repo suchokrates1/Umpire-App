@@ -304,6 +304,24 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     }
     
     /**
+     * Rotuje serwującego w deblu (1 -> 2 -> 3 -> 4 -> 1)
+     */
+    private fun rotateDoublesServer(state: MatchState) {
+        state.currentServer = when (state.currentServer) {
+            1 -> 2  // Gracz 1 (Zespół A) -> Gracz 2 (Zespół B)
+            2 -> 3  // Gracz 2 (Zespół B) -> Gracz 3 (Partner 1, Zespół A)
+            3 -> 4  // Gracz 3 (Zespół A) -> Gracz 4 (Zespół B)
+            4 -> 1  // Gracz 4 (Zespół B) -> Gracz 1 (Zespół A)
+            else -> 1
+        }
+        
+        // Ustaw isPlayer1Serving na podstawie currentServer
+        // 1,3 = Zespół A (player1Serving = true)
+        // 2,4 = Zespół B (player1Serving = false)
+        state.isPlayer1Serving = (state.currentServer == 1 || state.currentServer == 3)
+    }
+    
+    /**
      * Dodaje punkt dla gracza
      */
     private fun addPoint(isPlayer1: Boolean) {
@@ -323,7 +341,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 
                 // Zmiana serwisu co 2 punkty (po 1,3,5,7,9... punkcie)
                 if (totalPoints % 2 == 1) {
-                    state.isPlayer1Serving = !state.isPlayer1Serving
+                    if (state.isDoubles) {
+                        // W deblu rotuj serwującego zgodnie z kolejnością
+                        rotateDoublesServer(state)
+                    } else {
+                        // W singlu zwykła zmiana
+                        state.isPlayer1Serving = !state.isPlayer1Serving
+                    }
                     logMatchEvent("serve_change")
                 }
                 
@@ -408,7 +432,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 state.player2Points = 0
                 
                 // Zmiana serwującego po gemie
-                state.isPlayer1Serving = !state.isPlayer1Serving
+                if (state.isDoubles) {
+                    // W deblu rotacja serwisów: 1 -> 2 -> 3 -> 4 -> 1
+                    rotateDoublesServer(state)
+                } else {
+                    // W singlu zwykła zmiana
+                    state.isPlayer1Serving = !state.isPlayer1Serving
+                }
                 
                 // Log game won event
                 logMatchEvent("game")
