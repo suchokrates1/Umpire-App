@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Lista krajów z kodami ISO -->
+    <string-array name="countries">
+        <item>🇵🇱 Poland (PL)</item>
+        <item>🇩🇪 Germany (DE)</item>
+        <item>🇫🇷 France (FR)</item>
+        <item>🇮🇹 Italy (IT)</item>
+        <item>🇪🇸 Spain (ES)</item>
+        <item>🇬🇧 United Kingdom (GB)</item>
+        <item>🇺🇸 USA (US)</item>
+        <item>🇦🇹 Austria (AT)</item>
+        <item>🇧🇪 Belgium (BE)</item>
+        <item>🇨🇿 Czech Republic (CZ)</item>
+        <item>🇩🇰 Denmark (DK)</item>
+        <item>🇫🇮 Finland (FI)</item>
+        <item>🇬🇷 Greece (GR)</item>
+        <item>🇭🇺 Hungary (HU)</item>
+        <item>🇮🇪 Ireland (IE)</item>
+        <item>🇳🇱 Netherlands (NL)</item>
+        <item>🇳🇴 Norway (NO)</item>
+        <item>🇵🇹 Portugal (PT)</item>
+        <item>🇷🇴 Romania (RO)</item>
+        <item>🇷🇺 Russia (RU)</item>
+        <item>🇸🇪 Sweden (SE)</item>
+        <item>🇨🇭 Switzerland (CH)</item>
+        <item>🇺🇦 Ukraine (UA)</item>
+        <item>🇦🇷 Argentina (AR)</item>
+        <item>🇦🇺 Australia (AU)</item>
+        <item>🇧🇷 Brazil (BR)</item>
+        <item>🇨🇦 Canada (CA)</item>
+        <item>🇨🇳 China (CN)</item>
+        <item>🇯🇵 Japan (JP)</item>
+        <item>🇰🇷 South Korea (KR)</item>
+        <item>🇲🇽 Mexico (MX)</item>
+        <item>🇿🇦 South Africa (ZA)</item>
+    </string-array>
+    
+    <string-array name="country_codes">
+        <item>PL</item>
+        <item>DE</item>
+        <item>FR</item>
+        <item>IT</item>
+        <item>ES</item>
+        <item>GB</item>
+        <item>US</item>
+        <item>AT</item>
+        <item>BE</item>
+        <item>CZ</item>
+        <item>DK</item>
+        <item>FI</item>
+        <item>GR</item>
+        <item>HU</item>
+        <item>IE</item>
+        <item>NL</item>
+        <item>NO</item>
+        <item>PT</item>
+        <item>RO</item>
+        <item>RU</item>
+        <item>SE</item>
+        <item>CH</item>
+        <item>UA</item>
+        <item>AR</item>
+        <item>AU</item>
+        <item>BR</item>
+        <item>CA</item>
+        <item>CN</item>
+        <item>JP</item>
+        <item>KR</item>
+        <item>MX</item>
+        <item>ZA</item>
+    </string-array>
+    
+    <!-- Kategorie turniejowe -->
+    <string-array name="player_categories">
+        <item>B1</item>
+        <item>B2</item>
+        <item>B3</item>
+        <item>B4</item>
+    </string-array>
+</resources>

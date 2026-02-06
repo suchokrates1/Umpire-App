@@ -32,6 +32,11 @@
     <string name="search_players">Cerca giocatori</string>
     <string name="add_player">+ Aggiungi nuovo giocatore</string>
     <string name="player_not_found">Giocatore non trovato</string>
+    <string name="tap_plus_to_add">Tocca + per aggiungere un nuovo giocatore</string>
+    <string name="player_first_name">Nome</string>
+    <string name="player_last_name">Cognome</string>
+    <string name="player_country">Paese</string>
+    <string name="player_category">Categoria</string>
     <string name="doubles">Doppio</string>
     <string name="singles">Singolo (2 giocatori)</string>
     <string name="doubles_mode">Doppio (4 giocatori)</string>
@@ -42,6 +47,9 @@
     
     <!-- Match -->
     <string name="undo">Annulla</string>
+    <string name="undo_with_icon">↶ Annulla</string>
+    <string name="confirm_undo">Annullare l\'ultima azione?</string>
+    <string name="confirm_finish_match">Sei sicuro di voler terminare la partita?</string>
     <string name="who_serves_first">Chi serve per primo?</string>
     <string name="swap_sides">⇄ Scambia lati</string>
     <string name="player_serves">%1$s\nServe</string>
@@ -52,8 +60,8 @@
     <string name="fault">FALLO</string>
     <string name="ball_in_play">PALLA IN GIOCO</string>
     <string name="winner">VINCENTE</string>
-    <string name="forced_error">ERRORE FORZATO</string>
-    <string name="unforced_error">ERRORE NON FORZATO</string>
+    <string name="forced_error">ERRORE\nFORZATO</string>
+    <string name="unforced_error">ERRORE\nNON FORZATO</string>
     <string name="match_finished">Partita terminata</string>
     <string name="winner_label">Vincitore: %1$s</string>
     <string name="finish">Fine</string>

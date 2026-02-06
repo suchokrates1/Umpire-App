@@ -33,8 +33,12 @@ class PlayerSelectionViewModel : ViewModel() {
     private val _canProceed = MutableLiveData<Boolean>(false)
     val canProceed: LiveData<Boolean> = _canProceed
     
+    // Nowo dodany gracz do automatycznego zaznaczenia
+    private val _newlyAddedPlayer = MutableLiveData<Player?>()
+    val newlyAddedPlayer: LiveData<Player?> = _newlyAddedPlayer
+    
     /**
-     * Ładuje listę zawodników z serwera (obecnie mock data)
+     * Ładuje listę zawodników z serwera
      */
     fun loadPlayers() {
         viewModelScope.launch {
@@ -121,18 +125,44 @@ class PlayerSelectionViewModel : ViewModel() {
     }
     
     /**
-     * Dodaje nowego zawodnika do API
+     * Czyści informację o nowo dodanym graczu
      */
-    fun addPlayer(courtId: String, name: String, flagCode: String) {
+    fun clearNewlyAddedPlayer() {
+        _newlyAddedPlayer.value = null
+    }
+    
+    /**
+     * Dodaje nowego zawodnika do API
+     * Po dodaniu automatycznie zaznacza go do meczu
+     */
+    fun addPlayer(name: String, flagCode: String, category: String = "B1", courtId: String = "", courtPin: String = "") {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             
-            val result = repository.addPlayer(courtId, name, flagCode)
+            val result = repository.addPlayer(name, flagCode, category, courtId, courtPin)
             result.onSuccess { newPlayer ->
                 // Odśwież listę zawodników
-                loadPlayers()
-                _error.value = "Zawodnik dodany pomyślnie"
+                val playersResult = repository.getPlayers()
+                playersResult.onSuccess { playersList ->
+                    _players.value = playersList
+                    
+                    // Znajdź nowego gracza na liście (po ID lub nazwie)
+                    val addedPlayer = playersList.find { it.id == newPlayer.id } 
+                        ?: playersList.find { it.name == newPlayer.name }
+                    
+                    if (addedPlayer != null) {
+                        // Automatycznie zaznacz nowego gracza
+                        togglePlayerSelection(addedPlayer)
+                        // Ustaw nowo dodanego gracza do przewinięcia listy
+                        _newlyAddedPlayer.value = addedPlayer
+                    }
+                    
+                    _isLoading.value = false
+                }.onFailure { exception ->
+                    _error.value = exception.message ?: "Błąd pobierania listy"
+                    _isLoading.value = false
+                }
             }.onFailure { exception ->
                 _error.value = exception.message ?: "Błąd dodawania zawodnika"
                 _isLoading.value = false

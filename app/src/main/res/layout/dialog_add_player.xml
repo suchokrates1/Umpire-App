@@ -7,47 +7,74 @@
     android:padding="16dp">
     
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutPlayerName"
+        android:id="@+id/layoutPlayerFirstName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nazwisko zawodnika"
+        android:hint="@string/player_first_name"
         app:boxStrokeColor="@color/primary"
         app:hintTextColor="@color/primary"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editPlayerName"
+            android:id="@+id/editPlayerFirstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
+            android:inputType="textPersonName|textCapWords"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
     
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutPlayerFlag"
+        android:id="@+id/layoutPlayerLastName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="Kod flagi (np. PL, US, FR)"
+        android:layout_marginTop="12dp"
+        android:hint="@string/player_last_name"
         app:boxStrokeColor="@color/primary"
         app:hintTextColor="@color/primary"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editPlayerFlag"
+            android:id="@+id/editPlayerLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapCharacters"
-            android:maxLength="2"
+            android:inputType="textPersonName|textCapWords"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
     
-    <TextView
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutPlayerCountry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Wprowadź dwuliterowy kod kraju (ISO 3166-1 alpha-2)"
-        android:textSize="12sp"
-        android:textColor="?android:attr/textColorSecondary" />
+        android:layout_marginTop="12dp"
+        android:hint="@string/player_country"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        
+        <AutoCompleteTextView
+            android:id="@+id/spinnerCountry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+    
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutPlayerCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="@string/player_category"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        
+        <AutoCompleteTextView
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

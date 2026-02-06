@@ -135,23 +135,30 @@ class TennisRepository {
     
     /**
      * Dodaje nowego zawodnika
+     * API format v1: { "name": "Nowak", "flag_code": "PL", "group_category": "B1", "kort_id": "1", "pin": "1234" }
      */
-    suspend fun addPlayer(courtId: String, name: String, flagCode: String): Result<Player> {
+    suspend fun addPlayer(name: String, flagCode: String, category: String = "B1", courtId: String = "", courtPin: String = ""): Result<Player> {
         return try {
-            val flagUrl = "https://flagcdn.com/w80/${flagCode.lowercase()}.png"
-            val pin = "1111" // TODO: Pobierz PIN z sesji/storage
-            
-            val playerRequest = mapOf(
-                "kort_id" to courtId,
-                "pin" to pin,
-                "name" to name,
+            val playerRequest = mutableMapOf(
+                "name" to name,  // v1 używa "name"
                 "flag_code" to flagCode.uppercase(),
-                "flag_url" to flagUrl
+                "group_category" to category  // v1 używa "group_category"
             )
+            
+            // Dodaj autoryzację kortu (wymagane!)
+            if (courtId.isNotEmpty() && courtPin.isNotEmpty()) {
+                playerRequest["kort_id"] = courtId
+                playerRequest["pin"] = courtPin
+            }
             
             val response = apiService.addPlayer(playerRequest)
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
+                val addPlayerResponse = response.body()!!
+                if (addPlayerResponse.ok && addPlayerResponse.player != null) {
+                    Result.success(addPlayerResponse.player)
+                } else {
+                    Result.failure(Exception(addPlayerResponse.error ?: "Błąd dodawania zawodnika"))
+                }
             } else {
                 Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
             }

@@ -20,8 +20,12 @@ class MatchHistoryRepository(private val matchDao: MatchDao) {
         return matchDao.getMatchesByCourt(courtId)
     }
     
+    /**
+     * Pobiera mecze gracza - filtrowanie po stronie aplikacji
+     * ponieważ player1 i player2 są przechowywane jako JSON
+     */
     fun getMatchesByPlayer(playerId: Int): Flow<List<MatchEntity>> {
-        return matchDao.getMatchesByPlayer(playerId)
+        return matchDao.getAllMatchesForPlayerFilter()
     }
     
     suspend fun getMatchById(matchId: Long): MatchEntity? {
@@ -63,7 +67,7 @@ class MatchHistoryRepository(private val matchDao: MatchDao) {
  */
 private fun MatchState.toEntity(): MatchEntity {
     return MatchEntity(
-        courtId = courtId,
+        courtId = courtId.toIntOrNull() ?: 0,
         courtName = courtName,
         matchStartTime = matchStartTime,
         matchEndTime = System.currentTimeMillis(),

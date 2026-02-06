@@ -4,10 +4,12 @@ import pl.vestmedia.tennisreferee.data.model.CourtsResponse
 import pl.vestmedia.tennisreferee.data.model.Match
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.PlayersResponse
+import pl.vestmedia.tennisreferee.data.model.AddPlayerResponse
 import pl.vestmedia.tennisreferee.data.model.CourtPinRequest
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
 import pl.vestmedia.tennisreferee.data.model.MatchEvent
 import pl.vestmedia.tennisreferee.data.model.MatchEventResponse
+import pl.vestmedia.tennisreferee.data.model.MatchStatisticsRequest
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -68,7 +70,7 @@ interface TennisApiService {
      * Dodaje nowego zawodnika
      */
     @POST("api/players")
-    suspend fun addPlayer(@Body playerRequest: Map<String, String>): Response<Player>
+    suspend fun addPlayer(@Body playerRequest: Map<String, String>): Response<AddPlayerResponse>
     
     /**
      * Loguje zdarzenie meczowe do serwera

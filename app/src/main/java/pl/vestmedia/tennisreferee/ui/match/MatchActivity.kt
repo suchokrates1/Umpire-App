@@ -1,12 +1,15 @@
 package pl.vestmedia.tennisreferee.ui.match
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchBinding
@@ -54,7 +57,12 @@ class MatchActivity : AppCompatActivity() {
         matchFinishedBinding = LayoutMatchFinishedBinding.bind(binding.layoutMatchFinished.root)
         
         // Pobierz stan meczu z Intent
-        val matchState = intent.getParcelableExtra<MatchState>(EXTRA_MATCH_STATE)
+        val matchState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(EXTRA_MATCH_STATE, MatchState::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_MATCH_STATE)
+        }
         
         if (matchState == null) {
             finish()
@@ -104,8 +112,9 @@ class MatchActivity : AppCompatActivity() {
             viewModel.setFirstServer(false)
         }
         
-        // Zamiana stron
+        // Zamiana stron z animacją
         serverSelectionBinding.buttonSwapSides.setOnClickListener {
+            animateSwapSides()
             viewModel.swapSides()
         }
         
@@ -164,14 +173,14 @@ class MatchActivity : AppCompatActivity() {
             viewModel.handleUnforcedError(isPlayer1)
         }
         
-        // Przycisk Cofnij
+        // Przycisk Cofnij z potwierdzeniem
         binding.buttonUndo.setOnClickListener {
-            viewModel.undoLastAction()
+            showUndoConfirmation()
         }
         
-        // Przycisk powrotu
+        // Przycisk zakończenia meczu z potwierdzeniem
         binding.buttonBack.setOnClickListener {
-            finish()
+            showFinishMatchConfirmation()
         }
     }
     
@@ -254,26 +263,61 @@ class MatchActivity : AppCompatActivity() {
         val leftPlayer = if (state.sidesSwapped) state.player2 else state.player1
         val rightPlayer = if (state.sidesSwapped) state.player1 else state.player2
         
-        serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.player_serves, state.player1.getDisplayName())
-        serverSelectionBinding.buttonPlayer2Serves.text = getString(R.string.player_serves, state.player2.getDisplayName())
-        
-        // Aktualizuj nazwiska w widoku serwisu (bez flag) - uwzględnij zamianę stron
-        serveBinding.textPlayerLeftName.text = leftPlayer.getDisplayName()
-        serveBinding.textPlayerRightName.text = rightPlayer.getDisplayName()
-        
-        // Aktualizuj nazwiska w widoku rally (bez flag) - uwzględnij zamianę stron
-        rallyBinding.textPlayerLeftName.text = leftPlayer.getDisplayName()
-        rallyBinding.textPlayerRightName.text = rightPlayer.getDisplayName()
+        // Dla debla użyj nazw zespołów
+        if (state.isDoubles) {
+            val team1Name = state.getTeam1DisplayName()
+            val team2Name = state.getTeam2DisplayName()
+            
+            serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.team_serves, team1Name)
+            serverSelectionBinding.buttonPlayer2Serves.text = getString(R.string.team_serves, team2Name)
+            
+            // W widoku serwisu pokaż aktualnego serwującego
+            serveBinding.textPlayerLeftName.text = if (!state.sidesSwapped) {
+                state.getCurrentServerName()
+            } else {
+                if (state.currentServer == 2 || state.currentServer == 4) state.getCurrentServerName() else ""
+            }
+            serveBinding.textPlayerRightName.text = if (state.sidesSwapped) {
+                state.getCurrentServerName()
+            } else {
+                if (state.currentServer == 2 || state.currentServer == 4) state.getCurrentServerName() else ""
+            }
+            
+            // Rally używa nazw zespołów
+            rallyBinding.textPlayerLeftName.text = if (!state.sidesSwapped) team1Name else team2Name
+            rallyBinding.textPlayerRightName.text = if (!state.sidesSwapped) team2Name else team1Name
+        } else {
+            // Singiel - normalna logika
+            serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.player_serves, state.player1.getDisplayName())
+            serverSelectionBinding.buttonPlayer2Serves.text = getString(R.string.player_serves, state.player2.getDisplayName())
+            
+            // Aktualizuj nazwiska w widoku serwisu (bez flag) - uwzględnij zamianę stron
+            serveBinding.textPlayerLeftName.text = leftPlayer.getDisplayName()
+            serveBinding.textPlayerRightName.text = rightPlayer.getDisplayName()
+            
+            // Aktualizuj nazwiska w widoku rally (bez flag) - uwzględnij zamianę stron
+            rallyBinding.textPlayerLeftName.text = leftPlayer.getDisplayName()
+            rallyBinding.textPlayerRightName.text = rightPlayer.getDisplayName()
+        }
     }
     
     private fun updateScoreboard(state: MatchState) {
-        // Flagi i nazwy graczy
-        scoreboardBinding.textPlayer1Flag.text = getCountryFlag(state.player1.flag)
-        scoreboardBinding.textPlayer2Flag.text = getCountryFlag(state.player2.flag)
-        
-        // Nazwiska bez ikony serwisu
-        scoreboardBinding.textPlayer1Name.text = state.player1.getDisplayName()
-        scoreboardBinding.textPlayer2Name.text = state.player2.getDisplayName()
+        // Flagi i nazwy graczy/zespołów
+        if (state.isDoubles) {
+            // Dla debla pokaż nazwy zespołów zamiast pojedynczych graczy
+            scoreboardBinding.textPlayer1Flag.text = "👥"  // Ikona zespołu
+            scoreboardBinding.textPlayer2Flag.text = "👥"
+            
+            scoreboardBinding.textPlayer1Name.text = state.getTeam1DisplayName()
+            scoreboardBinding.textPlayer2Name.text = state.getTeam2DisplayName()
+        } else {
+            // Singiel - flagi i nazwiska
+            scoreboardBinding.textPlayer1Flag.text = getCountryFlag(state.player1.flag)
+            scoreboardBinding.textPlayer2Flag.text = getCountryFlag(state.player2.flag)
+            
+            scoreboardBinding.textPlayer1Name.text = state.player1.getDisplayName()
+            scoreboardBinding.textPlayer2Name.text = state.player2.getDisplayName()
+        }
         
         // Ikona serwisu przy punktach
         scoreboardBinding.textPlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.GONE
@@ -310,8 +354,8 @@ class MatchActivity : AppCompatActivity() {
             scoreboardBinding.textPlayer2Set2.text = set2.player2Games.toString()
         } else {
             // Przed drugim setem - pokaż 0
-            scoreboardBinding.textPlayer1Set2.text = "0"
-            scoreboardBinding.textPlayer2Set2.text = "0"
+            scoreboardBinding.textPlayer1Set2.text = getString(R.string.zero_score)
+            scoreboardBinding.textPlayer2Set2.text = getString(R.string.zero_score)
         }
         
         // Zaznacz aktywny set pomarańczowym tłem
@@ -320,11 +364,11 @@ class MatchActivity : AppCompatActivity() {
         // Tryb gry
         when {
             state.isSuperTiebreak -> {
-                scoreboardBinding.textGameMode.text = "Super Tie-break (do 10, 2 przewagi)"
+                scoreboardBinding.textGameMode.text = getString(R.string.super_tiebreak_mode)
                 scoreboardBinding.textGameMode.visibility = View.VISIBLE
             }
             state.isTiebreak -> {
-                scoreboardBinding.textGameMode.text = "Tie-break (do 7, 2 przewagi)"
+                scoreboardBinding.textGameMode.text = getString(R.string.tiebreak_mode)
                 scoreboardBinding.textGameMode.visibility = View.VISIBLE
             }
             else -> {
@@ -419,8 +463,8 @@ class MatchActivity : AppCompatActivity() {
             state.player1.getDisplayName()
         }
         
-        serverSelectionBinding.buttonPlayer1Serves.text = "$leftPlayerName\n${getString(R.string.player_serves_short)}"
-        serverSelectionBinding.buttonPlayer2Serves.text = "$rightPlayerName\n${getString(R.string.player_serves_short)}"
+        serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.player_serves, leftPlayerName)
+        serverSelectionBinding.buttonPlayer2Serves.text = getString(R.string.player_serves, rightPlayerName)
         
         // Zastosuj kolory drużyn dla debla
         val isDoublesMatch = intent.getBooleanExtra(EXTRA_IS_DOUBLES, false)
@@ -553,7 +597,7 @@ class MatchActivity : AppCompatActivity() {
                         state.player2.getDisplayName()
                     }
                     
-                    matchFinishedBinding.textWinner.text = "Zwycięzca: $winner"
+                    matchFinishedBinding.textWinner.text = getString(R.string.winner_label, winner)
                     
                     // Wyświetl statystyki
                     updateMatchStatistics(state)
@@ -629,10 +673,68 @@ class MatchActivity : AppCompatActivity() {
         val hours = (durationMs / (1000 * 60 * 60))
         
         return if (hours > 0) {
-            String.format("%d:%02d:%02d", hours, minutes, seconds)
+            String.format(java.util.Locale.US, "%d:%02d:%02d", hours, minutes, seconds)
         } else {
-            String.format("%02d:%02d", minutes, seconds)
+            String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
         }
+    }
+    
+    /**
+     * Pokazuje dialog potwierdzenia cofnięcia akcji
+     */
+    private fun showUndoConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.undo)
+            .setMessage(R.string.confirm_undo)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                viewModel.undoLastAction()
+            }
+            .setNegativeButton(R.string.no, null)
+            .show()
+    }
+    
+    /**
+     * Pokazuje dialog potwierdzenia zakończenia meczu
+     */
+    private fun showFinishMatchConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.finish_match)
+            .setMessage(R.string.confirm_finish_match)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                finish()
+            }
+            .setNegativeButton(R.string.no, null)
+            .show()
+    }
+    
+    /**
+     * Łagodna animacja zamiany stron - fade out + slide
+     */
+    private fun animateSwapSides() {
+        val button1 = serverSelectionBinding.buttonPlayer1Serves
+        val button2 = serverSelectionBinding.buttonPlayer2Serves
+        
+        // Fade out oba przyciski
+        val fadeOut1 = ObjectAnimator.ofFloat(button1, "alpha", 1f, 0f)
+        val fadeOut2 = ObjectAnimator.ofFloat(button2, "alpha", 1f, 0f)
+        
+        fadeOut1.duration = 150
+        fadeOut2.duration = 150
+        
+        // Po fade out - zaktualizuj i fade in
+        val fadeIn1 = ObjectAnimator.ofFloat(button1, "alpha", 0f, 1f)
+        val fadeIn2 = ObjectAnimator.ofFloat(button2, "alpha", 0f, 1f)
+        
+        fadeIn1.duration = 150
+        fadeIn2.duration = 150
+        
+        // Sekwencja: fade out -> fade in
+        val animatorSet = AnimatorSet()
+        animatorSet.play(fadeOut1).with(fadeOut2)
+        animatorSet.play(fadeIn1).after(fadeOut1)
+        animatorSet.play(fadeIn2).after(fadeOut2)
+        
+        animatorSet.start()
     }
     
     override fun onDestroy() {
