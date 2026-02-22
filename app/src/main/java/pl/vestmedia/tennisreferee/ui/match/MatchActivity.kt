@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -17,8 +19,10 @@ import pl.vestmedia.tennisreferee.databinding.LayoutScoreboardBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutServerSelectionBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutServeBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutRallyBinding
+import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
 import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.data.model.StatsMode
 import pl.vestmedia.tennisreferee.data.model.Player
 
 /**
@@ -31,8 +35,12 @@ class MatchActivity : AppCompatActivity() {
     private lateinit var serverSelectionBinding: LayoutServerSelectionBinding
     private lateinit var serveBinding: LayoutServeBinding
     private lateinit var rallyBinding: LayoutRallyBinding
+    private lateinit var basicScoringBinding: LayoutBasicScoringBinding
     private lateinit var matchFinishedBinding: LayoutMatchFinishedBinding
     private val viewModel: MatchViewModel by viewModels()
+    
+    // Śledzenie stanu serwisu do animacji przejścia na 2. serwis
+    private var wasFirstServe: Boolean = true
     
     private val timerHandler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
@@ -54,6 +62,7 @@ class MatchActivity : AppCompatActivity() {
         serverSelectionBinding = LayoutServerSelectionBinding.bind(binding.layoutServerSelection.root)
         serveBinding = LayoutServeBinding.bind(binding.layoutServe.root)
         rallyBinding = LayoutRallyBinding.bind(binding.layoutRally.root)
+        basicScoringBinding = LayoutBasicScoringBinding.bind(binding.layoutBasicScoring.root)
         matchFinishedBinding = LayoutMatchFinishedBinding.bind(binding.layoutMatchFinished.root)
         
         // Pobierz stan meczu z Intent
@@ -71,8 +80,28 @@ class MatchActivity : AppCompatActivity() {
         
         viewModel.initializeMatch(matchState)
         
+        // Nie wyłączaj ekranu podczas meczu
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        
         setupObservers()
         setupListeners()
+        
+        // Obsługa przycisku wstecz - potwierdzenie podczas meczu
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val state = viewModel.matchState.value
+                if (state?.isMatchFinished == true) {
+                    finish()
+                } else {
+                    AlertDialog.Builder(this@MatchActivity)
+                        .setTitle(R.string.confirm_exit_title)
+                        .setMessage(R.string.confirm_exit_message)
+                        .setPositiveButton(R.string.yes) { _, _ -> finish() }
+                        .setNegativeButton(R.string.no, null)
+                        .show()
+                }
+            }
+        })
     }
     
     private fun setupObservers() {
@@ -82,6 +111,10 @@ class MatchActivity : AppCompatActivity() {
             updateServerSelectionButtons(state)
             updateServeView(state)
             updateTimer(state)
+            // Aktualizuj widok basic scoring gdy zmienia się stan (np. fault → 2. serwis)
+            if (viewModel.currentView.value == MatchView.BASIC_SCORING) {
+                updateBasicScoringView(state)
+            }
         }
         
         viewModel.currentView.observe(this) { view ->
@@ -171,6 +204,34 @@ class MatchActivity : AppCompatActivity() {
         rallyBinding.buttonUnforcedErrorRight.setOnClickListener {
             val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
             viewModel.handleUnforcedError(isPlayer1)
+        }
+        
+        // ===== BASIC MODE Listeners =====
+        // Win buttons - serwujący (lewa strona)
+        basicScoringBinding.buttonWinServerLeft.setOnClickListener {
+            val isPlayer1 = !(viewModel.matchState.value?.sidesSwapped ?: false)
+            viewModel.handleBasicWin(isPlayer1)
+        }
+        basicScoringBinding.buttonFaultServerLeft.setOnClickListener {
+            viewModel.handleBasicFault()
+        }
+        // Win buttons - odbierający (lewa strona)
+        basicScoringBinding.buttonWinReceiverLeft.setOnClickListener {
+            val isPlayer1 = !(viewModel.matchState.value?.sidesSwapped ?: false)
+            viewModel.handleBasicWin(isPlayer1)
+        }
+        // Win buttons - serwujący (prawa strona)
+        basicScoringBinding.buttonWinServerRight.setOnClickListener {
+            val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
+            viewModel.handleBasicWin(isPlayer1)
+        }
+        basicScoringBinding.buttonFaultServerRight.setOnClickListener {
+            viewModel.handleBasicFault()
+        }
+        // Win buttons - odbierający (prawa strona)
+        basicScoringBinding.buttonWinReceiverRight.setOnClickListener {
+            val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
+            viewModel.handleBasicWin(isPlayer1)
         }
         
         // Przycisk Cofnij z potwierdzeniem
@@ -286,6 +347,10 @@ class MatchActivity : AppCompatActivity() {
             // Rally używa nazw zespołów
             rallyBinding.textPlayerLeftName.text = if (!state.sidesSwapped) team1Name else team2Name
             rallyBinding.textPlayerRightName.text = if (!state.sidesSwapped) team2Name else team1Name
+            
+            // Basic scoring - nazwy zespołów
+            basicScoringBinding.textPlayerLeftName.text = if (!state.sidesSwapped) team1Name else team2Name
+            basicScoringBinding.textPlayerRightName.text = if (!state.sidesSwapped) team2Name else team1Name
         } else {
             // Singiel - normalna logika
             serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.player_serves, state.player1.getDisplayName())
@@ -298,7 +363,116 @@ class MatchActivity : AppCompatActivity() {
             // Aktualizuj nazwiska w widoku rally (bez flag) - uwzględnij zamianę stron
             rallyBinding.textPlayerLeftName.text = leftPlayer.getDisplayName()
             rallyBinding.textPlayerRightName.text = rightPlayer.getDisplayName()
+            
+            // Aktualizuj nazwiska w widoku basic scoring - uwzględnij zamianę stron
+            basicScoringBinding.textPlayerLeftName.text = leftPlayer.getDisplayName()
+            basicScoringBinding.textPlayerRightName.text = rightPlayer.getDisplayName()
         }
+    }
+    
+    private fun updateBasicScoringView(state: MatchState) {
+        // Określ, po której stronie ekranu jest serwujący
+        val serverOnLeft = (state.isPlayer1Serving && !state.sidesSwapped) ||
+                          (!state.isPlayer1Serving && state.sidesSwapped)
+        
+        if (serverOnLeft) {
+            // Serwujący po lewej - pokaż WIN+FAULT po lewej, tylko WIN po prawej
+            basicScoringBinding.layoutServerLeft.visibility = View.VISIBLE
+            basicScoringBinding.layoutReceiverLeft.visibility = View.GONE
+            basicScoringBinding.layoutServerRight.visibility = View.GONE
+            basicScoringBinding.layoutReceiverRight.visibility = View.VISIBLE
+        } else {
+            // Serwujący po prawej - tylko WIN po lewej, WIN+FAULT po prawej
+            basicScoringBinding.layoutServerLeft.visibility = View.GONE
+            basicScoringBinding.layoutReceiverLeft.visibility = View.VISIBLE
+            basicScoringBinding.layoutServerRight.visibility = View.VISIBLE
+            basicScoringBinding.layoutReceiverRight.visibility = View.GONE
+        }
+        
+        // Dynamiczny tekst i kolor przycisku w zależności od serwisu
+        val isFirst = state.isFirstServe
+        if (isFirst) {
+            // 1. serwis — przycisk "2. SERWIS" (pomarańczowy)
+            basicScoringBinding.buttonFaultServerLeft.text = getString(R.string.second_serve_button)
+            basicScoringBinding.buttonFaultServerRight.text = getString(R.string.second_serve_button)
+            basicScoringBinding.buttonFaultServerLeft.setBackgroundColor(0xFFFF9800.toInt())
+            basicScoringBinding.buttonFaultServerRight.setBackgroundColor(0xFFFF9800.toInt())
+        } else {
+            // 2. serwis — przycisk "2x FAULT" (czerwony)
+            basicScoringBinding.buttonFaultServerLeft.text = getString(R.string.double_fault_button)
+            basicScoringBinding.buttonFaultServerRight.text = getString(R.string.double_fault_button)
+            basicScoringBinding.buttonFaultServerLeft.setBackgroundColor(0xFFF44336.toInt())
+            basicScoringBinding.buttonFaultServerRight.setBackgroundColor(0xFFF44336.toInt())
+        }
+        
+        // Aktualizuj informację o serwisie z animacją przejścia
+        val shouldAnimate = wasFirstServe && !isFirst
+        wasFirstServe = isFirst
+        
+        if (isFirst) {
+            basicScoringBinding.textServeInfo.text = getString(R.string.first_serve)
+        } else {
+            val fullText = getString(R.string.second_serve)
+            val styledText = android.text.SpannableString(fullText)
+            val firstServeEnd = fullText.indexOf(">")
+            if (firstServeEnd > 0) {
+                styledText.setSpan(
+                    android.text.style.ForegroundColorSpan(android.graphics.Color.GRAY),
+                    0, firstServeEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                // Pogrub "2nd serve" po strzałce
+                styledText.setSpan(
+                    android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                    firstServeEnd + 1, fullText.length,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                // Powiększ "2nd serve"
+                styledText.setSpan(
+                    android.text.style.RelativeSizeSpan(1.3f),
+                    firstServeEnd + 1, fullText.length,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            basicScoringBinding.textServeInfo.text = styledText
+        }
+        
+        // Animacja slide przejścia na 2. serwis
+        if (shouldAnimate) {
+            animateServeTransition()
+        }
+    }
+    
+    /**
+     * Animacja przejścia na 2. serwis — slide down + scale pulse na pasku serwisu
+     */
+    private fun animateServeTransition() {
+        val serveInfoView = basicScoringBinding.textServeInfo
+        
+        // Slide z góry + fade in
+        serveInfoView.translationY = -80f
+        serveInfoView.alpha = 0f
+        serveInfoView.scaleX = 0.8f
+        serveInfoView.scaleY = 0.8f
+        
+        val slideDown = ObjectAnimator.ofFloat(serveInfoView, "translationY", -80f, 0f)
+        val fadeIn = ObjectAnimator.ofFloat(serveInfoView, "alpha", 0f, 1f)
+        val scaleX = ObjectAnimator.ofFloat(serveInfoView, "scaleX", 0.8f, 1.15f, 1f)
+        val scaleY = ObjectAnimator.ofFloat(serveInfoView, "scaleY", 0.8f, 1.15f, 1f)
+        
+        AnimatorSet().apply {
+            playTogether(slideDown, fadeIn, scaleX, scaleY)
+            duration = 450
+            interpolator = android.view.animation.OvershootInterpolator(1.2f)
+            start()
+        }
+        
+        // Krótki flash tła na czerwono, potem powrót
+        val originalColor = basicScoringBinding.textServeInfo.currentTextColor
+        basicScoringBinding.textServeInfo.setTextColor(0xFFF44336.toInt())
+        serveInfoView.postDelayed({
+            basicScoringBinding.textServeInfo.setTextColor(originalColor)
+        }, 600)
     }
     
     private fun updateScoreboard(state: MatchState) {
@@ -531,6 +705,7 @@ class MatchActivity : AppCompatActivity() {
         animateViewTransition(binding.layoutServerSelection.root, View.GONE)
         animateViewTransition(binding.layoutServe.root, View.GONE)
         animateViewTransition(binding.layoutRally.root, View.GONE)
+        animateViewTransition(binding.layoutBasicScoring.root, View.GONE)
         animateViewTransition(binding.layoutMatchFinished.root, View.GONE)
         
         // Scoreboard widoczny wszędzie oprócz wyboru serwującego
@@ -588,6 +763,11 @@ class MatchActivity : AppCompatActivity() {
                     // Nazwiska są już ustawione w updatePlayerNames()
                 }
                 
+                MatchView.BASIC_SCORING -> {
+                    animateViewTransition(binding.layoutBasicScoring.root, View.VISIBLE)
+                    updateBasicScoringView(state)
+                }
+                
                 MatchView.MATCH_FINISHED -> {
                     animateViewTransition(binding.layoutMatchFinished.root, View.VISIBLE)
                     
@@ -617,6 +797,20 @@ class MatchActivity : AppCompatActivity() {
         
         matchFinishedBinding.textDoubleFaultsPlayer1.text = state.player1Stats.doubleFaults.toString()
         matchFinishedBinding.textDoubleFaultsPlayer2.text = state.player2Stats.doubleFaults.toString()
+        
+        matchFinishedBinding.textWinnersPlayer1.text = state.player1Stats.winners.toString()
+        matchFinishedBinding.textWinnersPlayer2.text = state.player2Stats.winners.toString()
+        
+        matchFinishedBinding.textUnforcedErrorsPlayer1.text = state.player1Stats.unforcedErrors.toString()
+        matchFinishedBinding.textUnforcedErrorsPlayer2.text = state.player2Stats.unforcedErrors.toString()
+        
+        matchFinishedBinding.textFirstServePctPlayer1.text = "${state.player1Stats.getFirstServePercentage()}%"
+        matchFinishedBinding.textFirstServePctPlayer2.text = "${state.player2Stats.getFirstServePercentage()}%"
+        
+        // Przycisk Nowy Mecz
+        matchFinishedBinding.buttonNewMatch.setOnClickListener {
+            finish()
+        }
     }
     
     /**

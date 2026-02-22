@@ -7,8 +7,8 @@ import com.google.gson.annotations.SerializedName
  */
 data class CourtsResponse(
     @SerializedName("courts")
-    val courts: List<Court>,
+    val courts: List<Court> = emptyList(),
     
     @SerializedName("total_count")
-    val totalCount: Int
+    val totalCount: Int = 0
 )

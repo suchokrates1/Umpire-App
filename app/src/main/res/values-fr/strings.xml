@@ -90,9 +90,25 @@
     <string name="error_network">Erreur de connexion réseau</string>
     <string name="error_unknown">Erreur inconnue</string>
     
+    <!-- Stats Mode Selection -->
+    <string name="stats_mode_title">Mode statistiques</string>
+    <string name="stats_mode_basic">Simple</string>
+    <string name="stats_mode_basic_short">WIN + FAUTE\nRapide &amp; simple</string>
+    <string name="stats_mode_advanced">Avancé</string>
+    <string name="stats_mode_advanced_short">Ace, Gagnant, Erreurs…\nStatistiques complètes</string>
+    
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
+
+    <!-- Statistics Labels -->
+    <string name="winners_stat">Coups gagnants</string>
+    <string name="forced_errors_stat">Erreurs forcées</string>
+    <string name="unforced_errors_stat">Fautes directes</string>
+    <string name="first_serve_pct">1er service %</string>
+    <string name="new_match_button">Nouveau match</string>
+    <string name="confirm_exit_title">Quitter le match ?</string>
+    <string name="confirm_exit_message">Le match est encore en cours. Voulez-vous vraiment quitter ?</string>
 </resources>

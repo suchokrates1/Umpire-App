@@ -54,6 +54,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- WIDOK: Basic scoring (uproszczony tryb) -->
+    <include
+        android:id="@+id/layoutBasicScoring"
+        layout="@layout/layout_basic_scoring"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutScoreboard"
+        app:layout_constraintBottom_toTopOf="@id/buttonUndo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- WIDOK: Koniec meczu -->
     <include
         android:id="@+id/layoutMatchFinished"

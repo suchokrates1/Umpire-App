@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Informacja o serwisie -->
+    <TextView
+        android:id="@+id/textServeInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/first_serve"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Nagłówek LEWA strona -->
+    <TextView
+        android:id="@+id/textPlayerLeftName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Player 1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toBottomOf="@id/textServeInfo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Nagłówek PRAWA strona -->
+    <TextView
+        android:id="@+id/textPlayerRightName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Player 2"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toBottomOf="@id/textServeInfo"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- ======================== -->
+    <!-- LEWA STRONA - Serwujący -->
+    <!-- ======================== -->
+    <LinearLayout
+        android:id="@+id/layoutServerLeft"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerLeftName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline">
+
+        <!-- WIN - serwujący -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonWinServerLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:text="@string/win_point"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#4CAF50"/>
+
+        <!-- 2. SERWIS / DOUBLE FAULT -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonFaultServerLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:text="@string/second_serve_button"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#FF9800"/>
+
+    </LinearLayout>
+
+    <!-- LEWA STRONA - Odbierający (tylko WIN) -->
+    <LinearLayout
+        android:id="@+id/layoutReceiverLeft"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerLeftName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonWinReceiverLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/win_point"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#4CAF50"/>
+
+    </LinearLayout>
+
+    <!-- ======================== -->
+    <!-- PRAWA STRONA - Serwujący -->
+    <!-- ======================== -->
+    <LinearLayout
+        android:id="@+id/layoutServerRight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerRightName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- WIN - serwujący -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonWinServerRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:text="@string/win_point"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#4CAF50"/>
+
+        <!-- 2. SERWIS / DOUBLE FAULT -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonFaultServerRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:text="@string/second_serve_button"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#FF9800"/>
+
+    </LinearLayout>
+
+    <!-- PRAWA STRONA - Odbierający (tylko WIN) -->
+    <LinearLayout
+        android:id="@+id/layoutReceiverRight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/textPlayerRightName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonWinReceiverRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/win_point"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#4CAF50"/>
+
+    </LinearLayout>
+
+    <!-- Guideline dla podziału na pół -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

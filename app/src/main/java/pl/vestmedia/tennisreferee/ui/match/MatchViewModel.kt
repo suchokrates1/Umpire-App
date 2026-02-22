@@ -46,7 +46,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             state.isPlayer1Serving = isPlayer1
             state.matchStartTime = System.currentTimeMillis()
             _matchState.value = state
-            _currentView.value = MatchView.SERVE
+            
+            // W trybie basic przejdź do uproszczonego widoku
+            if (state.statsMode == StatsMode.BASIC) {
+                _currentView.value = MatchView.BASIC_SCORING
+            } else {
+                _currentView.value = MatchView.SERVE
+            }
             
             // Log match start event
             logMatchEvent("match_start")
@@ -81,6 +87,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 previousIsTiebreak = state.isTiebreak,
                 previousIsSuperTiebreak = state.isSuperTiebreak,
                 previousSetsHistorySize = state.setsHistory.size,
+                previousSidesSwapped = state.sidesSwapped,
+                previousTotalGamesPlayed = state.totalGamesPlayed,
+                previousCurrentServer = state.currentServer,
+                previousIsMatchFinished = state.isMatchFinished,
                 previousPlayer1Stats = state.player1Stats.copy(),
                 previousPlayer2Stats = state.player2Stats.copy(),
                 description = description
@@ -113,6 +123,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             state.isFirstServe = lastAction.previousIsFirstServe
             state.isTiebreak = lastAction.previousIsTiebreak
             state.isSuperTiebreak = lastAction.previousIsSuperTiebreak
+            state.sidesSwapped = lastAction.previousSidesSwapped
+            state.totalGamesPlayed = lastAction.previousTotalGamesPlayed
+            state.currentServer = lastAction.previousCurrentServer
+            state.isMatchFinished = lastAction.previousIsMatchFinished
             
             // Przywróć historię setów
             while (state.setsHistory.size > lastAction.previousSetsHistorySize) {
@@ -143,7 +157,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             _canUndo.value = state.actionsHistory.isNotEmpty()
             _undoMessage.value = "Cofnięto: ${lastAction.description}"
             _matchState.value = state
-            _currentView.value = MatchView.SERVE
+            _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
         }
     }
     
@@ -303,6 +317,89 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
+    // ===== BASIC MODE =====
+    
+    /**
+     * Tryb BASIC: Gracz wygrywa punkt (serwujący lub odbierający)
+     * W basic mode nie rozróżniamy ace/winner/forced/unforced — po prostu WIN.
+     */
+    fun handleBasicWin(isPlayer1: Boolean) {
+        _matchState.value?.let { state ->
+            val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
+            saveStateBeforeAction(ActionType.WINNER, "Win - $playerName")
+            
+            if (isPlayer1) {
+                state.player1Stats.winners++
+            } else {
+                state.player2Stats.winners++
+            }
+            
+            // Statystyki serwisu — serwis wpadł (1. lub 2.)
+            if (state.isFirstServe) {
+                // 1. serwis wpadł
+                if (state.isPlayer1Serving) {
+                    state.player1Stats.firstServesIn++
+                    state.player1Stats.firstServesTotal++
+                } else {
+                    state.player2Stats.firstServesIn++
+                    state.player2Stats.firstServesTotal++
+                }
+            } else {
+                // 2. serwis wpadł (1. był fault — już policzony)
+                if (state.isPlayer1Serving) {
+                    state.player1Stats.secondServesIn++
+                    state.player1Stats.secondServesTotal++
+                } else {
+                    state.player2Stats.secondServesIn++
+                    state.player2Stats.secondServesTotal++
+                }
+            }
+            
+            addPoint(isPlayer1)
+            state.isFirstServe = true
+            _matchState.value = state
+            checkGameAndSetStatus()
+        }
+    }
+    
+    /**
+     * Tryb BASIC: Fault serwującego
+     * 1. serwis → przejście na 2. serwis
+     * 2. serwis → podwójny błąd, punkt dla odbierającego
+     */
+    fun handleBasicFault() {
+        _matchState.value?.let { state ->
+            if (state.isFirstServe) {
+                saveStateBeforeAction(ActionType.FAULT, "Fault - 1st serve")
+                // 1. serwis nieudany — policz próbę
+                if (state.isPlayer1Serving) {
+                    state.player1Stats.firstServesTotal++
+                } else {
+                    state.player2Stats.firstServesTotal++
+                }
+                state.isFirstServe = false
+                _matchState.value = state
+            } else {
+                // Podwójny błąd
+                val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                saveStateBeforeAction(ActionType.DOUBLE_FAULT, "Double Fault - $serverName")
+                
+                if (state.isPlayer1Serving) {
+                    state.player1Stats.doubleFaults++
+                    state.player1Stats.secondServesTotal++
+                    addPoint(false)
+                } else {
+                    state.player2Stats.doubleFaults++
+                    state.player2Stats.secondServesTotal++
+                    addPoint(true)
+                }
+                state.isFirstServe = true
+                _matchState.value = state
+                checkGameAndSetStatus()
+            }
+        }
+    }
+    
     /**
      * Rotuje serwującego w deblu (1 -> 2 -> 3 -> 4 -> 1)
      */
@@ -398,6 +495,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     state.player2Games = 0
                     state.isTiebreak = false
                     state.isSuperTiebreak = false
+                    
+                    // Zmiana stron i reset gemów po tiebreaku
+                    state.sidesSwapped = !state.sidesSwapped
+                    state.totalGamesPlayed = 0
                     
                     // Sprawdź czy mecz się skończył (szczególnie ważne dla Super TB)
                     if (state.shouldEndMatch()) {
@@ -507,13 +608,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 
                 _matchState.value = state
-                _currentView.value = MatchView.SERVE
+                _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
                 
                 // Synchronizuj wynik z serwerem po każdym gemie
                 syncMatchWithServer()
             } else {
                 // Gem trwa dalej
-                _currentView.value = MatchView.SERVE
+                _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
             }
         }
     }
@@ -525,6 +626,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         when (_currentView.value) {
             MatchView.SERVE -> _currentView.value = MatchView.SERVER_SELECTION
             MatchView.RALLY -> _currentView.value = MatchView.SERVE
+            MatchView.BASIC_SCORING -> _currentView.value = MatchView.SERVER_SELECTION
             else -> {}
         }
     }
@@ -543,14 +645,12 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     player1 = PlayerInfo(
                         name = state.player1.getDisplayName(),
                         flag = state.player1.flag,
-                        isServing = state.isPlayer1Serving && !state.sidesSwapped || 
-                                   !state.isPlayer1Serving && state.sidesSwapped
+                        isServing = state.isPlayer1Serving
                     ),
                     player2 = PlayerInfo(
                         name = state.player2.getDisplayName(),
                         flag = state.player2.flag,
-                        isServing = !state.isPlayer1Serving && !state.sidesSwapped || 
-                                   state.isPlayer1Serving && state.sidesSwapped
+                        isServing = !state.isPlayer1Serving
                     ),
                     score = ScoreInfo(
                         player1Sets = state.player1Sets,
@@ -562,6 +662,18 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         isTiebreak = state.isTiebreak,
                         isSuperTiebreak = state.isSuperTiebreak,
                         matchFinished = state.isMatchFinished
+                    ),
+                    stats = LiveStatsInfo(
+                        player1Aces = state.player1Stats.aces,
+                        player1DoubleFaults = state.player1Stats.doubleFaults,
+                        player1Winners = state.player1Stats.winners,
+                        player1UnforcedErrors = state.player1Stats.unforcedErrors,
+                        player1FirstServePct = state.player1Stats.getFirstServePercentage(),
+                        player2Aces = state.player2Stats.aces,
+                        player2DoubleFaults = state.player2Stats.doubleFaults,
+                        player2Winners = state.player2Stats.winners,
+                        player2UnforcedErrors = state.player2Stats.unforcedErrors,
+                        player2FirstServePct = state.player2Stats.getFirstServePercentage()
                     )
                 )
                 
@@ -676,5 +788,6 @@ enum class MatchView {
     SERVER_SELECTION,  // Wybór pierwszego serwującego
     SERVE,             // Widok serwisu (Ace/Fault/Ball in play)
     RALLY,             // Widok wymiany (Winner/Forced/Unforced)
+    BASIC_SCORING,     // Uproszczony widok (Win/Fault)
     MATCH_FINISHED     // Koniec meczu
 }

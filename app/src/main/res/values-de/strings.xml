@@ -90,9 +90,25 @@
     <string name="error_network">Netzwerkverbindungsfehler</string>
     <string name="error_unknown">Unbekannter Fehler</string>
     
+    <!-- Stats Mode Selection -->
+    <string name="stats_mode_title">Statistikmodus</string>
+    <string name="stats_mode_basic">Einfach</string>
+    <string name="stats_mode_basic_short">WIN + FAULT\nSchnell &amp; einfach</string>
+    <string name="stats_mode_advanced">Erweitert</string>
+    <string name="stats_mode_advanced_short">Ass, Gewinner, Fehler…\nVolle Statistiken</string>
+    
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+
+    <!-- Statistics Labels -->
+    <string name="winners_stat">Gewinner-Schläge</string>
+    <string name="forced_errors_stat">Erzwungene Fehler</string>
+    <string name="unforced_errors_stat">Unerzwungene Fehler</string>
+    <string name="first_serve_pct">1. Aufschlag %</string>
+    <string name="new_match_button">Neues Spiel</string>
+    <string name="confirm_exit_title">Spiel verlassen?</string>
+    <string name="confirm_exit_message">Das Spiel ist noch im Gange. Möchten Sie wirklich gehen?</string>
 </resources>

@@ -17,31 +17,37 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="16dp"/>
 
-    <!-- Przycisk zmiany stron -->
+    <!-- Duży przycisk zmiany stron - 40% wysokości -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonSwapSides"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="@string/swap_sides"
-        android:textSize="14sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         app:icon="@android:drawable/ic_menu_rotate"
         app:iconGravity="start"
+        app:iconSize="36dp"
+        app:cornerRadius="16dp"
         app:layout_constraintTop_toBottomOf="@id/textTitle"
+        app:layout_constraintBottom_toTopOf="@id/buttonPlayer1Serves"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp"/>
+        app:layout_constraintVertical_weight="4"
+        app:layout_constraintVertical_chainStyle="spread"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"/>
 
-    <!-- Duży przycisk - Gracz 1 serwuje -->
+    <!-- Przycisk - Gracz 1 serwuje (30% wysokości) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonPlayer1Serves"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="[Gracz 1]\nSerwuje"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:cornerRadius="16dp"
         android:layout_marginEnd="8dp"
@@ -49,15 +55,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/buttonPlayer2Serves"
+        app:layout_constraintVertical_weight="3"
         app:layout_constraintWidth_percent="0.48"/>
 
-    <!-- Duży przycisk - Gracz 2 serwuje -->
+    <!-- Przycisk - Gracz 2 serwuje (30% wysokości) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonPlayer2Serves"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="[Gracz 2]\nSerwuje"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:cornerRadius="16dp"
         android:layout_marginStart="8dp"
@@ -65,6 +72,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/buttonPlayer1Serves"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_weight="3"
         app:layout_constraintWidth_percent="0.48"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

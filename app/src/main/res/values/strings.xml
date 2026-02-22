@@ -59,6 +59,8 @@
     <string name="serve">Serve</string>
     <string name="ace">ACE</string>
     <string name="fault">FAULT</string>
+    <string name="second_serve_button">2. SERWIS</string>
+    <string name="double_fault_button">2x FAULT</string>
     <string name="ball_in_play">BALL IN PLAY</string>
     <string name="winner">WINNER</string>
     <string name="forced_error">FORCED ERROR</string>
@@ -68,6 +70,16 @@
     <string name="finish">Finish</string>
     <string name="finish_match">Finish Match</string>
     <string name="new_match">New Match</string>
+    
+    <!-- Stats Mode Selection -->
+    <string name="stats_mode_title">Statistics Mode</string>
+    <string name="stats_mode_basic">Basic</string>
+    <string name="stats_mode_basic_desc">Simplified scoring: only Win and Fault buttons.\nTracks: double faults.</string>
+    <string name="stats_mode_basic_short">WIN + FAULT only\nQuick &amp; simple</string>
+    <string name="stats_mode_advanced">Advanced</string>
+    <string name="stats_mode_advanced_desc">Full scoring: Ace, Fault, Ball in Play, Winner, Forced Error, Unforced Error.\nTracks: aces, double faults, winners, forced/unforced errors, serve %.</string>
+    <string name="stats_mode_advanced_short">Ace, Winner, Errors…\nFull statistics</string>
+    <string name="win_point">WIN</string>
     
     <!-- Scoreboard -->
     <string name="scoreboard_player">Player</string>
@@ -86,6 +98,11 @@
     <string name="statistics">Statistics</string>
     <string name="aces">Aces</string>
     <string name="double_faults">Double Faults</string>
+    <string name="winners_stat">Winners</string>
+    <string name="forced_errors_stat">Forced Errors</string>
+    <string name="unforced_errors_stat">Unforced Errors</string>
+    <string name="first_serve_pct">1st Serve %</string>
+    <string name="new_match_button">New Match</string>
     <string name="player_serves_short">Serves</string>
     
     <!-- Errors -->
@@ -99,6 +116,8 @@
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="confirm_exit_title">Leave Match?</string>
+    <string name="confirm_exit_message">The match is still in progress. Are you sure you want to leave?</string>
     
     <!-- Match History -->
     <string name="match_history_title">Match History</string>

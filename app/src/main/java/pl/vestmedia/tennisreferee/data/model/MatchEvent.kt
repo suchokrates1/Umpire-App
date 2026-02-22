@@ -21,6 +21,9 @@ data class MatchEvent(
     @SerializedName("score")
     val score: ScoreInfo,
     
+    @SerializedName("stats")
+    val stats: LiveStatsInfo? = null,
+    
     @SerializedName("timestamp")
     val timestamp: Long = System.currentTimeMillis()
 )
@@ -71,4 +74,28 @@ data class MatchEventResponse(
     
     @SerializedName("message")
     val message: String?
+)
+
+data class LiveStatsInfo(
+    @SerializedName("player1_aces")
+    val player1Aces: Int,
+    @SerializedName("player1_double_faults")
+    val player1DoubleFaults: Int,
+    @SerializedName("player1_winners")
+    val player1Winners: Int,
+    @SerializedName("player1_unforced_errors")
+    val player1UnforcedErrors: Int,
+    @SerializedName("player1_first_serve_pct")
+    val player1FirstServePct: Int,
+    
+    @SerializedName("player2_aces")
+    val player2Aces: Int,
+    @SerializedName("player2_double_faults")
+    val player2DoubleFaults: Int,
+    @SerializedName("player2_winners")
+    val player2Winners: Int,
+    @SerializedName("player2_unforced_errors")
+    val player2UnforcedErrors: Int,
+    @SerializedName("player2_first_serve_pct")
+    val player2FirstServePct: Int
 )

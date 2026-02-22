@@ -17,6 +17,7 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityPlayerSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.data.model.StatsMode
 import pl.vestmedia.tennisreferee.ui.match.MatchActivity
 
 /**
@@ -233,6 +234,37 @@ class PlayerSelectionActivity : AppCompatActivity() {
             return
         }
         
+        // Pokaż dialog wyboru trybu statystyk
+        showStatsModeDialog(selectedPlayers)
+    }
+    
+    private fun showStatsModeDialog(selectedPlayers: List<Player>) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_stats_mode, null)
+        
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+        
+        // Make dialog background transparent so card corners are visible
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardBasicMode)
+            .setOnClickListener {
+                dialog.dismiss()
+                startMatchWithMode(selectedPlayers, StatsMode.BASIC)
+            }
+        
+        dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardAdvancedMode)
+            .setOnClickListener {
+                dialog.dismiss()
+                startMatchWithMode(selectedPlayers, StatsMode.ADVANCED)
+            }
+        
+        dialog.show()
+    }
+    
+    private fun startMatchWithMode(selectedPlayers: List<Player>, statsMode: StatsMode) {
         val isDoublesMatch = viewModel.isDoubles.value ?: false
         
         // Utwórz stan meczu
@@ -246,7 +278,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 courtId = courtId,
                 courtName = courtName,
                 isDoubles = true,
-                currentServer = 1
+                currentServer = 1,
+                statsMode = statsMode
             )
         } else {
             // Singiel - 2 graczy
@@ -255,7 +288,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 player2 = selectedPlayers[1],
                 courtId = courtId,
                 courtName = courtName,
-                isDoubles = false
+                isDoubles = false,
+                statsMode = statsMode
             )
         }
         
