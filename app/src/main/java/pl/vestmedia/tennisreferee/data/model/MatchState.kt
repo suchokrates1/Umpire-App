@@ -54,6 +54,9 @@ data class MatchState(
     val player1Stats: MatchStatistics = MatchStatistics(),
     val player2Stats: MatchStatistics = MatchStatistics(),
     
+    // Tryb statystyk (BASIC = uproszczony, ADVANCED = pełny)
+    var statsMode: StatsMode = StatsMode.ADVANCED,
+    
     // Historia akcji (do cofania)
     val actionsHistory: @RawValue MutableList<MatchAction> = mutableListOf()
 ) : Parcelable {

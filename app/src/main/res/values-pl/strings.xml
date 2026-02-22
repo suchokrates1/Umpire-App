@@ -13,6 +13,13 @@
     <string name="court_name">Kort %1$s</string>
     <string name="court_available">Dostępny</string>
     <string name="court_occupied">Zajęty</string>
+    
+    <!-- Stats Mode Selection -->
+    <string name="stats_mode_title">Tryb statystyk</string>
+    <string name="stats_mode_basic">Podstawowy</string>
+    <string name="stats_mode_basic_short">WIN + FAULT\nSzybko i prosto</string>
+    <string name="stats_mode_advanced">Zaawansowany</string>
+    <string name="stats_mode_advanced_short">As, Winner, Błędy…\nPełne statystyki</string>
     <string name="court_pin_title">Autoryzacja kortu</string>
     <string name="court_pin_message">Wprowadź PIN dla kortu: %1$s</string>
     <string name="pin_hint">Wprowadź PIN</string>
@@ -122,4 +129,13 @@
     <string name="app_description">Profesjonalna aplikacja dla sędziów tenisowych do prowadzenia wyników w czasie rzeczywistym</string>
     <string name="version_format">Wersja %1$s</string>
     <string name="version_unknown">Wersja nieznana</string>
+
+    <!-- Statistics Labels -->
+    <string name="winners_stat">Zagrania wygrywające</string>
+    <string name="forced_errors_stat">Błędy wymuszone</string>
+    <string name="unforced_errors_stat">Błędy niewymuszone</string>
+    <string name="first_serve_pct">1. serwis %</string>
+    <string name="new_match_button">Nowy mecz</string>
+    <string name="confirm_exit_title">Opuścić mecz?</string>
+    <string name="confirm_exit_message">Mecz jest nadal w toku. Czy na pewno chcesz wyjść?</string>
 </resources>

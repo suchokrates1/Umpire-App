@@ -157,7 +157,138 @@
                     android:padding="8dp"/>
             </TableRow>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/dividerVertical"/>
+
+            <!-- Winners -->
+            <TableRow
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="4dp">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/winners_stat"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:padding="8dp"/>
+                
+                <TextView
+                    android:id="@+id/textWinnersPlayer1"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="0"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                
+                <TextView
+                    android:id="@+id/textWinnersPlayer2"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="0"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/dividerVertical"/>
+
+            <!-- Unforced Errors -->
+            <TableRow
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="4dp">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/unforced_errors_stat"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:padding="8dp"/>
+                
+                <TextView
+                    android:id="@+id/textUnforcedErrorsPlayer1"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="0"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                
+                <TextView
+                    android:id="@+id/textUnforcedErrorsPlayer2"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="0"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/dividerVertical"/>
+
+            <!-- 1st Serve % -->
+            <TableRow
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="4dp">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/first_serve_pct"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:padding="8dp"/>
+                
+                <TextView
+                    android:id="@+id/textFirstServePctPlayer1"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="0%"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                
+                <TextView
+                    android:id="@+id/textFirstServePctPlayer2"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="0%"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+            </TableRow>
+
         </TableLayout>
+
+        <!-- New Match Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonNewMatch"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/new_match_button"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            app:cornerRadius="12dp"/>
 
     </LinearLayout>
 

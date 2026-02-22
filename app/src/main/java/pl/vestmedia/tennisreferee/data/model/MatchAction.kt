@@ -23,6 +23,10 @@ data class MatchAction(
     val previousIsTiebreak: Boolean,
     val previousIsSuperTiebreak: Boolean,
     val previousSetsHistorySize: Int,
+    val previousSidesSwapped: Boolean = false,
+    val previousTotalGamesPlayed: Int = 0,
+    val previousCurrentServer: Int = 1,
+    val previousIsMatchFinished: Boolean = false,
     
     // Statystyki przed akcją
     val previousPlayer1Stats: MatchStatistics,
