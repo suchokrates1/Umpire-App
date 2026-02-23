@@ -94,6 +94,15 @@
     <string name="super_tiebreak">Super tie-break (to %1$d)</string>
     <string name="tiebreak_mode">Tie-break (to 7, win by 2)</string>
     <string name="super_tiebreak_mode">Super Tie-break (to 10, win by 2)</string>
+
+    <!-- Match announcements -->
+    <string name="announce_side_change">Change Sides!</string>
+    <string name="announce_side_change_msg">Players change ends of the court.</string>
+    <string name="announce_tiebreak">Tie-break!</string>
+    <string name="announce_tiebreak_msg">Score is 4–4. Starting tie-break (first to 7, win by 2).</string>
+    <string name="announce_super_tiebreak">Super Tie-break!</string>
+    <string name="announce_super_tiebreak_msg">Sets are 1–1. Starting deciding super tie-break (first to 10, win by 2).</string>
+    <string name="continue_btn">Continue</string>
     <string name="match_finished_title">Match Finished!</string>
     <string name="statistics">Statistics</string>
     <string name="aces">Aces</string>

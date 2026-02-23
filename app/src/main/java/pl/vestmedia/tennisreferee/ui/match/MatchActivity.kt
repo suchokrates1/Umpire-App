@@ -133,6 +133,14 @@ class MatchActivity : AppCompatActivity() {
                 viewModel.clearUndoMessage()
             }
         }
+        
+        // Match announcements (side change, tiebreak, super tiebreak)
+        viewModel.matchAnnouncement.observe(this) { announcement ->
+            announcement?.let {
+                showMatchAnnouncement(it)
+                viewModel.clearMatchAnnouncement()
+            }
+        }
     }
     
     private fun setupListeners() {
@@ -934,6 +942,38 @@ class MatchActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopTimerUpdates()
+    }
+    
+    /**
+     * Shows a blocking announcement dialog for match events.
+     * The umpire must tap "Dalej" / "Continue" to proceed.
+     */
+    private fun showMatchAnnouncement(type: String) {
+        val (title, message, icon) = when (type) {
+            "side_change" -> Triple(
+                getString(R.string.announce_side_change),
+                getString(R.string.announce_side_change_msg),
+                "\uD83D\uDD04"  // 🔄
+            )
+            "tiebreak" -> Triple(
+                getString(R.string.announce_tiebreak),
+                getString(R.string.announce_tiebreak_msg),
+                "\uD83C\uDFBE"  // 🎾
+            )
+            "super_tiebreak" -> Triple(
+                getString(R.string.announce_super_tiebreak),
+                getString(R.string.announce_super_tiebreak_msg),
+                "\uD83C\uDFC6"  // 🏆
+            )
+            else -> return
+        }
+        
+        AlertDialog.Builder(this)
+            .setTitle("$icon  $title")
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton(R.string.continue_btn, null)
+            .show()
     }
 }
 
