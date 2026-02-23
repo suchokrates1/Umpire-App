@@ -85,6 +85,15 @@
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (do %1$d)</string>
     <string name="super_tiebreak">Super tie-break (do %1$d)</string>
+
+    <!-- Match announcements -->
+    <string name="announce_side_change">Zmiana stron!</string>
+    <string name="announce_side_change_msg">Zawodnicy zamieniają się stronami kortu.</string>
+    <string name="announce_tiebreak">Tie-break!</string>
+    <string name="announce_tiebreak_msg">Wynik 4–4. Rozpoczynamy tie-break (do 7, wygrana różnicą 2).</string>
+    <string name="announce_super_tiebreak">Super Tie-break!</string>
+    <string name="announce_super_tiebreak_msg">Sety 1–1. Rozpoczynamy decydujący super tie-break (do 10, wygrana różnicą 2).</string>
+    <string name="continue_btn">Dalej</string>
     <string name="match_finished_title">Koniec meczu!</string>
     <string name="statistics">Statystyki</string>
     <string name="aces">Asy</string>

@@ -28,6 +28,15 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private val _undoMessage = MutableLiveData<String?>()
     val undoMessage: LiveData<String?> = _undoMessage
     
+    // Match announcements (side change, tiebreak, super tiebreak)
+    // Value: "side_change" | "tiebreak" | "super_tiebreak" | null
+    private val _matchAnnouncement = MutableLiveData<String?>()
+    val matchAnnouncement: LiveData<String?> = _matchAnnouncement
+    
+    fun clearMatchAnnouncement() {
+        _matchAnnouncement.value = null
+    }
+    
     private val apiService = RetrofitClient.apiService
     private val matchHistoryRepository = (application as TennisRefereeApp).matchHistoryRepository
     
@@ -452,6 +461,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 if (totalPoints > 0 && totalPoints % 6 == 0) {
                     state.sidesSwapped = !state.sidesSwapped
                     logMatchEvent("side_change")
+                    _matchAnnouncement.value = "side_change"
                 }
             }
         }
@@ -499,6 +509,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     // Zmiana stron i reset gemów po tiebreaku
                     state.sidesSwapped = !state.sidesSwapped
                     state.totalGamesPlayed = 0
+                    _matchAnnouncement.value = "side_change"
                     
                     // Sprawdź czy mecz się skończył (szczególnie ważne dla Super TB)
                     if (state.shouldEndMatch()) {
@@ -525,6 +536,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     // Automatyczna zmiana stron co nieparzyste gemy (1, 3, 5, 7...)
                     if (state.totalGamesPlayed % 2 == 1) {
                         state.sidesSwapped = !state.sidesSwapped
+                        _matchAnnouncement.value = "side_change"
                     }
                 }
                 
@@ -591,6 +603,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     // Sprawdź czy należy rozpocząć super tiebreak (1:1 w setach)
                     if (state.player1Sets == 1 && state.player2Sets == 1) {
                         state.isSuperTiebreak = true
+                        _matchAnnouncement.value = "super_tiebreak"
                     }
                     
                     // Resetuj gemy i licznik rozegranych gemów na nowy set
@@ -600,11 +613,16 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     
                     // Automatyczna zmiana stron po zakończeniu seta
                     state.sidesSwapped = !state.sidesSwapped
+                    // Side change announcement (only if no super TB announcement already)
+                    if (_matchAnnouncement.value != "super_tiebreak") {
+                        _matchAnnouncement.value = "side_change"
+                    }
                 }
                 
                 // Sprawdź czy należy rozpocząć tiebreak (6:6)
                 if (state.shouldStartTiebreak() && !state.isSuperTiebreak) {
                     state.isTiebreak = true
+                    _matchAnnouncement.value = "tiebreak"
                 }
                 
                 _matchState.value = state
