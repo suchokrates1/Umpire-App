@@ -610,13 +610,6 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     state.player1Games = 0
                     state.player2Games = 0
                     state.totalGamesPlayed = 0
-                    
-                    // Automatyczna zmiana stron po zakończeniu seta
-                    state.sidesSwapped = !state.sidesSwapped
-                    // Side change announcement (only if no super TB announcement already)
-                    if (_matchAnnouncement.value != "super_tiebreak") {
-                        _matchAnnouncement.value = "side_change"
-                    }
                 }
                 
                 // Sprawdź czy należy rozpocząć tiebreak (6:6)
