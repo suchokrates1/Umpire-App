@@ -99,18 +99,6 @@
             android:minHeight="48dp"
             android:layout_marginTop="2dp">
 
-            <!-- Ikona serwisu (piłka) - PRZED flagą -->
-            <TextView
-                android:id="@+id/textPlayer1ServerIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="●"
-                android:textSize="16sp"
-                android:textColor="#CDDC39"
-                android:layout_marginEnd="6dp"
-                android:contentDescription="@string/player_serves_short"
-                android:visibility="invisible"/>
-
             <!-- Flaga -->
             <TextView
                 android:id="@+id/textPlayer1Flag"
@@ -135,6 +123,16 @@
                 app:autoSizeMinTextSize="14sp"
                 app:autoSizeMaxTextSize="28sp"
                 app:autoSizeStepGranularity="1sp"/>
+
+            <!-- Ikona serwisu (piłka tenisowa) - po lewej od punktów -->
+            <ImageView
+                android:id="@+id/imagePlayer1ServerIcon"
+                android:layout_width="@dimen/scoreboard_serve_icon"
+                android:layout_height="@dimen/scoreboard_serve_icon"
+                android:src="@drawable/ic_tennis_ball"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/player_serves_short"
+                android:visibility="invisible"/>
 
             <!-- Punkty -->
             <TextView
@@ -204,18 +202,6 @@
             android:minHeight="48dp"
             android:layout_marginTop="2dp">
 
-            <!-- Ikona serwisu (piłka) - PRZED flagą -->
-            <TextView
-                android:id="@+id/textPlayer2ServerIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="●"
-                android:textSize="16sp"
-                android:textColor="#CDDC39"
-                android:layout_marginEnd="6dp"
-                android:contentDescription="@string/player_serves_short"
-                android:visibility="invisible"/>
-
             <!-- Flaga -->
             <TextView
                 android:id="@+id/textPlayer2Flag"
@@ -240,6 +226,16 @@
                 app:autoSizeMinTextSize="14sp"
                 app:autoSizeMaxTextSize="28sp"
                 app:autoSizeStepGranularity="1sp"/>
+
+            <!-- Ikona serwisu (piłka tenisowa) - po lewej od punktów -->
+            <ImageView
+                android:id="@+id/imagePlayer2ServerIcon"
+                android:layout_width="@dimen/scoreboard_serve_icon"
+                android:layout_height="@dimen/scoreboard_serve_icon"
+                android:src="@drawable/ic_tennis_ball"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/player_serves_short"
+                android:visibility="invisible"/>
 
             <!-- Punkty -->
             <TextView

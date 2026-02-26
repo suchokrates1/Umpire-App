@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ═══════════════════════════════════════════════════════
+     Base dimensions (phones, < 600dp smallest width)
+     Tablet overrides: values-sw600dp, values-sw720dp
+     ═══════════════════════════════════════════════════════ -->
+<resources>
+
+    <!-- ── Scoreboard ── -->
+    <dimen name="scoreboard_padding">12dp</dimen>
+    <dimen name="scoreboard_row_min_height">48dp</dimen>
+
+    <!-- Headers -->
+    <dimen name="scoreboard_header_text">13sp</dimen>
+
+    <!-- Player name (autoSize bounds) -->
+    <dimen name="scoreboard_name_min_text">14sp</dimen>
+    <dimen name="scoreboard_name_max_text">22sp</dimen>
+
+    <!-- Serve icon (ImageView) -->
+    <dimen name="scoreboard_serve_icon">18dp</dimen>
+
+    <!-- Flag emoji -->
+    <dimen name="scoreboard_flag_text">20sp</dimen>
+
+    <!-- Points column -->
+    <dimen name="scoreboard_points_text">32sp</dimen>
+    <dimen name="scoreboard_points_width">56dp</dimen>
+
+    <!-- Set columns -->
+    <dimen name="scoreboard_set_text">24sp</dimen>
+    <dimen name="scoreboard_set_width">52dp</dimen>
+    <dimen name="scoreboard_set_bg_height">42dp</dimen>
+
+    <!-- Timer / game mode -->
+    <dimen name="scoreboard_timer_text">16sp</dimen>
+    <dimen name="scoreboard_mode_text">14sp</dimen>
+
+    <!-- ── Scoring views (serve, rally, basic) ── -->
+    <dimen name="scoring_serve_info_text">20sp</dimen>
+    <dimen name="scoring_name_min_text">14sp</dimen>
+    <dimen name="scoring_name_max_text">28sp</dimen>
+    <dimen name="scoring_name_height">32dp</dimen>
+    <dimen name="scoring_button_text">28sp</dimen>
+
+</resources>

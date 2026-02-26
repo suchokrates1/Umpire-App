@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ═══════════════════════════════════════════════════════
+     Tablet 7"+ (smallest width ≥ 600dp)
+     ═══════════════════════════════════════════════════════ -->
+<resources>
+
+    <!-- ── Scoreboard ── -->
+    <dimen name="scoreboard_padding">16dp</dimen>
+    <dimen name="scoreboard_row_min_height">60dp</dimen>
+
+    <dimen name="scoreboard_header_text">16sp</dimen>
+
+    <dimen name="scoreboard_name_min_text">20sp</dimen>
+    <dimen name="scoreboard_name_max_text">32sp</dimen>
+
+    <dimen name="scoreboard_serve_icon">24dp</dimen>
+    <dimen name="scoreboard_flag_text">26sp</dimen>
+
+    <dimen name="scoreboard_points_text">40sp</dimen>
+    <dimen name="scoreboard_points_width">72dp</dimen>
+
+    <dimen name="scoreboard_set_text">30sp</dimen>
+    <dimen name="scoreboard_set_width">64dp</dimen>
+    <dimen name="scoreboard_set_bg_height">52dp</dimen>
+
+    <dimen name="scoreboard_timer_text">20sp</dimen>
+    <dimen name="scoreboard_mode_text">18sp</dimen>
+
+    <!-- ── Scoring views ── -->
+    <dimen name="scoring_serve_info_text">28sp</dimen>
+    <dimen name="scoring_name_min_text">20sp</dimen>
+    <dimen name="scoring_name_max_text">40sp</dimen>
+    <dimen name="scoring_name_height">48dp</dimen>
+    <dimen name="scoring_button_text">36sp</dimen>
+
+</resources>

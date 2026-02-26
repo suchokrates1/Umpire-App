@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tennis ball serve indicator icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Ball body - optic yellow (#CCFF00 is official, #C6D930 for dark contrast) -->
+    <path
+        android:fillColor="#C6D930"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z"/>
+
+    <!-- Seam curve - left arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round"
+        android:pathData="M9.5,2.2C6.5,6.5 6.5,11 9,14.5c1.5,2.2 1.8,5.2 0.5,7.3"/>
+
+    <!-- Seam curve - right arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round"
+        android:pathData="M14.5,2.2c3,4.3 3,8.8 0.5,12.3c-1.5,2.2 -1.8,5.2 -0.5,7.3"/>
+</vector>
