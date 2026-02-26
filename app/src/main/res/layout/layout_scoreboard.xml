@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp"
+        android:padding="@dimen/scoreboard_padding"
         android:background="@color/score_background">
 
         <!-- Timer meczu -->
@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="00:00"
-            android:textSize="16sp"
+            android:textSize="@dimen/scoreboard_timer_text"
             android:textColor="?android:attr/textColorSecondary"
             android:gravity="center"
             android:textStyle="bold"
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=""
-            android:textSize="14sp"
+            android:textSize="@dimen/scoreboard_mode_text"
             android:textColor="@color/accent"
             android:gravity="center"
             android:textStyle="bold"
@@ -58,33 +58,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/scoreboard_player"
-                android:textSize="13sp"
+                android:textSize="@dimen/scoreboard_header_text"
                 android:textColor="?android:attr/textColorSecondary"
                 android:gravity="start"/>
 
             <TextView
-                android:layout_width="56dp"
+                android:layout_width="@dimen/scoreboard_points_width"
                 android:layout_height="wrap_content"
                 android:text="@string/scoreboard_points"
-                android:textSize="13sp"
+                android:textSize="@dimen/scoreboard_header_text"
                 android:textColor="?android:attr/textColorSecondary"
                 android:gravity="center"/>
 
             <TextView
                 android:id="@+id/headerSet1"
-                android:layout_width="52dp"
+                android:layout_width="@dimen/scoreboard_set_width"
                 android:layout_height="wrap_content"
                 android:text="@string/scoreboard_set1"
-                android:textSize="13sp"
+                android:textSize="@dimen/scoreboard_header_text"
                 android:textColor="?android:attr/textColorSecondary"
                 android:gravity="center"/>
 
             <TextView
                 android:id="@+id/headerSet2"
-                android:layout_width="52dp"
+                android:layout_width="@dimen/scoreboard_set_width"
                 android:layout_height="wrap_content"
                 android:text="@string/scoreboard_set2"
-                android:textSize="13sp"
+                android:textSize="@dimen/scoreboard_header_text"
                 android:textColor="?android:attr/textColorSecondary"
                 android:gravity="center"/>
 
@@ -96,7 +96,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:minHeight="48dp"
+            android:minHeight="@dimen/scoreboard_row_min_height"
             android:layout_marginTop="2dp">
 
             <!-- Flaga -->
@@ -105,23 +105,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textSize="20sp"
+                android:textSize="@dimen/scoreboard_flag_text"
                 android:layout_marginEnd="6dp"/>
 
             <!-- Nazwisko - auto-size -->
             <TextView
                 android:id="@+id/textPlayer1Name"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/scoreboard_row_min_height"
                 android:layout_weight="1"
                 android:text="Player 1"
                 android:textStyle="bold"
                 android:textColor="@color/score_text"
                 android:maxLines="1"
                 android:ellipsize="end"
+                android:gravity="center_vertical"
                 app:autoSizeTextType="uniform"
-                app:autoSizeMinTextSize="14sp"
-                app:autoSizeMaxTextSize="28sp"
+                app:autoSizeMinTextSize="@dimen/scoreboard_name_min_text"
+                app:autoSizeMaxTextSize="@dimen/scoreboard_name_max_text"
                 app:autoSizeStepGranularity="1sp"/>
 
             <!-- Ikona serwisu (piłka tenisowa) - po lewej od punktów -->
@@ -137,23 +138,23 @@
             <!-- Punkty -->
             <TextView
                 android:id="@+id/textPlayer1Points"
-                android:layout_width="56dp"
+                android:layout_width="@dimen/scoreboard_points_width"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="32sp"
+                android:textSize="@dimen/scoreboard_points_text"
                 android:textStyle="bold"
                 android:textColor="@color/accent"
                 android:gravity="center"/>
 
             <!-- Set 1 -->
             <FrameLayout
-                android:layout_width="52dp"
+                android:layout_width="@dimen/scoreboard_set_width"
                 android:layout_height="wrap_content">
                 
                 <View
                     android:id="@+id/backgroundPlayer1Set1"
                     android:layout_width="match_parent"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/scoreboard_set_bg_height"
                     android:background="@android:color/transparent"/>
                 
                 <TextView
@@ -161,7 +162,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/scoreboard_set_text"
                     android:textStyle="bold"
                     android:textColor="@color/score_text"
                     android:gravity="center"
@@ -170,13 +171,13 @@
 
             <!-- Set 2 -->
             <FrameLayout
-                android:layout_width="52dp"
+                android:layout_width="@dimen/scoreboard_set_width"
                 android:layout_height="wrap_content">
                 
                 <View
                     android:id="@+id/backgroundPlayer1Set2"
                     android:layout_width="match_parent"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/scoreboard_set_bg_height"
                     android:background="@android:color/transparent"/>
                 
                 <TextView
@@ -184,7 +185,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/scoreboard_set_text"
                     android:textStyle="bold"
                     android:textColor="@color/score_text"
                     android:gravity="center"
@@ -199,7 +200,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:minHeight="48dp"
+            android:minHeight="@dimen/scoreboard_row_min_height"
             android:layout_marginTop="2dp">
 
             <!-- Flaga -->
@@ -208,23 +209,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textSize="20sp"
+                android:textSize="@dimen/scoreboard_flag_text"
                 android:layout_marginEnd="6dp"/>
 
             <!-- Nazwisko - auto-size -->
             <TextView
                 android:id="@+id/textPlayer2Name"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/scoreboard_row_min_height"
                 android:layout_weight="1"
                 android:text="Player 2"
                 android:textStyle="bold"
                 android:textColor="@color/score_text"
                 android:maxLines="1"
                 android:ellipsize="end"
+                android:gravity="center_vertical"
                 app:autoSizeTextType="uniform"
-                app:autoSizeMinTextSize="14sp"
-                app:autoSizeMaxTextSize="28sp"
+                app:autoSizeMinTextSize="@dimen/scoreboard_name_min_text"
+                app:autoSizeMaxTextSize="@dimen/scoreboard_name_max_text"
                 app:autoSizeStepGranularity="1sp"/>
 
             <!-- Ikona serwisu (piłka tenisowa) - po lewej od punktów -->
@@ -240,23 +242,23 @@
             <!-- Punkty -->
             <TextView
                 android:id="@+id/textPlayer2Points"
-                android:layout_width="56dp"
+                android:layout_width="@dimen/scoreboard_points_width"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="32sp"
+                android:textSize="@dimen/scoreboard_points_text"
                 android:textStyle="bold"
                 android:textColor="@color/accent"
                 android:gravity="center"/>
 
             <!-- Set 1 -->
             <FrameLayout
-                android:layout_width="52dp"
+                android:layout_width="@dimen/scoreboard_set_width"
                 android:layout_height="wrap_content">
                 
                 <View
                     android:id="@+id/backgroundPlayer2Set1"
                     android:layout_width="match_parent"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/scoreboard_set_bg_height"
                     android:background="@android:color/transparent"/>
                 
                 <TextView
@@ -264,7 +266,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/scoreboard_set_text"
                     android:textStyle="bold"
                     android:textColor="@color/score_text"
                     android:gravity="center"
@@ -273,13 +275,13 @@
 
             <!-- Set 2 -->
             <FrameLayout
-                android:layout_width="52dp"
+                android:layout_width="@dimen/scoreboard_set_width"
                 android:layout_height="wrap_content">
                 
                 <View
                     android:id="@+id/backgroundPlayer2Set2"
                     android:layout_width="match_parent"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/scoreboard_set_bg_height"
                     android:background="@android:color/transparent"/>
                 
                 <TextView
@@ -287,7 +289,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/scoreboard_set_text"
                     android:textStyle="bold"
                     android:textColor="@color/score_text"
                     android:gravity="center"
