@@ -21,6 +21,7 @@ import pl.vestmedia.tennisreferee.databinding.LayoutServeBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutRallyBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
+import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
 import pl.vestmedia.tennisreferee.data.model.MatchState
 import pl.vestmedia.tennisreferee.data.model.StatsMode
 import pl.vestmedia.tennisreferee.data.model.Player
@@ -37,6 +38,7 @@ class MatchActivity : AppCompatActivity() {
     private lateinit var rallyBinding: LayoutRallyBinding
     private lateinit var basicScoringBinding: LayoutBasicScoringBinding
     private lateinit var matchFinishedBinding: LayoutMatchFinishedBinding
+    private lateinit var announcementBinding: LayoutAnnouncementBinding
     private val viewModel: MatchViewModel by viewModels()
     
     // Śledzenie stanu serwisu do animacji przejścia na 2. serwis
@@ -64,6 +66,7 @@ class MatchActivity : AppCompatActivity() {
         rallyBinding = LayoutRallyBinding.bind(binding.layoutRally.root)
         basicScoringBinding = LayoutBasicScoringBinding.bind(binding.layoutBasicScoring.root)
         matchFinishedBinding = LayoutMatchFinishedBinding.bind(binding.layoutMatchFinished.root)
+        announcementBinding = LayoutAnnouncementBinding.bind(binding.layoutAnnouncement.root)
         
         // Pobierz stan meczu z Intent
         val matchState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -134,13 +137,8 @@ class MatchActivity : AppCompatActivity() {
             }
         }
         
-        // Match announcements (side change, tiebreak, super tiebreak)
-        viewModel.matchAnnouncement.observe(this) { announcement ->
-            announcement?.let {
-                showMatchAnnouncement(it)
-                viewModel.clearMatchAnnouncement()
-            }
-        }
+        // Match announcements — now handled as inline ANNOUNCEMENT view
+        // (no more AlertDialog popups)
     }
     
     private fun setupListeners() {
@@ -168,6 +166,11 @@ class MatchActivity : AppCompatActivity() {
             viewModel.handleFault()
         }
         
+        // Foot Fault - lewa strona
+        serveBinding.buttonFootFaultLeft.setOnClickListener {
+            viewModel.handleFootFault()
+        }
+        
         // Serwis - prawa strona (Player 2)
         serveBinding.buttonAceRight.setOnClickListener {
             viewModel.handleAce()
@@ -175,6 +178,11 @@ class MatchActivity : AppCompatActivity() {
         
         serveBinding.buttonFaultRight.setOnClickListener {
             viewModel.handleFault()
+        }
+        
+        // Foot Fault - prawa strona
+        serveBinding.buttonFootFaultRight.setOnClickListener {
+            viewModel.handleFootFault()
         }
         
         // Ball in Play - wspólny przycisk dla obu graczy
@@ -250,6 +258,11 @@ class MatchActivity : AppCompatActivity() {
         // Przycisk zakończenia meczu z potwierdzeniem
         binding.buttonBack.setOnClickListener {
             showFinishMatchConfirmation()
+        }
+        
+        // Przycisk "Dalej" na karcie ogłoszenia
+        announcementBinding.buttonAnnouncementContinue.setOnClickListener {
+            viewModel.continueFromAnnouncement()
         }
     }
     
@@ -505,6 +518,26 @@ class MatchActivity : AppCompatActivity() {
         scoreboardBinding.textPlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.GONE
         scoreboardBinding.textPlayer2ServerIcon.visibility = if (!state.isPlayer1Serving) View.VISIBLE else View.GONE
         
+        // W deblu pokaż nazwisko serwującego obok ikony
+        if (state.isDoubles) {
+            val serverName = when (state.currentServer) {
+                1 -> state.player1.name
+                2 -> state.player2.name
+                3 -> state.player3?.name ?: ""
+                4 -> state.player4?.name ?: ""
+                else -> ""
+            }
+            val serverIcon = "🎾 $serverName"
+            if (state.isPlayer1Serving) {
+                scoreboardBinding.textPlayer1ServerIcon.text = serverIcon
+            } else {
+                scoreboardBinding.textPlayer2ServerIcon.text = serverIcon
+            }
+        } else {
+            scoreboardBinding.textPlayer1ServerIcon.text = "🎾"
+            scoreboardBinding.textPlayer2ServerIcon.text = "🎾"
+        }
+        
         // Punkty z animacją
         animateScoreChange(scoreboardBinding.textPlayer1Points, state.getPlayer1PointsDisplay())
         animateScoreChange(scoreboardBinding.textPlayer2Points, state.getPlayer2PointsDisplay())
@@ -518,10 +551,11 @@ class MatchActivity : AppCompatActivity() {
             scoreboardBinding.textPlayer1Set1.text = state.player1Games.toString()
             scoreboardBinding.textPlayer2Set1.text = state.player2Games.toString()
         } else {
-            // Pierwszy set zakończony
+            // Pierwszy set zakończony — pokaż z wynikiem tiebreak jeśli był
             val set1 = state.setsHistory[0]
-            scoreboardBinding.textPlayer1Set1.text = set1.player1Games.toString()
-            scoreboardBinding.textPlayer2Set1.text = set1.player2Games.toString()
+            val tbSuffix1 = if (set1.tiebreakLoserPoints != null) "(${set1.tiebreakLoserPoints})" else ""
+            scoreboardBinding.textPlayer1Set1.text = "${set1.player1Games}${ if (set1.player1Games < set1.player2Games) tbSuffix1 else "" }"
+            scoreboardBinding.textPlayer2Set1.text = "${set1.player2Games}${ if (set1.player2Games < set1.player1Games) tbSuffix1 else "" }"
         }
         
         // Set 2 - zawsze widoczny
@@ -530,10 +564,11 @@ class MatchActivity : AppCompatActivity() {
             scoreboardBinding.textPlayer1Set2.text = state.player1Games.toString()
             scoreboardBinding.textPlayer2Set2.text = state.player2Games.toString()
         } else if (state.setsHistory.size > 1) {
-            // Drugi set zakończony
+            // Drugi set zakończony — pokaż z wynikiem tiebreak jeśli był
             val set2 = state.setsHistory[1]
-            scoreboardBinding.textPlayer1Set2.text = set2.player1Games.toString()
-            scoreboardBinding.textPlayer2Set2.text = set2.player2Games.toString()
+            val tbSuffix2 = if (set2.tiebreakLoserPoints != null) "(${set2.tiebreakLoserPoints})" else ""
+            scoreboardBinding.textPlayer1Set2.text = "${set2.player1Games}${ if (set2.player1Games < set2.player2Games) tbSuffix2 else "" }"
+            scoreboardBinding.textPlayer2Set2.text = "${set2.player2Games}${ if (set2.player2Games < set2.player1Games) tbSuffix2 else "" }"
         } else {
             // Przed drugim setem - pokaż 0
             scoreboardBinding.textPlayer1Set2.text = getString(R.string.zero_score)
@@ -715,6 +750,7 @@ class MatchActivity : AppCompatActivity() {
         animateViewTransition(binding.layoutRally.root, View.GONE)
         animateViewTransition(binding.layoutBasicScoring.root, View.GONE)
         animateViewTransition(binding.layoutMatchFinished.root, View.GONE)
+        animateViewTransition(binding.layoutAnnouncement.root, View.GONE)
         
         // Scoreboard widoczny wszędzie oprócz wyboru serwującego
         binding.layoutScoreboard.root.visibility = if (view == MatchView.SERVER_SELECTION) {
@@ -727,6 +763,36 @@ class MatchActivity : AppCompatActivity() {
             when (view) {
                 MatchView.SERVER_SELECTION -> {
                     animateViewTransition(binding.layoutServerSelection.root, View.VISIBLE)
+                }
+                
+                MatchView.ANNOUNCEMENT -> {
+                    val (title, message, icon) = when (viewModel.pendingAnnouncementType) {
+                        "side_change" -> Triple(
+                            getString(R.string.announce_side_change),
+                            getString(R.string.announce_side_change_msg),
+                            "\uD83D\uDD04"  // 🔄
+                        )
+                        "tiebreak" -> Triple(
+                            getString(R.string.announce_tiebreak),
+                            getString(R.string.announce_tiebreak_msg),
+                            "\uD83C\uDFBE"  // 🎾
+                        )
+                        "super_tiebreak" -> Triple(
+                            getString(R.string.announce_super_tiebreak),
+                            getString(R.string.announce_super_tiebreak_msg),
+                            "\uD83C\uDFC6"  // 🏆
+                        )
+                        "deciding_point" -> Triple(
+                            getString(R.string.deciding_point),
+                            getString(R.string.deciding_point_msg),
+                            "\u2757"  // ❗
+                        )
+                        else -> Triple("", "", "")
+                    }
+                    announcementBinding.textAnnouncementIcon.text = icon
+                    announcementBinding.textAnnouncementTitle.text = title
+                    announcementBinding.textAnnouncementMessage.text = message
+                    animateViewTransition(binding.layoutAnnouncement.root, View.VISIBLE)
                 }
                 
                 MatchView.SERVE -> {
@@ -786,6 +852,7 @@ class MatchActivity : AppCompatActivity() {
                     }
                     
                     matchFinishedBinding.textWinner.text = getString(R.string.winner_label, winner)
+                    matchFinishedBinding.textWinner.setTextColor(android.graphics.Color.parseColor("#FFD700")) // Gold highlight
                     
                     // Wyświetl statystyki
                     updateMatchStatistics(state)
@@ -944,36 +1011,6 @@ class MatchActivity : AppCompatActivity() {
         stopTimerUpdates()
     }
     
-    /**
-     * Shows a blocking announcement dialog for match events.
-     * The umpire must tap "Dalej" / "Continue" to proceed.
-     */
-    private fun showMatchAnnouncement(type: String) {
-        val (title, message, icon) = when (type) {
-            "side_change" -> Triple(
-                getString(R.string.announce_side_change),
-                getString(R.string.announce_side_change_msg),
-                "\uD83D\uDD04"  // 🔄
-            )
-            "tiebreak" -> Triple(
-                getString(R.string.announce_tiebreak),
-                getString(R.string.announce_tiebreak_msg),
-                "\uD83C\uDFBE"  // 🎾
-            )
-            "super_tiebreak" -> Triple(
-                getString(R.string.announce_super_tiebreak),
-                getString(R.string.announce_super_tiebreak_msg),
-                "\uD83C\uDFC6"  // 🏆
-            )
-            else -> return
-        }
-        
-        AlertDialog.Builder(this)
-            .setTitle("$icon  $title")
-            .setMessage(message)
-            .setCancelable(false)
-            .setPositiveButton(R.string.continue_btn, null)
-            .show()
-    }
+
 }
 

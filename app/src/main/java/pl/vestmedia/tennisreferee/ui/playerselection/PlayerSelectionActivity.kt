@@ -52,7 +52,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         courtPin = intent.getStringExtra(EXTRA_COURT_PIN) ?: ""
         
         if (courtId.isEmpty()) {
-            Toast.makeText(this, "Błąd: Brak danych kortu", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.error_no_court_data), Toast.LENGTH_LONG).show()
             finish()
             return
         }
@@ -210,7 +210,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         // Pokaż listę wybranych graczy
         if (selectedPlayers.isNotEmpty()) {
-            val names = selectedPlayers.joinToString(", ") { it.getDisplayName() }
+            val names = selectedPlayers.joinToString(", ") { it.getFullName() }
             binding.textSelectedPlayers.text = names
             binding.textSelectedPlayers.visibility = View.VISIBLE
         } else {
@@ -230,7 +230,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         val selectedPlayers = viewModel.getSelectedPlayersList()
         
         if (selectedPlayers.size < 2) {
-            Toast.makeText(this, "Wybierz odpowiednią liczbę graczy", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_select_correct_players), Toast.LENGTH_SHORT).show()
             return
         }
         
@@ -249,22 +249,26 @@ class PlayerSelectionActivity : AppCompatActivity() {
         // Make dialog background transparent so card corners are visible
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         
+        val switchNoAdvantage = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchNoAdvantage)
+        
         dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardBasicMode)
             .setOnClickListener {
+                val noAdv = switchNoAdvantage.isChecked
                 dialog.dismiss()
-                startMatchWithMode(selectedPlayers, StatsMode.BASIC)
+                startMatchWithMode(selectedPlayers, StatsMode.BASIC, noAdv)
             }
         
         dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardAdvancedMode)
             .setOnClickListener {
+                val noAdv = switchNoAdvantage.isChecked
                 dialog.dismiss()
-                startMatchWithMode(selectedPlayers, StatsMode.ADVANCED)
+                startMatchWithMode(selectedPlayers, StatsMode.ADVANCED, noAdv)
             }
         
         dialog.show()
     }
     
-    private fun startMatchWithMode(selectedPlayers: List<Player>, statsMode: StatsMode) {
+    private fun startMatchWithMode(selectedPlayers: List<Player>, statsMode: StatsMode, noAdvantage: Boolean = false) {
         val isDoublesMatch = viewModel.isDoubles.value ?: false
         
         // Utwórz stan meczu
@@ -279,7 +283,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 courtName = courtName,
                 isDoubles = true,
                 currentServer = 1,
-                statsMode = statsMode
+                statsMode = statsMode,
+                noAdvantage = noAdvantage
             )
         } else {
             // Singiel - 2 graczy
@@ -289,7 +294,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 courtId = courtId,
                 courtName = courtName,
                 isDoubles = false,
-                statsMode = statsMode
+                statsMode = statsMode,
+                noAdvantage = noAdvantage
             )
         }
         
@@ -312,7 +318,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
             allPlayers
         } else {
             allPlayers.filter { player ->
-                player.name.contains(query, ignoreCase = true)
+                player.getFullName().contains(query, ignoreCase = true)
             }
         }
         
@@ -380,12 +386,12 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 val selectedCategory = spinnerCategory.text.toString()
                 
                 if (firstName.isEmpty()) {
-                    Toast.makeText(this, "Wprowadź imię zawodnika", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.error_enter_first_name), Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
                 
                 if (lastName.isEmpty()) {
-                    Toast.makeText(this, "Wprowadź nazwisko zawodnika", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.error_enter_last_name), Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
                 
@@ -393,11 +399,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 val countryIndex = countries.indexOf(selectedCountry)
                 val flagCode = if (countryIndex >= 0) countryCodes[countryIndex] else "PL"
                 
-                // Połącz imię i nazwisko
-                val fullName = "$firstName $lastName"
-                
                 // Dodaj zawodnika do serwera (automatycznie zaznaczy i przewinie)
-                viewModel.addPlayer(fullName, flagCode, selectedCategory, courtId, courtPin)
+                viewModel.addPlayer(firstName, lastName, flagCode, selectedCategory, courtId, courtPin)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()

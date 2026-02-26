@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Tennis Schiedsrichter</string>
+    <string name="app_name">Blind Tennis Referee</string>
     
     <!-- Language Selection -->
     <string name="select_language">Sprache auswählen</string>
@@ -53,13 +53,17 @@
     <string name="who_serves_first">Wer schlägt zuerst auf?</string>
     <string name="swap_sides">⇄ Seiten wechseln</string>
     <string name="player_serves">%1$s\nSchlägt auf</string>
+    <string name="team_serves">%1$s\nSchlägt auf</string>
     <string name="first_serve">1. Aufschlag</string>
     <string name="second_serve">1. Aufschlag  >  2. Aufschlag</string>
     <string name="serve">Aufschlag</string>
     <string name="ace">ASS</string>
     <string name="fault">FEHLER</string>
+    <string name="second_serve_button">2. AUFSCHLAG</string>
+    <string name="double_fault_button">DOPPELFEHLER</string>
     <string name="ball_in_play">BALL IM SPIEL</string>
-    <string name="winner">GEWINNER</string>
+    <string name="foot_fault">FUSSFEHLER</string>
+    <string name="winner">WINNER</string>
     <string name="forced_error">ERZWUNGENER\nFEHLER</string>
     <string name="unforced_error">UNERZWUNGENER\nFEHLER</string>
     <string name="match_finished">Spiel beendet</string>
@@ -77,7 +81,18 @@
     <string name="points">Punkte</string>
     <string name="set">Satz %1$d</string>
     <string name="tiebreak">Tie-break (bis %1$d)</string>
-    <string name="super_tiebreak">Super Tie-Break (bis %1$d)</string>
+    <string name="super_tiebreak">Match-Tiebreak (bis %1$d)</string>
+    <string name="tiebreak_mode">Tie-break (bis 7, Gewinn mit 2 Vorsprung)</string>
+    <string name="super_tiebreak_mode">Match-Tiebreak (bis 10, Gewinn mit 2 Vorsprung)</string>
+
+    <!-- Match announcements -->
+    <string name="announce_side_change">Seitenwechsel!</string>
+    <string name="announce_side_change_msg">Spieler wechseln die Seiten.</string>
+    <string name="announce_tiebreak">Tie-break!</string>
+    <string name="announce_tiebreak_msg">Spielstand 4–4. Tie-break beginnt (bis 7, Gewinn mit 2 Vorsprung).</string>
+    <string name="announce_super_tiebreak">Match-Tiebreak!</string>
+    <string name="announce_super_tiebreak_msg">Sätze 1–1. Entscheidender Match-Tiebreak beginnt (bis 10, Gewinn mit 2 Vorsprung).</string>
+    <string name="continue_btn">Weiter</string>
     <string name="match_finished_title">Match beendet!</string>
     <string name="statistics">Statistiken</string>
     <string name="aces">Asse</string>
@@ -89,19 +104,59 @@
     <string name="error_loading_players">Fehler beim Laden der Spieler</string>
     <string name="error_network">Netzwerkverbindungsfehler</string>
     <string name="error_unknown">Unbekannter Fehler</string>
+    <string name="error_no_court_data">Fehler: Fehlende Platzdaten</string>
+    <string name="error_select_correct_players">Wählen Sie die richtige Anzahl von Spielern</string>
+    <string name="error_enter_first_name">Vorname des Spielers eingeben</string>
+    <string name="error_enter_last_name">Nachname des Spielers eingeben</string>
+    <string name="error_adding_player">Fehler beim Hinzufügen des Spielers</string>
+    <string name="no_actions_to_undo">Keine Aktionen zum Rückgängigmachen</string>
+    <string name="undo_action_format">Rückgängig: %1$s</string>
     
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Statistikmodus</string>
     <string name="stats_mode_basic">Einfach</string>
     <string name="stats_mode_basic_short">WIN + FAULT\nSchnell &amp; einfach</string>
     <string name="stats_mode_advanced">Erweitert</string>
-    <string name="stats_mode_advanced_short">Ass, Gewinner, Fehler…\nVolle Statistiken</string>
+    <string name="stats_mode_advanced_short">Ass, Winner, Fehler…\nVolle Statistiken</string>
+    <string name="win_point">WIN</string>
+    <string name="no_advantage_mode">Ohne Vorteil (Entscheidungspunkt)</string>
+    <string name="no_advantage_desc">Bei Einstand (40–40) gewinnt der nächste Punkt das Spiel. Rückschläger wählt die Seite.</string>
+    <string name="deciding_point">Entscheidungspunkt!</string>
+    <string name="deciding_point_msg">Spielstand 40–40. Der Rückschläger wählt, von welcher Seite er returniert. Der nächste Punkt entscheidet.</string>
+    <string name="zero_score">0</string>
     
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+
+    <!-- Match History -->
+    <string name="match_history_title">Spielverlauf</string>
+    <string name="match_history">Spielverlauf</string>
+    <string name="no_matches_saved">Keine gespeicherten Spiele</string>
+    <string name="match_score_format">%1$d : %2$d</string>
+    <string name="winner_format">Gewinner: %1$s</string>
+    <string name="delete_match">Spiel löschen</string>
+    <string name="delete_all_matches">Alle löschen</string>
+    <string name="confirm_delete_match">Dieses Spiel löschen?</string>
+    <string name="confirm_delete_all_matches">Alle Spiele aus dem Verlauf löschen?</string>
+    <string name="match_deleted">Spiel gelöscht</string>
+    <string name="all_matches_deleted">Alle Spiele gelöscht</string>
+    <string name="match_details">Spieldetails</string>
+    <string name="match_details_placeholder">Spieldetails werden hier angezeigt</string>
+
+    <!-- Settings -->
+    <string name="settings">Einstellungen</string>
+    <string name="appearance">Erscheinungsbild</string>
+    <string name="theme">Design</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="theme_system">Systemstandard</string>
+    <string name="about">Über</string>
+    <string name="app_description">Professionelle Tennis-Schiedsrichter-App für Echtzeit-Spielstanderfassung</string>
+    <string name="version_format">Version %1$s</string>
+    <string name="version_unknown">Version unbekannt</string>
 
     <!-- Statistics Labels -->
     <string name="winners_stat">Gewinner-Schläge</string>

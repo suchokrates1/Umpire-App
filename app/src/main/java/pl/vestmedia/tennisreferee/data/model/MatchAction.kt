@@ -40,6 +40,7 @@ enum class ActionType {
     ACE,
     FAULT,
     DOUBLE_FAULT,
+    FOOT_FAULT,
     WINNER,
     FORCED_ERROR,
     UNFORCED_ERROR,

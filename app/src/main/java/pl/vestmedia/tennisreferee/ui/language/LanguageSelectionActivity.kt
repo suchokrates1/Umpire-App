@@ -60,6 +60,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
         val languages = listOf(
             Language("de", "Deutsch", "🇩🇪"),
             Language("en", "English", "🇬🇧"),
+            Language("es", "Español", "🇪🇸"),
             Language("fr", "Français", "🇫🇷"),
             Language("it", "Italiano", "🇮🇹"),
             Language("pl", "Polski", "🇵🇱")

@@ -24,6 +24,6 @@ data class Court(
     val currentMatchId: Int? = null
 ) {
     fun getDisplayName(context: Context): String {
-        return name ?: context.getString(R.string.court_name, id)
+        return context.getString(R.string.court_name, id)
     }
 }

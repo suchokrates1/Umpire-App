@@ -26,6 +26,9 @@ data class MatchState(
     val team2Name: String? = null,
     var currentServer: Int = 1, // 1-4, aktualny serwujący w deblu
     
+    // No-Advantage (deciding point) mode — at deuce, next point wins the game
+    val noAdvantage: Boolean = false,
+    
     // Wyniki
     var player1Sets: Int = 0,
     var player2Sets: Int = 0,
@@ -116,21 +119,31 @@ data class MatchState(
             return points.toString()
         }
         
+        // No-Advantage mode: at deuce, show "40-40" (immediate deciding point)
+        if (noAdvantage) {
+            return when(points) {
+                0 -> "0"
+                1 -> "15"
+                2 -> "30"
+                else -> "40"  // 3+ always shows "40", game decided at first to 4
+            }
+        }
+        
         return when {
-            points >= 4 && opponentPoints >= 4 -> {
+            // Deuce/Advantage territory: both players reached 40 (3 points)
+            points >= 3 && opponentPoints >= 3 -> {
                 when {
-                    points == opponentPoints -> "40"
-                    points > opponentPoints -> "ADV"
-                    else -> "40"
+                    points == opponentPoints -> "40"  // Deuce
+                    points > opponentPoints -> "ADV"  // Advantage this player
+                    else -> "40"  // Opponent has advantage
                 }
             }
-            points >= 4 -> "40"
             else -> when(points) {
                 0 -> "0"
                 1 -> "15"
                 2 -> "30"
                 3 -> "40"
-                else -> "0"
+                else -> "40"  // Should not happen (game won before this)
             }
         }
     }
@@ -147,8 +160,11 @@ data class MatchState(
             // Super tie-break do 10 (z przewagą 2)
             return (player1Points >= 10 || player2Points >= 10) && 
                    kotlin.math.abs(player1Points - player2Points) >= 2
+        } else if (noAdvantage) {
+            // No-Advantage: at deuce (3-3), next point wins — first to 4 wins
+            return player1Points >= 4 || player2Points >= 4
         } else {
-            // Normalny gem
+            // Normalny gem z advantage
             return (player1Points >= 4 || player2Points >= 4) && 
                    kotlin.math.abs(player1Points - player2Points) >= 2
         }
@@ -257,7 +273,8 @@ data class MatchState(
                 firstServePercentage = player2Stats.getFirstServePercentage().toDouble()
             ),
             matchDurationMs = matchDuration,
-            winner = winner
+            winner = winner,
+            statsMode = statsMode.name
         )
     }
 }

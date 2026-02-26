@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Tennis Referee</string>
+    <string name="app_name">Blind Tennis Referee</string>
     
     <!-- Language Selection -->
     <string name="select_language">Select Language</string>
@@ -59,9 +59,10 @@
     <string name="serve">Serve</string>
     <string name="ace">ACE</string>
     <string name="fault">FAULT</string>
-    <string name="second_serve_button">2. SERWIS</string>
-    <string name="double_fault_button">2x FAULT</string>
+    <string name="second_serve_button">2nd SERVE</string>
+    <string name="double_fault_button">DOUBLE FAULT</string>
     <string name="ball_in_play">BALL IN PLAY</string>
+    <string name="foot_fault">FOOT FAULT</string>
     <string name="winner">WINNER</string>
     <string name="forced_error">FORCED ERROR</string>
     <string name="unforced_error">UNFORCED ERROR</string>
@@ -80,6 +81,10 @@
     <string name="stats_mode_advanced_desc">Full scoring: Ace, Fault, Ball in Play, Winner, Forced Error, Unforced Error.\nTracks: aces, double faults, winners, forced/unforced errors, serve %.</string>
     <string name="stats_mode_advanced_short">Ace, Winner, Errors…\nFull statistics</string>
     <string name="win_point">WIN</string>
+    <string name="no_advantage_mode">No-Advantage (Deciding Point)</string>
+    <string name="no_advantage_desc">At deuce (40–40), the next point wins the game. Receiver chooses return side.</string>
+    <string name="deciding_point">Deciding Point!</string>
+    <string name="deciding_point_msg">Score is 40–40. Receiver chooses which side to return from. Next point wins the game.</string>
     
     <!-- Scoreboard -->
     <string name="scoreboard_player">Player</string>
@@ -91,17 +96,17 @@
     <string name="points">Points</string>
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (to %1$d)</string>
-    <string name="super_tiebreak">Super tie-break (to %1$d)</string>
+    <string name="super_tiebreak">Match tie-break (to %1$d)</string>
     <string name="tiebreak_mode">Tie-break (to 7, win by 2)</string>
-    <string name="super_tiebreak_mode">Super Tie-break (to 10, win by 2)</string>
+    <string name="super_tiebreak_mode">Match Tie-break (to 10, win by 2)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">Change Sides!</string>
     <string name="announce_side_change_msg">Players change ends of the court.</string>
     <string name="announce_tiebreak">Tie-break!</string>
     <string name="announce_tiebreak_msg">Score is 4–4. Starting tie-break (first to 7, win by 2).</string>
-    <string name="announce_super_tiebreak">Super Tie-break!</string>
-    <string name="announce_super_tiebreak_msg">Sets are 1–1. Starting deciding super tie-break (first to 10, win by 2).</string>
+    <string name="announce_super_tiebreak">Match Tie-break!</string>
+    <string name="announce_super_tiebreak_msg">Sets are 1–1. Starting deciding match tie-break (first to 10, win by 2).</string>
     <string name="continue_btn">Continue</string>
     <string name="match_finished_title">Match Finished!</string>
     <string name="statistics">Statistics</string>
@@ -119,6 +124,13 @@
     <string name="error_loading_players">Error loading players</string>
     <string name="error_network">Network connection error</string>
     <string name="error_unknown">Unknown error</string>
+    <string name="error_no_court_data">Error: Missing court data</string>
+    <string name="error_select_correct_players">Select the correct number of players</string>
+    <string name="error_enter_first_name">Enter player first name</string>
+    <string name="error_enter_last_name">Enter player last name</string>
+    <string name="error_adding_player">Error adding player</string>
+    <string name="no_actions_to_undo">No actions to undo</string>
+    <string name="undo_action_format">Undone: %1$s</string>
     
     <!-- Common -->
     <string name="ok">OK</string>

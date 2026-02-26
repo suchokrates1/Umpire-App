@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.*
@@ -28,13 +29,18 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private val _undoMessage = MutableLiveData<String?>()
     val undoMessage: LiveData<String?> = _undoMessage
     
-    // Match announcements (side change, tiebreak, super tiebreak)
-    // Value: "side_change" | "tiebreak" | "super_tiebreak" | null
-    private val _matchAnnouncement = MutableLiveData<String?>()
-    val matchAnnouncement: LiveData<String?> = _matchAnnouncement
+    // Pending announcement type — set before switching to ANNOUNCEMENT view
+    var pendingAnnouncementType: String? = null
+        private set
     
-    fun clearMatchAnnouncement() {
-        _matchAnnouncement.value = null
+    /**
+     * Called when the umpire taps "Continue" on the announcement card.
+     * Transitions to the appropriate scoring view.
+     */
+    fun continueFromAnnouncement() {
+        pendingAnnouncementType = null
+        val state = _matchState.value ?: return
+        _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
     }
     
     private val apiService = RetrofitClient.apiService
@@ -115,7 +121,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun undoLastAction() {
         _matchState.value?.let { state ->
             if (state.actionsHistory.isEmpty()) {
-                _undoMessage.value = "Brak akcji do cofnięcia"
+                _undoMessage.value = getApplication<Application>().getString(R.string.no_actions_to_undo)
                 return
             }
             
@@ -164,7 +170,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             state.player2Stats.secondServesTotal = lastAction.previousPlayer2Stats.secondServesTotal
             
             _canUndo.value = state.actionsHistory.isNotEmpty()
-            _undoMessage.value = "Cofnięto: ${lastAction.description}"
+            _undoMessage.value = getApplication<Application>().getString(R.string.undo_action_format, lastAction.description)
             _matchState.value = state
             _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
         }
@@ -231,6 +237,42 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     state.player2Stats.doubleFaults++
                     state.player2Stats.secondServesTotal++
                     addPoint(true) // Punkt dla przeciwnika
+                }
+                state.isFirstServe = true
+                _matchState.value = state
+                checkGameAndSetStatus()
+            }
+        }
+    }
+    
+    /**
+     * Obsługuje FOOT FAULT - błąd stopy przy serwisie
+     * Traktowany identycznie jak zwykły fault (ITF Rules of Tennis, Rule 18)
+     */
+    fun handleFootFault() {
+        _matchState.value?.let { state ->
+            if (state.isFirstServe) {
+                saveStateBeforeAction(ActionType.FOOT_FAULT, "Foot Fault - First Serve")
+                
+                if (state.isPlayer1Serving) {
+                    state.player1Stats.firstServesTotal++
+                } else {
+                    state.player2Stats.firstServesTotal++
+                }
+                state.isFirstServe = false
+                _matchState.value = state
+            } else {
+                val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                saveStateBeforeAction(ActionType.FOOT_FAULT, "Foot Fault (Double) - $serverName")
+                
+                if (state.isPlayer1Serving) {
+                    state.player1Stats.doubleFaults++
+                    state.player1Stats.secondServesTotal++
+                    addPoint(false)
+                } else {
+                    state.player2Stats.doubleFaults++
+                    state.player2Stats.secondServesTotal++
+                    addPoint(true)
                 }
                 state.isFirstServe = true
                 _matchState.value = state
@@ -461,7 +503,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 if (totalPoints > 0 && totalPoints % 6 == 0) {
                     state.sidesSwapped = !state.sidesSwapped
                     logMatchEvent("side_change")
-                    _matchAnnouncement.value = "side_change"
+                    pendingAnnouncementType = "side_change"
+                    _matchState.value = state
+                    _currentView.value = MatchView.ANNOUNCEMENT
+                    return
                 }
             }
         }
@@ -491,12 +536,16 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         state.player2Sets++
                     }
                     
+                    // Oblicz punkty przegranego tiebreak (do wyświetlenia np. 5-4(7))
+                    val tiebreakLoserPts = if (player1Won) state.player2Points else state.player1Points
+                    
                     // Zapisz wynik seta (teraz będzie 7:6)
                     state.setsHistory.add(
                         SetScore(
                             setNumber = state.setsHistory.size + 1,
                             player1Games = state.player1Games,
-                            player2Games = state.player2Games
+                            player2Games = state.player2Games,
+                            tiebreakLoserPoints = tiebreakLoserPts
                         )
                     )
                     
@@ -509,16 +558,17 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     // Zmiana stron i reset gemów po tiebreaku
                     state.sidesSwapped = !state.sidesSwapped
                     state.totalGamesPlayed = 0
-                    _matchAnnouncement.value = "side_change"
+                    pendingAnnouncementType = "side_change"
                     
                     // Sprawdź czy mecz się skończył (szczególnie ważne dla Super TB)
                     if (state.shouldEndMatch()) {
                         state.isMatchFinished = true
                         state.matchDuration = System.currentTimeMillis() - state.matchStartTime
                         _matchState.value = state
-                        saveMatchToDatabase(state)
-                        finishMatchOnServer()
-                        sendMatchStatistics()
+                        
+                        // Sekwencyjne zakończenie meczu
+                        finalizeMatchOnServer(state)
+                        
                         _currentView.value = MatchView.MATCH_FINISHED
                         return
                     }
@@ -536,7 +586,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     // Automatyczna zmiana stron co nieparzyste gemy (1, 3, 5, 7...)
                     if (state.totalGamesPlayed % 2 == 1) {
                         state.sidesSwapped = !state.sidesSwapped
-                        _matchAnnouncement.value = "side_change"
+                        pendingAnnouncementType = "side_change"
                     }
                 }
                 
@@ -584,17 +634,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         state.matchDuration = System.currentTimeMillis() - state.matchStartTime
                         _matchState.value = state
                         
-                        // Zapisz mecz do bazy danych
-                        saveMatchToDatabase(state)
-                        
-                        // Zakończ mecz na serwerze
-                        finishMatchOnServer()
-                        
-                        // Wyślij statystyki do API
-                        sendMatchStatistics()
-                        
-                        // Log match end event
-                        logMatchEvent("match_end")
+                        // Sekwencyjne zakończenie meczu
+                        finalizeMatchOnServer(state)
                         
                         _currentView.value = MatchView.MATCH_FINISHED
                         return
@@ -603,7 +644,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     // Sprawdź czy należy rozpocząć super tiebreak (1:1 w setach)
                     if (state.player1Sets == 1 && state.player2Sets == 1) {
                         state.isSuperTiebreak = true
-                        _matchAnnouncement.value = "super_tiebreak"
+                        pendingAnnouncementType = "super_tiebreak"
                     }
                     
                     // Resetuj gemy i licznik rozegranych gemów na nowy set
@@ -615,17 +656,32 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 // Sprawdź czy należy rozpocząć tiebreak (6:6)
                 if (state.shouldStartTiebreak() && !state.isSuperTiebreak) {
                     state.isTiebreak = true
-                    _matchAnnouncement.value = "tiebreak"
+                    pendingAnnouncementType = "tiebreak"
                 }
                 
                 _matchState.value = state
-                _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+                
+                // Jeśli jest ogłoszenie, pokaż kartę ogłoszenia zamiast od razu wracać do gry
+                if (pendingAnnouncementType != null) {
+                    _currentView.value = MatchView.ANNOUNCEMENT
+                } else {
+                    _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+                }
                 
                 // Synchronizuj wynik z serwerem po każdym gemie
                 syncMatchWithServer()
             } else {
                 // Gem trwa dalej
-                _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+                
+                // W trybie no-advantage, przy 40-40 (3-3) pokaż ogłoszenie "deciding point"
+                if (state.noAdvantage && state.player1Points == 3 && state.player2Points == 3
+                    && !state.isTiebreak && !state.isSuperTiebreak) {
+                    pendingAnnouncementType = "deciding_point"
+                    _matchState.value = state
+                    _currentView.value = MatchView.ANNOUNCEMENT
+                } else {
+                    _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+                }
             }
         }
     }
@@ -643,6 +699,102 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     }
     
     /**
+     * Sekwencyjne zakończenie meczu na serwerze.
+     * Kolejność: sync → match_end event → finish → statistics → local save
+     */
+    private fun finalizeMatchOnServer(state: MatchState) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // 1. Wyślij aktualny stan meczu z sets_history (PUT /matches/{id})
+                state.matchId?.let { matchId ->
+                    try {
+                        val match = state.toMatch()
+                        apiService.updateMatch(matchId, match)
+                    } catch (e: Exception) {
+                        println("Error syncing final match state: ${e.message}")
+                    }
+                }
+
+                // 2. Wyślij event match_end (POST /match-events) z pełnym sets_history
+                try {
+                    val event = MatchEvent(
+                        courtId = state.courtId,
+                        eventType = "match_end",
+                        player1 = PlayerInfo(
+                            name = state.player1.getDisplayName(),
+                            fullName = state.player1.getFullName(),
+                            flag = state.player1.flag,
+                            isServing = state.isPlayer1Serving
+                        ),
+                        player2 = PlayerInfo(
+                            name = state.player2.getDisplayName(),
+                            fullName = state.player2.getFullName(),
+                            flag = state.player2.flag,
+                            isServing = !state.isPlayer1Serving
+                        ),
+                        score = ScoreInfo(
+                            player1Sets = state.player1Sets,
+                            player2Sets = state.player2Sets,
+                            player1Games = state.player1Games,
+                            player2Games = state.player2Games,
+                            player1Points = state.player1Points,
+                            player2Points = state.player2Points,
+                            isTiebreak = state.isTiebreak,
+                            isSuperTiebreak = state.isSuperTiebreak,
+                            matchFinished = state.isMatchFinished,
+                            setsHistory = state.setsHistory.toList(),
+                            statsMode = state.statsMode.name
+                        ),
+                        stats = LiveStatsInfo(
+                            player1Aces = state.player1Stats.aces,
+                            player1DoubleFaults = state.player1Stats.doubleFaults,
+                            player1Winners = state.player1Stats.winners,
+                            player1UnforcedErrors = state.player1Stats.unforcedErrors,
+                            player1FirstServePct = state.player1Stats.getFirstServePercentage(),
+                            player2Aces = state.player2Stats.aces,
+                            player2DoubleFaults = state.player2Stats.doubleFaults,
+                            player2Winners = state.player2Stats.winners,
+                            player2UnforcedErrors = state.player2Stats.unforcedErrors,
+                            player2FirstServePct = state.player2Stats.getFirstServePercentage()
+                        )
+                    )
+                    apiService.logMatchEvent(event)
+                } catch (e: Exception) {
+                    println("Error sending match_end event: ${e.message}")
+                }
+
+                // 3. Zakończ mecz na serwerze (POST /matches/{id}/finish)
+                state.matchId?.let { matchId ->
+                    try {
+                        apiService.finishMatch(matchId)
+                    } catch (e: Exception) {
+                        println("Error finishing match on server: ${e.message}")
+                    }
+                }
+
+                // 4. Wyślij statystyki (POST /match-statistics)
+                val statisticsRequest = state.toMatchStatisticsRequest()
+                if (statisticsRequest != null) {
+                    try {
+                        apiService.sendMatchStatistics(statisticsRequest)
+                    } catch (e: Exception) {
+                        println("Error sending match statistics: ${e.message}")
+                    }
+                }
+            } catch (e: Exception) {
+                println("Error in finalizeMatchOnServer: ${e.message}")
+            }
+
+            // 5. Zapisz lokalnie do Room DB
+            try {
+                matchHistoryRepository.saveMatch(state)
+            } catch (e: Exception) {
+                println("Error saving match to local database: ${e.message}")
+            }
+        }
+    }
+
+    /**
      * Loguje zdarzenie meczowe do serwera
      */
     private fun logMatchEvent(eventType: String) {
@@ -655,11 +807,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     eventType = eventType,
                     player1 = PlayerInfo(
                         name = state.player1.getDisplayName(),
+                        fullName = state.player1.getFullName(),
                         flag = state.player1.flag,
                         isServing = state.isPlayer1Serving
                     ),
                     player2 = PlayerInfo(
                         name = state.player2.getDisplayName(),
+                        fullName = state.player2.getFullName(),
                         flag = state.player2.flag,
                         isServing = !state.isPlayer1Serving
                     ),
@@ -672,7 +826,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         player2Points = state.player2Points,
                         isTiebreak = state.isTiebreak,
                         isSuperTiebreak = state.isSuperTiebreak,
-                        matchFinished = state.isMatchFinished
+                        matchFinished = state.isMatchFinished,
+                        setsHistory = state.setsHistory.toList(),
+                        statsMode = state.statsMode.name
                     ),
                     stats = LiveStatsInfo(
                         player1Aces = state.player1Stats.aces,
@@ -800,5 +956,6 @@ enum class MatchView {
     SERVE,             // Widok serwisu (Ace/Fault/Ball in play)
     RALLY,             // Widok wymiany (Winner/Forced/Unforced)
     BASIC_SCORING,     // Uproszczony widok (Win/Fault)
+    ANNOUNCEMENT,      // Ogłoszenie (zmiana stron, tiebreak, super tiebreak)
     MATCH_FINISHED     // Koniec meczu
 }

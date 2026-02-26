@@ -37,7 +37,7 @@ class CourtSelectionViewModel : ViewModel() {
                 _courts.value = courtsList
                 _isLoading.value = false
             }.onFailure { exception ->
-                _error.value = exception.message ?: "Nieznany błąd"
+                _error.value = exception.message ?: "Unknown error"
                 _isLoading.value = false
             }
         }

@@ -29,6 +29,7 @@
             android:text="@string/winner_label"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="#FFD700"
             android:layout_marginBottom="32dp"/>
 
         <TextView

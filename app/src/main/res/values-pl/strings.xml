@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sędzia Tenisowy</string>
+    <string name="app_name">Blind Tennis Referee</string>
     
     <!-- Language Selection -->
     <string name="select_language">Wybierz język</string>
@@ -20,6 +20,12 @@
     <string name="stats_mode_basic_short">WIN + FAULT\nSzybko i prosto</string>
     <string name="stats_mode_advanced">Zaawansowany</string>
     <string name="stats_mode_advanced_short">As, Winner, Błędy…\nPełne statystyki</string>
+    <string name="win_point">WIN</string>
+    <string name="no_advantage_mode">Bez przewagi (Punkt decydujący)</string>
+    <string name="no_advantage_desc">Przy równowadze (40–40) następny punkt wygrywa gema. Odbierający wybiera stronę.</string>
+    <string name="deciding_point">Punkt decydujący!</string>
+    <string name="deciding_point_msg">Wynik 40–40. Odbierający wybiera stronę returnu. Następny punkt wygrywa gema.</string>
+    <string name="zero_score">0</string>
     <string name="court_pin_title">Autoryzacja kortu</string>
     <string name="court_pin_message">Wprowadź PIN dla kortu: %1$s</string>
     <string name="pin_hint">Wprowadź PIN</string>
@@ -60,12 +66,16 @@
     <string name="who_serves_first">Kto serwuje pierwszy?</string>
     <string name="swap_sides">⇄ Zamień strony</string>
     <string name="player_serves">%1$s\nSerwuje</string>
+    <string name="team_serves">%1$s\nSerwuje</string>
     <string name="first_serve">1. Serwis</string>
     <string name="second_serve">1. serwis  >  2. serwis</string>
     <string name="serve">Serwis</string>
     <string name="ace">AS</string>
     <string name="fault">BŁĄD</string>
+    <string name="second_serve_button">2. SERWIS</string>
+    <string name="double_fault_button">PODWÓJNY BŁĄD</string>
     <string name="ball_in_play">PIŁKA W GRZE</string>
+    <string name="foot_fault">BŁĄD STOPY</string>
     <string name="winner">WYGRANY</string>
     <string name="forced_error">WYMUSZONY\nBŁĄD</string>
     <string name="unforced_error">NIEWYMUSZONY\nBŁĄD</string>
@@ -84,15 +94,17 @@
     <string name="points">Punkty</string>
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (do %1$d)</string>
-    <string name="super_tiebreak">Super tie-break (do %1$d)</string>
+    <string name="super_tiebreak">Match tie-break (do %1$d)</string>
+    <string name="tiebreak_mode">Tie-break (do 7, wygrana różnicą 2)</string>
+    <string name="super_tiebreak_mode">Match Tie-break (do 10, wygrana różnicą 2)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">Zmiana stron!</string>
     <string name="announce_side_change_msg">Zawodnicy zamieniają się stronami kortu.</string>
     <string name="announce_tiebreak">Tie-break!</string>
     <string name="announce_tiebreak_msg">Wynik 4–4. Rozpoczynamy tie-break (do 7, wygrana różnicą 2).</string>
-    <string name="announce_super_tiebreak">Super Tie-break!</string>
-    <string name="announce_super_tiebreak_msg">Sety 1–1. Rozpoczynamy decydujący super tie-break (do 10, wygrana różnicą 2).</string>
+    <string name="announce_super_tiebreak">Match Tie-break!</string>
+    <string name="announce_super_tiebreak_msg">Sety 1–1. Rozpoczynamy decydujący match tie-break (do 10, wygrana różnicą 2).</string>
     <string name="continue_btn">Dalej</string>
     <string name="match_finished_title">Koniec meczu!</string>
     <string name="statistics">Statystyki</string>
@@ -105,6 +117,13 @@
     <string name="error_loading_players">Błąd wczytywania zawodników</string>
     <string name="error_network">Błąd połączenia z serwerem</string>
     <string name="error_unknown">Nieznany błąd</string>
+    <string name="error_no_court_data">Błąd: Brak danych kortu</string>
+    <string name="error_select_correct_players">Wybierz odpowiednią liczbę graczy</string>
+    <string name="error_enter_first_name">Wprowadź imię zawodnika</string>
+    <string name="error_enter_last_name">Wprowadź nazwisko zawodnika</string>
+    <string name="error_adding_player">Błąd dodawania zawodnika</string>
+    <string name="no_actions_to_undo">Brak akcji do cofnięcia</string>
+    <string name="undo_action_format">Cofnięto: %1$s</string>
     
     <!-- Common -->
     <string name="ok">OK</string>
