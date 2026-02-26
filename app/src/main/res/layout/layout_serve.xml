@@ -87,6 +87,18 @@
             android:layout_margin="8dp"
             android:backgroundTint="#F44336"/>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonFootFaultLeft"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:text="@string/foot_fault"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#FF5722"/>
+
     </LinearLayout>
 
     <!-- PRAWA STRONA - Gracz 2 serwuje -->
@@ -125,6 +137,18 @@
             app:cornerRadius="12dp"
             android:layout_margin="8dp"
             android:backgroundTint="#F44336"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonFootFaultRight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:text="@string/foot_fault"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#FF5722"/>
 
     </LinearLayout>
 

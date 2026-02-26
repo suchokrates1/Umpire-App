@@ -66,6 +66,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- WIDOK: Ogłoszenie (zmiana stron, tiebreak, super tiebreak) -->
+    <include
+        android:id="@+id/layoutAnnouncement"
+        layout="@layout/layout_announcement"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutScoreboard"
+        app:layout_constraintBottom_toTopOf="@id/buttonUndo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- WIDOK: Koniec meczu -->
     <include
         android:id="@+id/layoutMatchFinished"

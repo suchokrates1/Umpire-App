@@ -44,5 +44,5 @@
     <color name="button_unforced_error">#F44336</color>
     
     <!-- Launcher icon -->
-    <color name="ic_launcher_background">#2E7D32</color>
+    <color name="ic_launcher_background">#1A237E</color>
 </resources>

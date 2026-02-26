@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Keystore (NEVER commit)
+keystore/
+*.jks
+*.keystore

@@ -50,7 +50,7 @@ class PlayerSelectionViewModel : ViewModel() {
                 _players.value = playersList
                 _isLoading.value = false
             }.onFailure { exception ->
-                _error.value = exception.message ?: "Nieznany błąd"
+                _error.value = exception.message ?: "Unknown error"
                 _isLoading.value = false
             }
         }
@@ -135,12 +135,12 @@ class PlayerSelectionViewModel : ViewModel() {
      * Dodaje nowego zawodnika do API
      * Po dodaniu automatycznie zaznacza go do meczu
      */
-    fun addPlayer(name: String, flagCode: String, category: String = "B1", courtId: String = "", courtPin: String = "") {
+    fun addPlayer(firstName: String, lastName: String, flagCode: String, category: String = "B1", courtId: String = "", courtPin: String = "") {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             
-            val result = repository.addPlayer(name, flagCode, category, courtId, courtPin)
+            val result = repository.addPlayer(firstName, lastName, flagCode, category, courtId, courtPin)
             result.onSuccess { newPlayer ->
                 // Odśwież listę zawodników
                 val playersResult = repository.getPlayers()
@@ -149,6 +149,7 @@ class PlayerSelectionViewModel : ViewModel() {
                     
                     // Znajdź nowego gracza na liście (po ID lub nazwie)
                     val addedPlayer = playersList.find { it.id == newPlayer.id } 
+                        ?: playersList.find { it.getFullName() == newPlayer.getFullName() }
                         ?: playersList.find { it.name == newPlayer.name }
                     
                     if (addedPlayer != null) {
@@ -160,11 +161,11 @@ class PlayerSelectionViewModel : ViewModel() {
                     
                     _isLoading.value = false
                 }.onFailure { exception ->
-                    _error.value = exception.message ?: "Błąd pobierania listy"
+                    _error.value = exception.message ?: "Error loading players"
                     _isLoading.value = false
                 }
             }.onFailure { exception ->
-                _error.value = exception.message ?: "Błąd dodawania zawodnika"
+                _error.value = exception.message ?: "Error adding player"
                 _isLoading.value = false
             }
         }

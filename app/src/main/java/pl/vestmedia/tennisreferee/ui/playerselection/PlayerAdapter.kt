@@ -42,7 +42,7 @@ class PlayerAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         
         fun bind(player: Player) {
-            binding.textPlayerName.text = player.getDisplayName()
+            binding.textPlayerName.text = player.getFullName()
             
             // Pokaż grupę jeśli dostępna
             if (player.group != null) {

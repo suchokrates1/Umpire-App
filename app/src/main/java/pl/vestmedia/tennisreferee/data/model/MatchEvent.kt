@@ -32,6 +32,9 @@ data class PlayerInfo(
     @SerializedName("name")
     val name: String,
     
+    @SerializedName("full_name")
+    val fullName: String? = null,
+    
     @SerializedName("flag")
     val flag: String?,
     
@@ -65,7 +68,13 @@ data class ScoreInfo(
     val isSuperTiebreak: Boolean,
     
     @SerializedName("match_finished")
-    val matchFinished: Boolean
+    val matchFinished: Boolean,
+    
+    @SerializedName("sets_history")
+    val setsHistory: List<SetScore> = emptyList(),
+    
+    @SerializedName("stats_mode")
+    val statsMode: String? = null
 )
 
 data class MatchEventResponse(

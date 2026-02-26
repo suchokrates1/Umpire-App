@@ -137,10 +137,12 @@ class TennisRepository {
      * Dodaje nowego zawodnika
      * API format v1: { "name": "Nowak", "flag_code": "PL", "group_category": "B1", "kort_id": "1", "pin": "1234" }
      */
-    suspend fun addPlayer(name: String, flagCode: String, category: String = "B1", courtId: String = "", courtPin: String = ""): Result<Player> {
+    suspend fun addPlayer(firstName: String, lastName: String, flagCode: String, category: String = "B1", courtId: String = "", courtPin: String = ""): Result<Player> {
         return try {
             val playerRequest = mutableMapOf(
-                "name" to name,  // v1 używa "name"
+                "first_name" to firstName,
+                "last_name" to lastName,
+                "name" to "$firstName $lastName".trim(),  // backward compat
                 "flag_code" to flagCode.uppercase(),
                 "group_category" to category  // v1 używa "group_category"
             )
@@ -157,7 +159,7 @@ class TennisRepository {
                 if (addPlayerResponse.ok && addPlayerResponse.player != null) {
                     Result.success(addPlayerResponse.player)
                 } else {
-                    Result.failure(Exception(addPlayerResponse.error ?: "Błąd dodawania zawodnika"))
+                    Result.failure(Exception(addPlayerResponse.error ?: "Error adding player"))
                 }
             } else {
                 Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))

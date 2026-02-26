@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Tennis Arbitro</string>
+    <string name="app_name">Blind Tennis Referee</string>
     
     <!-- Language Selection -->
     <string name="select_language">Seleziona lingua</string>
@@ -53,12 +53,16 @@
     <string name="who_serves_first">Chi serve per primo?</string>
     <string name="swap_sides">⇄ Scambia lati</string>
     <string name="player_serves">%1$s\nServe</string>
+    <string name="team_serves">%1$s\nServe</string>
     <string name="first_serve">1° Servizio</string>
     <string name="second_serve">1° servizio  >  2° servizio</string>
     <string name="serve">Servizio</string>
     <string name="ace">ACE</string>
     <string name="fault">FALLO</string>
+    <string name="second_serve_button">2° SERVIZIO</string>
+    <string name="double_fault_button">DOPPIO FALLO</string>
     <string name="ball_in_play">PALLA IN GIOCO</string>
+    <string name="foot_fault">FALLO DI PIEDE</string>
     <string name="winner">VINCENTE</string>
     <string name="forced_error">ERRORE\nFORZATO</string>
     <string name="unforced_error">ERRORE\nNON FORZATO</string>
@@ -77,7 +81,18 @@
     <string name="points">Punti</string>
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (a %1$d)</string>
-    <string name="super_tiebreak">Super tie-break (a %1$d)</string>
+    <string name="super_tiebreak">Match tie-break (a %1$d)</string>
+    <string name="tiebreak_mode">Tie-break (a 7, vittoria per 2)</string>
+    <string name="super_tiebreak_mode">Match Tie-break (a 10, vittoria per 2)</string>
+
+    <!-- Match announcements -->
+    <string name="announce_side_change">Cambio campo!</string>
+    <string name="announce_side_change_msg">I giocatori cambiano lato del campo.</string>
+    <string name="announce_tiebreak">Tie-break!</string>
+    <string name="announce_tiebreak_msg">Punteggio 4–4. Inizia il tie-break (a 7, vittoria per 2).</string>
+    <string name="announce_super_tiebreak">Match Tie-break!</string>
+    <string name="announce_super_tiebreak_msg">Set 1–1. Inizia il match tie-break decisivo (a 10, vittoria per 2).</string>
+    <string name="continue_btn">Continua</string>
     <string name="match_finished_title">Partita finita!</string>
     <string name="statistics">Statistiche</string>
     <string name="aces">Ace</string>
@@ -89,6 +104,13 @@
     <string name="error_loading_players">Errore nel caricamento dei giocatori</string>
     <string name="error_network">Errore di connessione di rete</string>
     <string name="error_unknown">Errore sconosciuto</string>
+    <string name="error_no_court_data">Errore: Dati del campo mancanti</string>
+    <string name="error_select_correct_players">Seleziona il numero corretto di giocatori</string>
+    <string name="error_enter_first_name">Inserisci il nome del giocatore</string>
+    <string name="error_enter_last_name">Inserisci il cognome del giocatore</string>
+    <string name="error_adding_player">Errore nell\'aggiunta del giocatore</string>
+    <string name="no_actions_to_undo">Nessuna azione da annullare</string>
+    <string name="undo_action_format">Annullato: %1$s</string>
     
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Modalità statistiche</string>
@@ -96,12 +118,45 @@
     <string name="stats_mode_basic_short">WIN + FALLO\nVeloce e semplice</string>
     <string name="stats_mode_advanced">Avanzata</string>
     <string name="stats_mode_advanced_short">Ace, Vincente, Errori…\nStatistiche complete</string>
+    <string name="win_point">WIN</string>
+    <string name="no_advantage_mode">Senza vantaggio (Punto decisivo)</string>
+    <string name="no_advantage_desc">Alla parità (40–40), il punto successivo vince il game. Il ricevitore sceglie il lato.</string>
+    <string name="deciding_point">Punto decisivo!</string>
+    <string name="deciding_point_msg">Punteggio 40–40. Il ricevitore sceglie da quale lato rispondere. Il prossimo punto vince il game.</string>
+    <string name="zero_score">0</string>
     
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
     <string name="yes">Sì</string>
     <string name="no">No</string>
+
+    <!-- Match History -->
+    <string name="match_history_title">Storico partite</string>
+    <string name="match_history">Storico partite</string>
+    <string name="no_matches_saved">Nessuna partita salvata</string>
+    <string name="match_score_format">%1$d : %2$d</string>
+    <string name="winner_format">Vincitore: %1$s</string>
+    <string name="delete_match">Elimina partita</string>
+    <string name="delete_all_matches">Elimina tutto</string>
+    <string name="confirm_delete_match">Eliminare questa partita?</string>
+    <string name="confirm_delete_all_matches">Eliminare tutte le partite dallo storico?</string>
+    <string name="match_deleted">Partita eliminata</string>
+    <string name="all_matches_deleted">Tutte le partite eliminate</string>
+    <string name="match_details">Dettagli partita</string>
+    <string name="match_details_placeholder">I dettagli della partita verranno visualizzati qui</string>
+
+    <!-- Settings -->
+    <string name="settings">Impostazioni</string>
+    <string name="appearance">Aspetto</string>
+    <string name="theme">Tema</string>
+    <string name="theme_light">Chiaro</string>
+    <string name="theme_dark">Scuro</string>
+    <string name="theme_system">Predefinito del sistema</string>
+    <string name="about">Info</string>
+    <string name="app_description">Applicazione professionale per arbitri di tennis per il punteggio in tempo reale</string>
+    <string name="version_format">Versione %1$s</string>
+    <string name="version_unknown">Versione sconosciuta</string>
 
     <!-- Statistics Labels -->
     <string name="winners_stat">Vincenti</string>

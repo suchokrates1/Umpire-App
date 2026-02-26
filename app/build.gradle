@@ -7,27 +7,39 @@ plugins {
 
 android {
     namespace = 'pl.vestmedia.tennisreferee'
-    compileSdk 34
+    compileSdk 35
+
+    signingConfigs {
+        release {
+            storeFile file('../keystore/release.jks')
+            storePassword 'blindtennis2026'
+            keyAlias 'blindtennis'
+            keyPassword 'blindtennis2026'
+        }
+    }
 
     defaultConfig {
         applicationId "pl.vestmedia.tennisreferee"
         minSdk 24
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        targetSdk 35
+        versionCode 7
+        versionName "1.0.0-beta7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     
     compileOptions {

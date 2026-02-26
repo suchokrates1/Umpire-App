@@ -36,5 +36,8 @@ data class SetScore(
     val player1Games: Int,
     
     @SerializedName("player2_games")
-    val player2Games: Int
+    val player2Games: Int,
+    
+    @SerializedName("tiebreak_loser_points")
+    val tiebreakLoserPoints: Int? = null  // For display like 5-4(7) — stores loser's tiebreak points
 )

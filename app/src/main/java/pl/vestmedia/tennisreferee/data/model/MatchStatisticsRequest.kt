@@ -25,7 +25,10 @@ data class MatchStatisticsRequest(
     val matchDurationMs: Long,
     
     @SerializedName("winner")
-    val winner: String?
+    val winner: String?,
+    
+    @SerializedName("stats_mode")
+    val statsMode: String? = null
 )
 
 data class PlayerStats(
