@@ -514,29 +514,9 @@ class MatchActivity : AppCompatActivity() {
             scoreboardBinding.textPlayer2Name.text = state.player2.getDisplayName()
         }
         
-        // Ikona serwisu przy punktach
-        scoreboardBinding.textPlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
-        scoreboardBinding.textPlayer2ServerIcon.visibility = if (!state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
-        
-        // W deblu pokaż nazwisko serwującego obok ikony
-        if (state.isDoubles) {
-            val serverName = when (state.currentServer) {
-                1 -> state.player1.name
-                2 -> state.player2.name
-                3 -> state.player3?.name ?: ""
-                4 -> state.player4?.name ?: ""
-                else -> ""
-            }
-            val serverIcon = "● $serverName"
-            if (state.isPlayer1Serving) {
-                scoreboardBinding.textPlayer1ServerIcon.text = serverIcon
-            } else {
-                scoreboardBinding.textPlayer2ServerIcon.text = serverIcon
-            }
-        } else {
-            scoreboardBinding.textPlayer1ServerIcon.text = "●"
-            scoreboardBinding.textPlayer2ServerIcon.text = "●"
-        }
+        // Ikona serwisu (piłka tenisowa) po lewej od punktów
+        scoreboardBinding.imagePlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
+        scoreboardBinding.imagePlayer2ServerIcon.visibility = if (!state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
         
         // Punkty z animacją
         animateScoreChange(scoreboardBinding.textPlayer1Points, state.getPlayer1PointsDisplay())
