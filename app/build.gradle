@@ -9,6 +9,24 @@ android {
     namespace = 'pl.vestmedia.tennisreferee'
     compileSdk 35
 
+    // ── Versioning scheme ───────────────────────────────────────
+    // versionCode = MAJOR*100000 + MINOR*10000 + PATCH*1000 + BUILD
+    // versionName = "MAJOR.MINOR.PATCH-QUALIFIER.BUILD"
+    //
+    // Qualifiers (Play Store track):
+    //   dev.N    → internal testing  (frequent builds)
+    //   alpha.N  → alpha track       (tested features)
+    //   beta.N   → open beta         (release candidates)
+    //   (none)   → production        (public release)
+    //
+    // Flow: Upload to internal → promote to alpha → beta → production
+    // ─────────────────────────────────────────────────────────────
+    def vMajor = 1
+    def vMinor = 0
+    def vPatch = 0
+    def vBuild = 1            // increment for each build
+    def vQualifier = "dev"    // "dev" | "alpha" | "beta" | "" (production)
+
     signingConfigs {
         release {
             storeFile file('../keystore/release.jks')
@@ -22,8 +40,8 @@ android {
         applicationId "pl.vestmedia.tennisreferee"
         minSdk 24
         targetSdk 35
-        versionCode 8
-        versionName "1.0.0-beta8"
+        versionCode vMajor * 100000 + vMinor * 10000 + vPatch * 1000 + vBuild
+        versionName vQualifier ? "${vMajor}.${vMinor}.${vPatch}-${vQualifier}.${vBuild}" : "${vMajor}.${vMinor}.${vPatch}"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
