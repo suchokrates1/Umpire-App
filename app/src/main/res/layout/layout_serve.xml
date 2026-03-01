@@ -11,7 +11,7 @@
         android:id="@+id/textServeInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="1. Serwis"
+        android:text="@string/first_serve"
         android:textSize="@dimen/scoring_serve_info_text"
         android:textStyle="bold"
         android:gravity="center"

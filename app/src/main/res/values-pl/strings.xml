@@ -17,8 +17,10 @@
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Tryb statystyk</string>
     <string name="stats_mode_basic">Podstawowy</string>
+    <string name="stats_mode_basic_desc">Uproszczone punktowanie: tylko przyciski Win i Fault.\nŚledzi: podwójne błędy.</string>
     <string name="stats_mode_basic_short">WIN + FAULT\nSzybko i prosto</string>
     <string name="stats_mode_advanced">Zaawansowany</string>
+    <string name="stats_mode_advanced_desc">Pełne punktowanie: As, Błąd, Piłka w grze, Wygrany, Wymuszony błąd, Niewymuszony błąd.\nŚledzi: asy, podwójne błędy, zagrania wygrywające, błędy wymuszone/niewymuszone, % serwisu.</string>
     <string name="stats_mode_advanced_short">As, Winner, Błędy…\nPełne statystyki</string>
     <string name="win_point">WIN</string>
     <string name="no_advantage_mode">Bez przewagi (Punkt decydujący)</string>
@@ -124,6 +126,17 @@
     <string name="error_adding_player">Błąd dodawania zawodnika</string>
     <string name="no_actions_to_undo">Brak akcji do cofnięcia</string>
     <string name="undo_action_format">Cofnięto: %1$s</string>
+
+    <!-- Undo descriptions -->
+    <string name="undo_ace">AS - %1$s</string>
+    <string name="undo_fault_first">Błąd - Pierwszy serwis</string>
+    <string name="undo_double_fault">Podwójny błąd - %1$s</string>
+    <string name="undo_foot_fault_first">Błąd stopy - Pierwszy serwis</string>
+    <string name="undo_foot_fault_double">Błąd stopy (podwójny) - %1$s</string>
+    <string name="undo_winner">Wygrany - %1$s</string>
+    <string name="undo_forced_error">Wymuszony błąd - %1$s</string>
+    <string name="undo_unforced_error">Niewymuszony błąd - %1$s</string>
+    <string name="undo_win">Wygrana - %1$s</string>
     
     <!-- Common -->
     <string name="ok">OK</string>

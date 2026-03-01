@@ -126,6 +126,17 @@
     <string name="error_adding_player">Error adding player</string>
     <string name="no_actions_to_undo">No actions to undo</string>
     <string name="undo_action_format">Undone: %1$s</string>
+
+    <!-- Undo descriptions -->
+    <string name="undo_ace">ACE - %1$s</string>
+    <string name="undo_fault_first">Fault - First Serve</string>
+    <string name="undo_double_fault">Double Fault - %1$s</string>
+    <string name="undo_foot_fault_first">Foot Fault - First Serve</string>
+    <string name="undo_foot_fault_double">Foot Fault (Double) - %1$s</string>
+    <string name="undo_winner">Winner - %1$s</string>
+    <string name="undo_forced_error">Forced Error - %1$s</string>
+    <string name="undo_unforced_error">Unforced Error - %1$s</string>
+    <string name="undo_win">Win - %1$s</string>
     
     <!-- Common -->
     <string name="ok">OK</string>

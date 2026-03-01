@@ -29,6 +29,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private val _undoMessage = MutableLiveData<String?>()
     val undoMessage: LiveData<String?> = _undoMessage
     
+    /** Helper: get localized string from resources */
+    private fun str(resId: Int, vararg args: Any): String =
+        getApplication<Application>().getString(resId, *args)
+    
     // Pending announcement type — set before switching to ANNOUNCEMENT view
     var pendingAnnouncementType: String? = null
         private set
@@ -189,7 +193,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun handleAce() {
         _matchState.value?.let { state ->
             val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
-            saveStateBeforeAction(ActionType.ACE, "ACE - $serverName")
+            saveStateBeforeAction(ActionType.ACE, str(R.string.undo_ace, serverName))
             
             if (state.isPlayer1Serving) {
                 state.player1Stats.aces++
@@ -215,7 +219,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         _matchState.value?.let { state ->
             if (state.isFirstServe) {
                 // Pierwszy serwis nieudany - przejdź na 2. serwis
-                saveStateBeforeAction(ActionType.FAULT, "Fault - First Serve")
+                saveStateBeforeAction(ActionType.FAULT, str(R.string.undo_fault_first))
                 
                 if (state.isPlayer1Serving) {
                     state.player1Stats.firstServesTotal++
@@ -227,7 +231,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 // Podwójny błąd
                 val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
-                saveStateBeforeAction(ActionType.DOUBLE_FAULT, "Double Fault - $serverName")
+                saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
                 
                 if (state.isPlayer1Serving) {
                     state.player1Stats.doubleFaults++
@@ -252,7 +256,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun handleFootFault() {
         _matchState.value?.let { state ->
             if (state.isFirstServe) {
-                saveStateBeforeAction(ActionType.FOOT_FAULT, "Foot Fault - First Serve")
+                saveStateBeforeAction(ActionType.FOOT_FAULT, str(R.string.undo_foot_fault_first))
                 
                 if (state.isPlayer1Serving) {
                     state.player1Stats.firstServesTotal++
@@ -263,7 +267,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 _matchState.value = state
             } else {
                 val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
-                saveStateBeforeAction(ActionType.FOOT_FAULT, "Foot Fault (Double) - $serverName")
+                saveStateBeforeAction(ActionType.FOOT_FAULT, str(R.string.undo_foot_fault_double, serverName))
                 
                 if (state.isPlayer1Serving) {
                     state.player1Stats.doubleFaults++
@@ -315,7 +319,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun handleWinner(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
             val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
-            saveStateBeforeAction(ActionType.WINNER, "Winner - $playerName")
+            saveStateBeforeAction(ActionType.WINNER, str(R.string.undo_winner, playerName))
             
             if (isPlayer1) {
                 state.player1Stats.winners++
@@ -334,7 +338,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun handleForcedError(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
             val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
-            saveStateBeforeAction(ActionType.FORCED_ERROR, "Forced Error - $playerName")
+            saveStateBeforeAction(ActionType.FORCED_ERROR, str(R.string.undo_forced_error, playerName))
             
             if (isPlayer1) {
                 state.player1Stats.forcedErrors++
@@ -354,7 +358,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun handleUnforcedError(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
             val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
-            saveStateBeforeAction(ActionType.UNFORCED_ERROR, "Unforced Error - $playerName")
+            saveStateBeforeAction(ActionType.UNFORCED_ERROR, str(R.string.undo_unforced_error, playerName))
             
             if (isPlayer1) {
                 state.player1Stats.unforcedErrors++
@@ -377,7 +381,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun handleBasicWin(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
             val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
-            saveStateBeforeAction(ActionType.WINNER, "Win - $playerName")
+            saveStateBeforeAction(ActionType.WINNER, str(R.string.undo_win, playerName))
             
             if (isPlayer1) {
                 state.player1Stats.winners++
@@ -421,7 +425,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun handleBasicFault() {
         _matchState.value?.let { state ->
             if (state.isFirstServe) {
-                saveStateBeforeAction(ActionType.FAULT, "Fault - 1st serve")
+                saveStateBeforeAction(ActionType.FAULT, str(R.string.undo_fault_first))
                 // 1. serwis nieudany — policz próbę
                 if (state.isPlayer1Serving) {
                     state.player1Stats.firstServesTotal++
@@ -433,7 +437,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 // Podwójny błąd
                 val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
-                saveStateBeforeAction(ActionType.DOUBLE_FAULT, "Double Fault - $serverName")
+                saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
                 
                 if (state.isPlayer1Serving) {
                     state.player1Stats.doubleFaults++

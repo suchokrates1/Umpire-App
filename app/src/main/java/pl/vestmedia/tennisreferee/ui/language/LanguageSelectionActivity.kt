@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityLanguageSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Language
 import pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity
@@ -51,7 +52,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
         binding = ActivityLanguageSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        supportActionBar?.title = "Tennis Referee"
+        supportActionBar?.title = getString(R.string.app_name)
         
         setupRecyclerView()
     }

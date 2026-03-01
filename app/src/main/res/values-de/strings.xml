@@ -111,6 +111,17 @@
     <string name="error_adding_player">Fehler beim Hinzufügen des Spielers</string>
     <string name="no_actions_to_undo">Keine Aktionen zum Rückgängigmachen</string>
     <string name="undo_action_format">Rückgängig: %1$s</string>
+
+    <!-- Undo descriptions -->
+    <string name="undo_ace">ASS - %1$s</string>
+    <string name="undo_fault_first">Fehler - Erster Aufschlag</string>
+    <string name="undo_double_fault">Doppelfehler - %1$s</string>
+    <string name="undo_foot_fault_first">Fußfehler - Erster Aufschlag</string>
+    <string name="undo_foot_fault_double">Fußfehler (Doppel) - %1$s</string>
+    <string name="undo_winner">Winner - %1$s</string>
+    <string name="undo_forced_error">Erzwungener Fehler - %1$s</string>
+    <string name="undo_unforced_error">Unerzwungener Fehler - %1$s</string>
+    <string name="undo_win">Gewinn - %1$s</string>
     
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Statistikmodus</string>
