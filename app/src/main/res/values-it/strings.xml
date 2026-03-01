@@ -111,6 +111,17 @@
     <string name="error_adding_player">Errore nell\'aggiunta del giocatore</string>
     <string name="no_actions_to_undo">Nessuna azione da annullare</string>
     <string name="undo_action_format">Annullato: %1$s</string>
+
+    <!-- Undo descriptions -->
+    <string name="undo_ace">ACE - %1$s</string>
+    <string name="undo_fault_first">Fallo - Primo servizio</string>
+    <string name="undo_double_fault">Doppio fallo - %1$s</string>
+    <string name="undo_foot_fault_first">Fallo di piede - Primo servizio</string>
+    <string name="undo_foot_fault_double">Fallo di piede (doppio) - %1$s</string>
+    <string name="undo_winner">Vincente - %1$s</string>
+    <string name="undo_forced_error">Errore forzato - %1$s</string>
+    <string name="undo_unforced_error">Errore non forzato - %1$s</string>
+    <string name="undo_win">Vittoria - %1$s</string>
     
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Modalità statistiche</string>

@@ -131,6 +131,17 @@
     <string name="error_adding_player">Error al agregar jugador</string>
     <string name="no_actions_to_undo">No hay acciones para deshacer</string>
     <string name="undo_action_format">Deshecho: %1$s</string>
+
+    <!-- Undo descriptions -->
+    <string name="undo_ace">ACE - %1$s</string>
+    <string name="undo_fault_first">Falta - Primer saque</string>
+    <string name="undo_double_fault">Doble falta - %1$s</string>
+    <string name="undo_foot_fault_first">Falta de pie - Primer saque</string>
+    <string name="undo_foot_fault_double">Falta de pie (doble) - %1$s</string>
+    <string name="undo_winner">Ganador - %1$s</string>
+    <string name="undo_forced_error">Error forzado - %1$s</string>
+    <string name="undo_unforced_error">Error no forzado - %1$s</string>
+    <string name="undo_win">Victoria - %1$s</string>
     
     <!-- Common -->
     <string name="ok">OK</string>
