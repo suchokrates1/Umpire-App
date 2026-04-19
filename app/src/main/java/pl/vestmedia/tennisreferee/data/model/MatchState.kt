@@ -29,6 +29,9 @@ data class MatchState(
     // No-Advantage (deciding point) mode — at deuce, next point wins the game
     val noAdvantage: Boolean = false,
     
+    // Konfiguracja formatu meczu
+    val matchConfig: MatchConfig = MatchConfig(),
+    
     // Wyniki
     var player1Sets: Int = 0,
     var player2Sets: Int = 0,
@@ -76,6 +79,19 @@ data class MatchState(
             player1.getDisplayName()
         }
     }
+
+    /**
+     * Zwraca pełną nazwę zespołu 1 (dla debla) lub pełne imię i nazwisko gracza 1
+     */
+    fun getTeam1FullName(): String {
+        return if (isDoubles && !team1Name.isNullOrEmpty()) {
+            team1Name
+        } else if (isDoubles && player3 != null) {
+            "${player1.getFullName()} / ${player3.getFullName()}"
+        } else {
+            player1.getFullName()
+        }
+    }
     
     /**
      * Zwraca nazwę zespołu 2 (dla debla) lub imię gracza 2
@@ -87,6 +103,19 @@ data class MatchState(
             "${player2.getDisplayName()} / ${player4.getDisplayName()}"
         } else {
             player2.getDisplayName()
+        }
+    }
+
+    /**
+     * Zwraca pełną nazwę zespołu 2 (dla debla) lub pełne imię i nazwisko gracza 2
+     */
+    fun getTeam2FullName(): String {
+        return if (isDoubles && !team2Name.isNullOrEmpty()) {
+            team2Name
+        } else if (isDoubles && player4 != null) {
+            "${player2.getFullName()} / ${player4.getFullName()}"
+        } else {
+            player2.getFullName()
         }
     }
     
@@ -153,12 +182,14 @@ data class MatchState(
      */
     fun isGameWon(): Boolean {
         if (isTiebreak) {
-            // Tie-break do 7 (z przewagą 2)
-            return (player1Points >= 7 || player2Points >= 7) && 
+            // Tie-break do matchConfig.tiebreakPoints (z przewagą 2)
+            val tbPts = matchConfig.tiebreakPoints
+            return (player1Points >= tbPts || player2Points >= tbPts) && 
                    kotlin.math.abs(player1Points - player2Points) >= 2
         } else if (isSuperTiebreak) {
-            // Super tie-break do 10 (z przewagą 2)
-            return (player1Points >= 10 || player2Points >= 10) && 
+            // Super tie-break do matchConfig.superTiebreakPoints (z przewagą 2)
+            val stbPts = matchConfig.superTiebreakPoints
+            return (player1Points >= stbPts || player2Points >= stbPts) && 
                    kotlin.math.abs(player1Points - player2Points) >= 2
         } else if (noAdvantage) {
             // No-Advantage: at deuce (3-3), next point wins — first to 4 wins
@@ -172,21 +203,34 @@ data class MatchState(
     
     /**
      * Sprawdza czy ktoś wygrał seta
-     * Wygrana: 4:0, 4:1, 4:2, 5:3
+     * Np. przy gamesPerSet=4: wygrana 4:0, 4:1, 4:2, 5:3
+     * Np. przy gamesPerSet=3 (krótki set): wygrana 3:0, 3:1, 3:2 (po TB z 2:2)
+     * Np. przy gamesPerSet=6: wygrana 6:0..6:4, 7:5
      */
     fun isSetWon(): Boolean {
         if (isTiebreak || isSuperTiebreak) {
             return false // W tiebreaku sprawdzamy isGameWon
         }
         
-        // Wygrana przy 4 gemach z przewagą 2 (4:0, 4:1, 4:2)
-        if ((player1Games >= 4 && player2Games <= 2 && player1Games - player2Games >= 2) ||
-            (player2Games >= 4 && player1Games <= 2 && player2Games - player1Games >= 2)) {
+        val gps = matchConfig.gamesPerSet
+        
+        // Krótkie sety (gps=3): set wygrywa ten kto pierwszy osiągnie gps gemów
+        // (bo TB startuje przy gps-1:gps-1, np. 2:2, i zwycięzca TB dostaje gem → 3:2)
+        if (gps <= 3) {
+            return player1Games >= gps || player2Games >= gps
+        }
+        
+        // Standardowe sety: wygrana z przewagą ≥2 gemów
+        if ((player1Games >= gps && player1Games - player2Games >= 2) ||
+            (player2Games >= gps && player2Games - player1Games >= 2)) {
             return true
         }
         
-        // Wygrana przy 5:3
-        if ((player1Games == 5 && player2Games == 3) || (player2Games == 5 && player1Games == 3)) {
+        // Wygrana przy gamesPerSet+1 : gamesPerSet-1 (np. 5:3 przy gps=4, 7:5 przy gps=6)
+        val gpsPlus1 = gps + 1
+        val gpsMinus1 = gps - 1
+        if ((player1Games == gpsPlus1 && player2Games == gpsMinus1) ||
+            (player2Games == gpsPlus1 && player1Games == gpsMinus1)) {
             return true
         }
         
@@ -194,18 +238,21 @@ data class MatchState(
     }
     
     /**
-     * Sprawdza czy powinien zacząć się tiebreak
-     * Tiebreak rozpoczyna się przy 4:4
+     * Sprawdza czy powinien zacząć się tiebreak.
+     * Krótkie sety (gamesPerSet=3): TB przy (gps-1):(gps-1) → 2:2
+     * Standardowe sety (gamesPerSet=4,6): TB przy gps:gps → 4:4, 6:6
      */
     fun shouldStartTiebreak(): Boolean {
-        return player1Games == 4 && player2Games == 4 && !isTiebreak && !isSuperTiebreak
+        val gps = matchConfig.gamesPerSet
+        val tbTrigger = if (gps <= 3) gps - 1 else gps
+        return player1Games == tbTrigger && player2Games == tbTrigger && !isTiebreak && !isSuperTiebreak
     }
     
     /**
      * Sprawdza czy mecz powinien się zakończyć
      */
     fun shouldEndMatch(): Boolean {
-        return player1Sets == 2 || player2Sets == 2
+        return player1Sets == matchConfig.setsToWin || player2Sets == matchConfig.setsToWin
     }
     
     /**
@@ -215,8 +262,8 @@ data class MatchState(
         return Match(
             id = matchId ?: 0,
             courtId = courtId,
-            player1Name = if (isDoubles) getTeam1DisplayName() else player1.getDisplayName(),
-            player2Name = if (isDoubles) getTeam2DisplayName() else player2.getDisplayName(),
+            player1Name = if (isDoubles) getTeam1FullName() else player1.getFullName(),
+            player2Name = if (isDoubles) getTeam2FullName() else player2.getFullName(),
             score = Score(
                 player1Sets = player1Sets,
                 player2Sets = player2Sets,
@@ -243,15 +290,15 @@ data class MatchState(
         if (matchId == null || !isMatchFinished) return null
         
         val winner = when {
-            player1Sets > player2Sets -> player1.getDisplayName()
-            player2Sets > player1Sets -> player2.getDisplayName()
+            player1Sets > player2Sets -> player1.getFullName()
+            player2Sets > player1Sets -> player2.getFullName()
             else -> null
         }
         
         return MatchStatisticsRequest(
             matchId = matchId!!,
-            player1Name = player1.getDisplayName(),
-            player2Name = player2.getDisplayName(),
+            player1Name = player1.getFullName(),
+            player2Name = player2.getFullName(),
             player1Stats = PlayerStats(
                 aces = player1Stats.aces,
                 doubleFaults = player1Stats.doubleFaults,

@@ -24,7 +24,7 @@ class MatchHistoryRepository(private val matchDao: MatchDao) {
      * Pobiera mecze gracza - filtrowanie po stronie aplikacji
      * ponieważ player1 i player2 są przechowywane jako JSON
      */
-    fun getMatchesByPlayer(playerId: Int): Flow<List<MatchEntity>> {
+    fun getMatchesByPlayer(@Suppress("UNUSED_PARAMETER") playerId: Int): Flow<List<MatchEntity>> {
         return matchDao.getAllMatchesForPlayerFilter()
     }
     

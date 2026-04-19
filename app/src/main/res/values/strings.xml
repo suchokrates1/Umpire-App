@@ -71,6 +71,8 @@
     <string name="finish">Finish</string>
     <string name="finish_match">Finish Match</string>
     <string name="new_match">New Match</string>
+    <string name="next_match_same_setup">▶ Next Match (same setup)</string>
+    <string name="next_match_new_setup">⚙ New Match (different setup)</string>
     
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Statistics Mode</string>
@@ -80,6 +82,19 @@
     <string name="stats_mode_advanced">Advanced</string>
     <string name="stats_mode_advanced_desc">Full scoring: Ace, Fault, Ball in Play, Winner, Forced Error, Unforced Error.\nTracks: aces, double faults, winners, forced/unforced errors, serve %.</string>
     <string name="stats_mode_advanced_short">Ace, Winner, Errors…\nFull statistics</string>
+    
+    <!-- Match Configuration Dialog -->
+    <string name="match_config_title">Match Setup</string>
+    <string name="match_config_format_header">Match Format</string>
+    <string name="match_config_games_per_set">Games per set</string>
+    <string name="match_config_sets_to_win">Sets to win</string>
+    <string name="match_config_tiebreak_to">Tiebreak to</string>
+    <string name="match_config_super_tiebreak_to">Match tiebreak to</string>
+    <string name="match_config_options_header">Options</string>
+    <string name="match_config_stats_header">Statistics Mode</string>
+    <string name="match_config_tb_only">Tiebreak Only</string>
+    <string name="match_config_tb_only_desc">Play a single tiebreak instead of sets</string>
+    <string name="match_config_tb_only_points">Tiebreak to</string>
     <string name="win_point">WIN</string>
     <string name="no_advantage_mode">No-Advantage (Deciding Point)</string>
     <string name="no_advantage_desc">At deuce (40–40), the next point wins the game. Receiver chooses return side.</string>
@@ -97,17 +112,18 @@
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (to %1$d)</string>
     <string name="super_tiebreak">Match tie-break (to %1$d)</string>
-    <string name="tiebreak_mode">Tie-break (to 7, win by 2)</string>
-    <string name="super_tiebreak_mode">Match Tie-break (to 10, win by 2)</string>
+    <string name="tiebreak_mode">Tie-break (to %1$d, win by 2)</string>
+    <string name="super_tiebreak_mode">Match Tie-break (to %1$d, win by 2)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">Change Sides!</string>
     <string name="announce_side_change_msg">Players change ends of the court.</string>
     <string name="announce_tiebreak">Tie-break!</string>
-    <string name="announce_tiebreak_msg">Score is 4–4. Starting tie-break (first to 7, win by 2).</string>
+    <string name="announce_tiebreak_msg">Score is %1$d–%1$d. Starting tie-break (first to %2$d, win by 2).</string>
     <string name="announce_super_tiebreak">Match Tie-break!</string>
-    <string name="announce_super_tiebreak_msg">Sets are 1–1. Starting deciding match tie-break (first to 10, win by 2).</string>
+    <string name="announce_super_tiebreak_msg">Sets are %1$d–%1$d. Starting deciding match tie-break (first to %2$d, win by 2).</string>
     <string name="continue_btn">Continue</string>
+    <string name="dont_change_sides">Don\'t change sides</string>
     <string name="match_finished_title">Match Finished!</string>
     <string name="statistics">Statistics</string>
     <string name="aces">Aces</string>
@@ -177,5 +193,10 @@
     <string name="app_description">Professional tennis referee application for real-time match scoring</string>
     <string name="version_format">Version %1$s</string>
     <string name="version_unknown">Version unknown</string>
+
+    <!-- Bracket warnings -->
+    <string name="bracket_warning_title">Match Notice</string>
+    <string name="bracket_warning_different_groups">These players are from different groups. Is this a knockout phase match?</string>
+    <string name="bracket_warning_friendly">These players are not assigned to any tournament group. This match will be recorded as a friendly.</string>
 </resources>
 

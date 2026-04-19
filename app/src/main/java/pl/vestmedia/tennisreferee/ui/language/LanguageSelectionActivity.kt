@@ -10,6 +10,7 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityLanguageSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Language
 import pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity
+import pl.vestmedia.tennisreferee.utils.AppLogger
 import java.util.Locale
 
 /**
@@ -49,6 +50,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLogger.screen("LanguageSelection")
         binding = ActivityLanguageSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
@@ -78,6 +80,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
     }
     
     private fun onLanguageSelected(language: Language) {
+        AppLogger.button("LanguageSelection", "language", language.code)
         setLanguage(this, language.code)
         
         // Przejdź do ekranu wyboru kortów

@@ -1,6 +1,9 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import android.app.Application
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +14,7 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.*
+import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * ViewModel zarządzający logiką meczu tenisowego
@@ -29,6 +33,26 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private val _undoMessage = MutableLiveData<String?>()
     val undoMessage: LiveData<String?> = _undoMessage
     
+    private val _bracketWarning = MutableLiveData<BracketWarningEvent?>()
+    val bracketWarning: LiveData<BracketWarningEvent?> = _bracketWarning
+    
+    data class BracketWarningEvent(val type: String, val matchId: Int)
+    
+    private fun getBatteryLevel(): Int? {
+        val batteryStatus = getApplication<Application>().registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        return batteryStatus?.let {
+            val level = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val scale = it.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+            if (level >= 0 && scale > 0) (level * 100 / scale) else null
+        }
+    }
+    
+    private fun isBatteryCharging(): Boolean {
+        val batteryStatus = getApplication<Application>().registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val status = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+        return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+    }
+    
     /** Helper: get localized string from resources */
     private fun str(resId: Int, vararg args: Any): String =
         getApplication<Application>().getString(resId, *args)
@@ -45,6 +69,18 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         pendingAnnouncementType = null
         val state = _matchState.value ?: return
         _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+    }
+    
+    /**
+     * Called when the umpire taps "Don't change sides" – reverses the swap and continues.
+     */
+    fun skipSideChange() {
+        _matchState.value?.let { state ->
+            state.sidesSwapped = !state.sidesSwapped
+            _matchState.value = state
+        }
+        AppLogger.action("Match", "SideChangeSkipped")
+        continueFromAnnouncement()
     }
     
     private val apiService = RetrofitClient.apiService
@@ -526,32 +562,39 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 val player1Won = state.player1Points > state.player2Points
                 
                 if (state.isTiebreak || state.isSuperTiebreak) {
-                    // Dodaj gem zwycięzcy tiebreak (aby było 7:6 zamiast 6:6)
-                    if (player1Won) {
-                        state.player1Games++
-                    } else {
-                        state.player2Games++
-                    }
-                    
-                    // Wygrany tiebreak = wygrany set
-                    if (player1Won) {
-                        state.player1Sets++
-                    } else {
-                        state.player2Sets++
-                    }
+                    val wasSuperTiebreak = state.isSuperTiebreak
                     
                     // Oblicz punkty przegranego tiebreak (do wyświetlenia np. 5-4(7))
                     val tiebreakLoserPts = if (player1Won) state.player2Points else state.player1Points
                     
-                    // Zapisz wynik seta (teraz będzie 7:6)
-                    state.setsHistory.add(
-                        SetScore(
-                            setNumber = state.setsHistory.size + 1,
-                            player1Games = state.player1Games,
-                            player2Games = state.player2Games,
-                            tiebreakLoserPoints = tiebreakLoserPts
+                    if (wasSuperTiebreak) {
+                        // Super tiebreak: zapisz rzeczywiste punkty (np. 10:5)
+                        // Nie dodajemy gemu — super TB nie ma gemów
+                        if (player1Won) state.player1Sets++ else state.player2Sets++
+                        
+                        state.setsHistory.add(
+                            SetScore(
+                                setNumber = state.setsHistory.size + 1,
+                                player1Games = state.player1Points,
+                                player2Games = state.player2Points,
+                                tiebreakLoserPoints = tiebreakLoserPts,
+                                isSuperTiebreak = true
+                            )
                         )
-                    )
+                    } else {
+                        // Zwykły tiebreak: dodaj gem zwycięzcy (aby było 5:4 zamiast 4:4)
+                        if (player1Won) state.player1Games++ else state.player2Games++
+                        if (player1Won) state.player1Sets++ else state.player2Sets++
+                        
+                        state.setsHistory.add(
+                            SetScore(
+                                setNumber = state.setsHistory.size + 1,
+                                player1Games = state.player1Games,
+                                player2Games = state.player2Games,
+                                tiebreakLoserPoints = tiebreakLoserPts
+                            )
+                        )
+                    }
                     
                     // Resetuj gemy i punkty
                     state.player1Games = 0
@@ -575,6 +618,14 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         
                         _currentView.value = MatchView.MATCH_FINISHED
                         return
+                    }
+                    
+                    // Sprawdź czy należy rozpocząć super tiebreak po wygranym tiebreaku
+                    // (gdy sety są np. 1:1 przy setsToWin=2)
+                    val setsToWinTB = state.matchConfig.setsToWin
+                    if (state.player1Sets == (setsToWinTB - 1) && state.player2Sets == (setsToWinTB - 1)) {
+                        state.isSuperTiebreak = true
+                        pendingAnnouncementType = "super_tiebreak"
                     }
                 } else {
                     // Normalny gem
@@ -645,8 +696,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         return
                     }
                     
-                    // Sprawdź czy należy rozpocząć super tiebreak (1:1 w setach)
-                    if (state.player1Sets == 1 && state.player2Sets == 1) {
+                    // Sprawdź czy należy rozpocząć super tiebreak (remis w setach, np. 1:1 przy setsToWin=2)
+                    val setsToWin = state.matchConfig.setsToWin
+                    if (state.player1Sets == (setsToWin - 1) && state.player2Sets == (setsToWin - 1)) {
                         state.isSuperTiebreak = true
                         pendingAnnouncementType = "super_tiebreak"
                     }
@@ -715,7 +767,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         val match = state.toMatch()
                         apiService.updateMatch(matchId, match)
                     } catch (e: Exception) {
-                        println("Error syncing final match state: ${e.message}")
+                        AppLogger.error("finalizeMatch", "sync final state: ${e.message}")
                     }
                 }
 
@@ -760,11 +812,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                             player2Winners = state.player2Stats.winners,
                             player2UnforcedErrors = state.player2Stats.unforcedErrors,
                             player2FirstServePct = state.player2Stats.getFirstServePercentage()
-                        )
+                        ),
+                        batteryLevel = getBatteryLevel(),
+                        isCharging = isBatteryCharging()
                     )
                     apiService.logMatchEvent(event)
                 } catch (e: Exception) {
-                    println("Error sending match_end event: ${e.message}")
+                    AppLogger.error("finalizeMatch", "match_end event: ${e.message}")
                 }
 
                 // 3. Zakończ mecz na serwerze (POST /matches/{id}/finish)
@@ -772,7 +826,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         apiService.finishMatch(matchId)
                     } catch (e: Exception) {
-                        println("Error finishing match on server: ${e.message}")
+                        AppLogger.error("finalizeMatch", "finish: ${e.message}")
                     }
                 }
 
@@ -782,18 +836,18 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         apiService.sendMatchStatistics(statisticsRequest)
                     } catch (e: Exception) {
-                        println("Error sending match statistics: ${e.message}")
+                        AppLogger.error("finalizeMatch", "statistics: ${e.message}")
                     }
                 }
             } catch (e: Exception) {
-                println("Error in finalizeMatchOnServer: ${e.message}")
+                AppLogger.error("finalizeMatch", "overall: ${e.message}")
             }
 
             // 5. Zapisz lokalnie do Room DB
             try {
                 matchHistoryRepository.saveMatch(state)
             } catch (e: Exception) {
-                println("Error saving match to local database: ${e.message}")
+                AppLogger.error("finalizeMatch", "local save: ${e.message}")
             }
         }
     }
@@ -803,6 +857,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     private fun logMatchEvent(eventType: String) {
         val state = _matchState.value ?: return
+        
+        AppLogger.action("Match", eventType, "score=${state.player1Points}-${state.player2Points} games=${state.player1Games}-${state.player2Games} sets=${state.player1Sets}-${state.player2Sets}")
         
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -845,15 +901,17 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         player2Winners = state.player2Stats.winners,
                         player2UnforcedErrors = state.player2Stats.unforcedErrors,
                         player2FirstServePct = state.player2Stats.getFirstServePercentage()
-                    )
+                    ),
+                    batteryLevel = getBatteryLevel(),
+                    isCharging = isBatteryCharging()
                 )
                 
                 val response = apiService.logMatchEvent(event)
                 if (!response.isSuccessful) {
-                    println("Failed to log match event: ${response.code()}")
+                    AppLogger.error("logMatchEvent", "HTTP ${response.code()} for $eventType")
                 }
             } catch (e: Exception) {
-                println("Error logging match event: ${e.message}")
+                AppLogger.error("logMatchEvent", "$eventType: ${e.message}")
                 // Nie przerywamy działania aplikacji przy błędzie logowania
             }
         }
@@ -867,7 +925,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 matchHistoryRepository.saveMatch(state)
             } catch (e: Exception) {
-                println("Error saving match to database: ${e.message}")
+                AppLogger.error("saveMatchToDatabase", e)
                 // Nie przerywamy działania aplikacji przy błędzie zapisu
             }
         }
@@ -886,10 +944,16 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         val response = apiService.createMatch(match)
                         
                         if (response.isSuccessful && response.body() != null) {
-                            state.matchId = response.body()!!.id
-                            println("Match created on server with ID: ${state.matchId}")
+                            val created = response.body()!!
+                            state.matchId = created.id
+                            AppLogger.api("createMatch", "OK id=${state.matchId} phase=${created.phase}")
+                            
+                            // Handle bracket warning
+                            created.bracketWarning?.let { warning ->
+                                _bracketWarning.postValue(BracketWarningEvent(warning, created.id))
+                            }
                         } else {
-                            println("Failed to create match on server: ${response.code()}")
+                            AppLogger.api("createMatch", "FAIL ${response.code()}")
                         }
                     } else {
                         // Aktualizuj istniejący mecz
@@ -897,17 +961,21 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         val response = apiService.updateMatch(state.matchId!!, match)
                         
                         if (!response.isSuccessful) {
-                            println("Failed to update match on server: ${response.code()}")
+                            AppLogger.api("updateMatch", "FAIL ${response.code()}")
                         }
                     }
                 } catch (e: Exception) {
-                    println("Error syncing match with server: ${e.message}")
+                    AppLogger.error("syncMatchWithServer", e)
                     // Nie przerywamy działania aplikacji przy błędzie synchronizacji
                 }
             }
         }
     }
     
+    fun clearBracketWarning() {
+        _bracketWarning.value = null
+    }
+
     /**
      * Kończy mecz na serwerze
      */
@@ -918,10 +986,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         val response = apiService.finishMatch(matchId)
                         if (!response.isSuccessful) {
-                            println("Failed to finish match on server: ${response.code()}")
+                            AppLogger.api("finishMatch", "FAIL ${response.code()}")
                         }
                     } catch (e: Exception) {
-                        println("Error finishing match on server: ${e.message}")
+                        AppLogger.error("finishMatchOnServer", e)
                     }
                 }
             }
@@ -939,12 +1007,12 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         val response = apiService.sendMatchStatistics(statisticsRequest)
                         if (response.isSuccessful) {
-                            println("Match statistics sent successfully")
+                            AppLogger.api("sendStatistics", "OK")
                         } else {
-                            println("Failed to send match statistics: ${response.code()}")
+                            AppLogger.api("sendStatistics", "FAIL ${response.code()}")
                         }
                     } catch (e: Exception) {
-                        println("Error sending match statistics: ${e.message}")
+                        AppLogger.error("sendMatchStatistics", e)
                     }
                 }
             }

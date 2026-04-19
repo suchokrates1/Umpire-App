@@ -39,5 +39,8 @@ data class SetScore(
     val player2Games: Int,
     
     @SerializedName("tiebreak_loser_points")
-    val tiebreakLoserPoints: Int? = null  // For display like 5-4(7) — stores loser's tiebreak points
+    val tiebreakLoserPoints: Int? = null,  // For display like 5-4(7) — stores loser's tiebreak points
+    
+    @SerializedName("is_super_tiebreak")
+    val isSuperTiebreak: Boolean = false  // True when this "set" is actually a super tiebreak (stores points, not games)
 )

@@ -28,7 +28,13 @@ data class Match(
     val createdAt: String?,
     
     @SerializedName("updated_at")
-    val updatedAt: String?
+    val updatedAt: String?,
+    
+    @SerializedName("bracket_warning")
+    val bracketWarning: String? = null,
+    
+    @SerializedName("phase")
+    val phase: String? = null
 )
 
 enum class MatchStatus {

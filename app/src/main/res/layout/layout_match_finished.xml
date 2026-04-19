@@ -280,15 +280,28 @@
 
         </TableLayout>
 
-        <!-- New Match Button -->
+        <!-- Next Match - same setup (default) -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonNewMatch"
+            android:id="@+id/buttonNextMatchSameSetup"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="@string/new_match_button"
-            android:textSize="18sp"
+            android:text="@string/next_match_same_setup"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
+            app:cornerRadius="12dp"
+            app:icon="@android:drawable/ic_media_play"
+            app:iconGravity="textStart"/>
+
+        <!-- New Match - new setup -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonNextMatchNewSetup"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/next_match_new_setup"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
             app:cornerRadius="12dp"/>
 
     </LinearLayout>

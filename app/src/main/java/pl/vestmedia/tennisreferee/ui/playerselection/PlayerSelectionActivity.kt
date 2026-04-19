@@ -17,7 +17,10 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityPlayerSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.data.model.MatchConfig
 import pl.vestmedia.tennisreferee.data.model.StatsMode
+import pl.vestmedia.tennisreferee.TennisRefereeApp
+import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.ui.match.MatchActivity
 
 /**
@@ -35,21 +38,30 @@ class PlayerSelectionActivity : AppCompatActivity() {
         const val EXTRA_COURT_ID = "court_id"
         const val EXTRA_COURT_NAME = "court_name"
         const val EXTRA_COURT_PIN = "court_pin"
+        const val EXTRA_MATCH_CONFIG = "match_config"
     }
     
     private var courtId: String = ""
     private var courtName: String = ""
     private var courtPin: String = ""
+    private var savedMatchConfig: MatchConfig? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+        AppLogger.screen("PlayerSelection")
+        (application as TennisRefereeApp).healthCheckManager.currentScreen = "PlayerSelection"
+        
         // Pobierz dane kortu z Intent
         courtId = intent.getStringExtra(EXTRA_COURT_ID) ?: ""
         courtName = intent.getStringExtra(EXTRA_COURT_NAME) ?: ""
         courtPin = intent.getStringExtra(EXTRA_COURT_PIN) ?: ""
+        
+        // Sprawdź czy przekazano konfigurację z poprzedniego meczu
+        @Suppress("DEPRECATION")
+        savedMatchConfig = intent.getParcelableExtra(EXTRA_MATCH_CONFIG)
         
         if (courtId.isEmpty()) {
             Toast.makeText(this, getString(R.string.error_no_court_data), Toast.LENGTH_LONG).show()
@@ -179,11 +191,13 @@ class PlayerSelectionActivity : AppCompatActivity() {
         })
         
         binding.checkboxDoubles.setOnCheckedChangeListener { _, isChecked ->
+            AppLogger.button("PlayerSelection", "Doubles", isChecked.toString())
             viewModel.setDoubles(isChecked)
         }
         
         // Przycisk "+" obok pola wyszukiwania
         binding.buttonAddPlayerTop.setOnClickListener {
+            AppLogger.button("PlayerSelection", "AddPlayer")
             showAddPlayerDialog()
         }
         
@@ -193,10 +207,12 @@ class PlayerSelectionActivity : AppCompatActivity() {
         }
         
         binding.buttonNext.setOnClickListener {
+            AppLogger.button("PlayerSelection", "Next")
             proceedToNextScreen()
         }
         
         binding.buttonBack.setOnClickListener {
+            AppLogger.button("PlayerSelection", "Back")
             finish()
         }
     }
@@ -233,43 +249,118 @@ class PlayerSelectionActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.error_select_correct_players), Toast.LENGTH_SHORT).show()
             return
         }
-        
-        // Pokaż dialog wyboru trybu statystyk
-        showStatsModeDialog(selectedPlayers)
+                // Jeśli mamy konfigurację z poprzedniego meczu, pomiń dialog
+        savedMatchConfig?.let { config ->
+            AppLogger.action("PlayerSelection", "ReuseSavedConfig", config.toString())
+            savedMatchConfig = null // Zużyj — następne użycie pokaże dialog
+            startMatchWithConfig(selectedPlayers, config)
+            return
+        }
+                // Pokaż dialog wyboru trybu statystyk
+        AppLogger.dialog("MatchConfig", "show")
+        showMatchConfigDialog(selectedPlayers)
     }
     
-    private fun showStatsModeDialog(selectedPlayers: List<Player>) {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_stats_mode, null)
+    private fun showMatchConfigDialog(selectedPlayers: List<Player>) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_match_config, null)
         
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setCancelable(true)
             .create()
         
-        // Make dialog background transparent so card corners are visible
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         
+        // === Toggle groups ===
+        val toggleGamesPerSet = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleGamesPerSet)
+        val toggleSetsToWin = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleSetsToWin)
+        val toggleTiebreakPoints = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleTiebreakPoints)
+        val toggleSuperTiebreakPoints = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleSuperTiebreakPoints)
         val switchNoAdvantage = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchNoAdvantage)
+        val switchTiebreakOnly = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchTiebreakOnly)
+        val layoutMatchFormat = dialogView.findViewById<android.widget.LinearLayout>(R.id.layoutMatchFormat)
+        val layoutTbOnlyPoints = dialogView.findViewById<android.widget.LinearLayout>(R.id.layoutTbOnlyPoints)
+        val toggleTbOnlyPoints = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleTbOnlyPoints)
+        
+        // Defaults: 4 games/set, 2 sets to win, TB to 7, super TB to 10
+        toggleGamesPerSet.check(R.id.btnGames4)
+        toggleSetsToWin.check(R.id.btnSets2)
+        toggleTiebreakPoints.check(R.id.btnTB7)
+        toggleSuperTiebreakPoints.check(R.id.btnSTB10)
+        toggleTbOnlyPoints.check(R.id.btnTbOnly10)
+        
+        // TB Only toggle: show/hide format controls
+        switchTiebreakOnly.setOnCheckedChangeListener { _, isChecked ->
+            layoutMatchFormat.visibility = if (isChecked) View.GONE else View.VISIBLE
+            layoutTbOnlyPoints.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
+        
+        // Helper: build MatchConfig from current toggle state
+        fun buildMatchConfig(statsMode: StatsMode): MatchConfig {
+            if (switchTiebreakOnly.isChecked) {
+                val tbPoints = when (toggleTbOnlyPoints.checkedButtonId) {
+                    R.id.btnTbOnly7 -> 7
+                    else -> 10
+                }
+                return MatchConfig(
+                    setsToWin = 1,
+                    superTiebreakPoints = tbPoints,
+                    statsMode = statsMode,
+                    noAdvantage = switchNoAdvantage.isChecked,
+                    tiebreakOnly = true
+                )
+            }
+            val gamesPerSet = when (toggleGamesPerSet.checkedButtonId) {
+                R.id.btnGames3 -> 3
+                R.id.btnGames6 -> 6
+                else -> 4
+            }
+            val setsToWin = when (toggleSetsToWin.checkedButtonId) {
+                R.id.btnSets1 -> 1
+                R.id.btnSets3 -> 3
+                else -> 2
+            }
+            val tiebreakPoints = when (toggleTiebreakPoints.checkedButtonId) {
+                R.id.btnTB10 -> 10
+                else -> 7
+            }
+            val superTiebreakPoints = when (toggleSuperTiebreakPoints.checkedButtonId) {
+                R.id.btnSTB7 -> 7
+                else -> 10
+            }
+            return MatchConfig(
+                gamesPerSet = gamesPerSet,
+                setsToWin = setsToWin,
+                tiebreakPoints = tiebreakPoints,
+                superTiebreakPoints = superTiebreakPoints,
+                statsMode = statsMode,
+                noAdvantage = switchNoAdvantage.isChecked
+            )
+        }
         
         dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardBasicMode)
             .setOnClickListener {
-                val noAdv = switchNoAdvantage.isChecked
                 dialog.dismiss()
-                startMatchWithMode(selectedPlayers, StatsMode.BASIC, noAdv)
+                val config = buildMatchConfig(StatsMode.BASIC)
+                AppLogger.dialog("MatchConfig", "BASIC | $config")
+                startMatchWithConfig(selectedPlayers, config)
             }
         
         dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardAdvancedMode)
             .setOnClickListener {
-                val noAdv = switchNoAdvantage.isChecked
                 dialog.dismiss()
-                startMatchWithMode(selectedPlayers, StatsMode.ADVANCED, noAdv)
+                val config = buildMatchConfig(StatsMode.ADVANCED)
+                AppLogger.dialog("MatchConfig", "ADVANCED | $config")
+                startMatchWithConfig(selectedPlayers, config)
             }
         
         dialog.show()
     }
     
-    private fun startMatchWithMode(selectedPlayers: List<Player>, statsMode: StatsMode, noAdvantage: Boolean = false) {
+    private fun startMatchWithConfig(selectedPlayers: List<Player>, config: MatchConfig) {
         val isDoublesMatch = viewModel.isDoubles.value ?: false
+        val playerNames = selectedPlayers.joinToString(", ") { it.getDisplayName() }
+        AppLogger.navigate("PlayerSelection", "Match", "players=[$playerNames] doubles=$isDoublesMatch config=$config")
         
         // Utwórz stan meczu
         val matchState = if (isDoublesMatch && selectedPlayers.size == 4) {
@@ -283,8 +374,9 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 courtName = courtName,
                 isDoubles = true,
                 currentServer = 1,
-                statsMode = statsMode,
-                noAdvantage = noAdvantage
+                statsMode = config.statsMode,
+                noAdvantage = config.noAdvantage,
+                matchConfig = config
             )
         } else {
             // Singiel - 2 graczy
@@ -294,9 +386,15 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 courtId = courtId,
                 courtName = courtName,
                 isDoubles = false,
-                statsMode = statsMode,
-                noAdvantage = noAdvantage
+                statsMode = config.statsMode,
+                noAdvantage = config.noAdvantage,
+                matchConfig = config
             )
+        }
+        
+        // Tryb TB Only - od razu rozpocznij super tiebreak
+        if (config.tiebreakOnly) {
+            matchState.isSuperTiebreak = true
         }
         
         // Przejdź do ekranu meczu

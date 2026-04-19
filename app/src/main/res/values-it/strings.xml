@@ -82,17 +82,18 @@
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (a %1$d)</string>
     <string name="super_tiebreak">Match tie-break (a %1$d)</string>
-    <string name="tiebreak_mode">Tie-break (a 7, vittoria per 2)</string>
-    <string name="super_tiebreak_mode">Match Tie-break (a 10, vittoria per 2)</string>
+    <string name="tiebreak_mode">Tie-break (a %1$d, vittoria per 2)</string>
+    <string name="super_tiebreak_mode">Match Tie-break (a %1$d, vittoria per 2)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">Cambio campo!</string>
     <string name="announce_side_change_msg">I giocatori cambiano lato del campo.</string>
     <string name="announce_tiebreak">Tie-break!</string>
-    <string name="announce_tiebreak_msg">Punteggio 4–4. Inizia il tie-break (a 7, vittoria per 2).</string>
+    <string name="announce_tiebreak_msg">Punteggio %1$d–%1$d. Inizia il tie-break (a %2$d, vittoria per 2).</string>
     <string name="announce_super_tiebreak">Match Tie-break!</string>
-    <string name="announce_super_tiebreak_msg">Set 1–1. Inizia il match tie-break decisivo (a 10, vittoria per 2).</string>
+    <string name="announce_super_tiebreak_msg">Set %1$d–%1$d. Inizia il match tie-break decisivo (a %2$d, vittoria per 2).</string>
     <string name="continue_btn">Continua</string>
+    <string name="dont_change_sides">Non cambiare lato</string>
     <string name="match_finished_title">Partita finita!</string>
     <string name="statistics">Statistiche</string>
     <string name="aces">Ace</string>
@@ -177,4 +178,10 @@
     <string name="new_match_button">Nuova partita</string>
     <string name="confirm_exit_title">Lasciare la partita?</string>
     <string name="confirm_exit_message">La partita è ancora in corso. Sei sicuro di voler uscire?</string>
+
+    <!-- Bracket warnings -->
+    <string name="bracket_warning_title">Avviso partita</string>
+    <string name="bracket_warning_different_groups">Questi giocatori sono di gruppi diversi. È una partita della fase a eliminazione?</string>
+    <string name="bracket_warning_friendly">Questi giocatori non sono assegnati a nessun gruppo del torneo. La partita sarà registrata come amichevole.</string>
+    <string name="ok">OK</string>
 </resources>

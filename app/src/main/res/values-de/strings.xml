@@ -82,17 +82,18 @@
     <string name="set">Satz %1$d</string>
     <string name="tiebreak">Tie-break (bis %1$d)</string>
     <string name="super_tiebreak">Match-Tiebreak (bis %1$d)</string>
-    <string name="tiebreak_mode">Tie-break (bis 7, Gewinn mit 2 Vorsprung)</string>
-    <string name="super_tiebreak_mode">Match-Tiebreak (bis 10, Gewinn mit 2 Vorsprung)</string>
+    <string name="tiebreak_mode">Tie-break (bis %1$d, Gewinn mit 2 Vorsprung)</string>
+    <string name="super_tiebreak_mode">Match-Tiebreak (bis %1$d, Gewinn mit 2 Vorsprung)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">Seitenwechsel!</string>
     <string name="announce_side_change_msg">Spieler wechseln die Seiten.</string>
     <string name="announce_tiebreak">Tie-break!</string>
-    <string name="announce_tiebreak_msg">Spielstand 4–4. Tie-break beginnt (bis 7, Gewinn mit 2 Vorsprung).</string>
+    <string name="announce_tiebreak_msg">Spielstand %1$d–%1$d. Tie-break beginnt (bis %2$d, Gewinn mit 2 Vorsprung).</string>
     <string name="announce_super_tiebreak">Match-Tiebreak!</string>
-    <string name="announce_super_tiebreak_msg">Sätze 1–1. Entscheidender Match-Tiebreak beginnt (bis 10, Gewinn mit 2 Vorsprung).</string>
+    <string name="announce_super_tiebreak_msg">Sätze %1$d–%1$d. Entscheidender Match-Tiebreak beginnt (bis %2$d, Gewinn mit 2 Vorsprung).</string>
     <string name="continue_btn">Weiter</string>
+    <string name="dont_change_sides">Seiten nicht wechseln</string>
     <string name="match_finished_title">Match beendet!</string>
     <string name="statistics">Statistiken</string>
     <string name="aces">Asse</string>
@@ -177,4 +178,10 @@
     <string name="new_match_button">Neues Spiel</string>
     <string name="confirm_exit_title">Spiel verlassen?</string>
     <string name="confirm_exit_message">Das Spiel ist noch im Gange. Möchten Sie wirklich gehen?</string>
+
+    <!-- Bracket warnings -->
+    <string name="bracket_warning_title">Spielhinweis</string>
+    <string name="bracket_warning_different_groups">Diese Spieler sind aus verschiedenen Gruppen. Ist das ein K.O.-Rundenspiel?</string>
+    <string name="bracket_warning_friendly">Diese Spieler sind keiner Turniergruppe zugeordnet. Das Spiel wird als Freundschaftsspiel gespeichert.</string>
+    <string name="ok">OK</string>
 </resources>

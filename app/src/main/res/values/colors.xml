@@ -43,6 +43,10 @@
     <color name="button_forced_error">#FF9800</color>
     <color name="button_unforced_error">#F44336</color>
     
+    <!-- TB Only / Advanced mode accent -->
+    <color name="tb_only_card_bg">#FFF8E1</color>
+    <color name="tb_only_accent">#E65100</color>
+    
     <!-- Launcher icon -->
     <color name="ic_launcher_background">#1A237E</color>
 </resources>

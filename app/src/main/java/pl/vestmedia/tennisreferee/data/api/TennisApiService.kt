@@ -83,5 +83,11 @@ interface TennisApiService {
      */
     @POST("api/match-statistics")
     suspend fun sendMatchStatistics(@Body statistics: MatchStatisticsRequest): Response<Unit>
+
+    /**
+     * Heartbeat — stan baterii i status online (niezależnie od meczu)
+     */
+    @POST("api/umpire-heartbeat")
+    suspend fun sendHeartbeat(@Body body: Map<String, String>): Response<Unit>
 }
 
