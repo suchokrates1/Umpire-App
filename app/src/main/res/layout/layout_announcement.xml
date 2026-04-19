@@ -47,6 +47,27 @@
         app:layout_constraintBottom_toTopOf="@id/buttonAnnouncementContinue"
         android:layout_marginBottom="32dp"/>
 
+    <!-- "Don't change sides" button – visible only for side_change announcements -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonAnnouncementSkipSideChange"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:text="@string/dont_change_sides"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:visibility="gone"
+        app:strokeColor="#4CAF50"
+        app:strokeWidth="2dp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toTopOf="@id/buttonAnnouncementContinue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"/>
+
     <!-- Large "Continue" / "Dalej" button at the bottom -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonAnnouncementContinue"

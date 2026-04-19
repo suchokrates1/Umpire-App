@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchHistoryBinding
+import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * Ekran historii rozegranych meczów
@@ -22,6 +23,7 @@ class MatchHistoryActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLogger.screen("MatchHistory")
         binding = ActivityMatchHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         

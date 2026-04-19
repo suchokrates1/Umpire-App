@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.databinding.ActivitySettingsBinding
+import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.utils.ThemeManager
 
 class SettingsActivity : AppCompatActivity() {
@@ -14,6 +15,7 @@ class SettingsActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLogger.screen("Settings")
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
@@ -46,6 +48,7 @@ class SettingsActivity : AppCompatActivity() {
                 R.id.radioSystem -> ThemeManager.THEME_SYSTEM
                 else -> ThemeManager.THEME_SYSTEM
             }
+            AppLogger.button("Settings", "Theme", theme)
             themeManager.setTheme(theme)
         }
     }

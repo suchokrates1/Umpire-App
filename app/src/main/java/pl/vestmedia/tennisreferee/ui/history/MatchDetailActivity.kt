@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.database.MatchEntity
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchDetailBinding
+import pl.vestmedia.tennisreferee.utils.AppLogger
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,6 +24,7 @@ class MatchDetailActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLogger.screen("MatchDetail")
         binding = ActivityMatchDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         

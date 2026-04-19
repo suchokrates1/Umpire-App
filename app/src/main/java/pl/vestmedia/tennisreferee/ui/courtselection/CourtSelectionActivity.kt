@@ -28,6 +28,8 @@ import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.ui.history.MatchHistoryActivity
 import pl.vestmedia.tennisreferee.ui.settings.SettingsActivity
+import pl.vestmedia.tennisreferee.TennisRefereeApp
+import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * Activity do wyboru kortu
@@ -58,6 +60,9 @@ class CourtSelectionActivity : AppCompatActivity() {
         
         binding = ActivityCourtSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        AppLogger.screen("CourtSelection")
+        (application as TennisRefereeApp).healthCheckManager.currentScreen = "CourtSelection"
         
         supportActionBar?.title = getString(R.string.select_court)
         
@@ -108,11 +113,13 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     private fun setupListeners() {
         binding.buttonRefresh.setOnClickListener {
+            AppLogger.button("CourtSelection", "Refresh")
             viewModel.loadCourts()
         }
     }
     
     private fun onCourtSelected(court: Court) {
+        AppLogger.button("CourtSelection", "CourtTap", "court=${court.id} name=${court.name}")
         showPinDialog(court)
     }
     
@@ -155,14 +162,18 @@ class CourtSelectionActivity : AppCompatActivity() {
                         progressBar.visibility = View.GONE
                         
                         result.onSuccess { _ ->
+                            AppLogger.action("CourtSelection", "PIN_OK", "court=${court.id}")
+                            (application as TennisRefereeApp).healthCheckManager.courtId = court.id
                             dialog.dismiss()
                             val intent = Intent(this@CourtSelectionActivity, PlayerSelectionActivity::class.java).apply {
                                 putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, court.id)
                                 putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, court.name)
                                 putExtra(PlayerSelectionActivity.EXTRA_COURT_PIN, pin)
                             }
+                            AppLogger.navigate("CourtSelection", "PlayerSelection", "court=${court.id}")
                             startActivity(intent)
                         }.onFailure { error ->
+                            AppLogger.action("CourtSelection", "PIN_FAIL", "court=${court.id} error=${error.message}")
                             // Wyczyść pola i włącz ponownie
                             digit1.setText("")
                             digit2.setText("")
@@ -250,11 +261,13 @@ class CourtSelectionActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
+                AppLogger.button("CourtSelection", "Menu:Settings")
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
                 true
             }
             R.id.action_match_history -> {
+                AppLogger.button("CourtSelection", "Menu:History")
                 val intent = Intent(this, MatchHistoryActivity::class.java)
                 startActivity(intent)
                 true

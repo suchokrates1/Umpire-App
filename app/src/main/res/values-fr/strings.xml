@@ -82,17 +82,18 @@
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Jeu décisif (à %1$d)</string>
     <string name="super_tiebreak">Jeu décisif du match (à %1$d)</string>
-    <string name="tiebreak_mode">Jeu décisif (à 7, victoire par 2)</string>
-    <string name="super_tiebreak_mode">Jeu décisif du match (à 10, victoire par 2)</string>
+    <string name="tiebreak_mode">Jeu décisif (à %1$d, victoire par 2)</string>
+    <string name="super_tiebreak_mode">Jeu décisif du match (à %1$d, victoire par 2)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">Changement de côtés !</string>
     <string name="announce_side_change_msg">Les joueurs changent de côté.</string>
     <string name="announce_tiebreak">Jeu décisif !</string>
-    <string name="announce_tiebreak_msg">Score 4–4. Le jeu décisif commence (à 7, victoire par 2).</string>
+    <string name="announce_tiebreak_msg">Score %1$d–%1$d. Le jeu décisif commence (à %2$d, victoire par 2).</string>
     <string name="announce_super_tiebreak">Jeu décisif du match !</string>
-    <string name="announce_super_tiebreak_msg">Sets 1–1. Le jeu décisif du match commence (à 10, victoire par 2).</string>
+    <string name="announce_super_tiebreak_msg">Sets %1$d–%1$d. Le jeu décisif du match commence (à %2$d, victoire par 2).</string>
     <string name="continue_btn">Continuer</string>
+    <string name="dont_change_sides">Ne pas changer de côté</string>
     <string name="match_finished_title">Match terminé !</string>
     <string name="statistics">Statistiques</string>
     <string name="aces">Aces</string>
@@ -177,4 +178,10 @@
     <string name="new_match_button">Nouveau match</string>
     <string name="confirm_exit_title">Quitter le match ?</string>
     <string name="confirm_exit_message">Le match est encore en cours. Voulez-vous vraiment quitter ?</string>
+
+    <!-- Bracket warnings -->
+    <string name="bracket_warning_title">Information sur le match</string>
+    <string name="bracket_warning_different_groups">Ces joueurs sont de groupes différents. Est-ce un match de phase éliminatoire ?</string>
+    <string name="bracket_warning_friendly">Ces joueurs ne sont assignés à aucun groupe de tournoi. Ce match sera enregistré comme amical.</string>
+    <string name="ok">OK</string>
 </resources>

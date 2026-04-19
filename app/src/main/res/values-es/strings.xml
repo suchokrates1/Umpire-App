@@ -97,17 +97,18 @@
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (hasta %1$d)</string>
     <string name="super_tiebreak">Match tie-break (hasta %1$d)</string>
-    <string name="tiebreak_mode">Tie-break (hasta 7, ganar por 2)</string>
-    <string name="super_tiebreak_mode">Match Tie-break (hasta 10, ganar por 2)</string>
+    <string name="tiebreak_mode">Tie-break (hasta %1$d, ganar por 2)</string>
+    <string name="super_tiebreak_mode">Match Tie-break (hasta %1$d, ganar por 2)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">¡Cambio de lado!</string>
     <string name="announce_side_change_msg">Los jugadores cambian de lado de la cancha.</string>
     <string name="announce_tiebreak">¡Tie-break!</string>
-    <string name="announce_tiebreak_msg">Marcador 4–4. Comienza el tie-break (primero a 7, ganar por 2).</string>
+    <string name="announce_tiebreak_msg">Marcador %1$d–%1$d. Comienza el tie-break (primero a %2$d, ganar por 2).</string>
     <string name="announce_super_tiebreak">¡Match Tie-break!</string>
-    <string name="announce_super_tiebreak_msg">Sets 1–1. Comienza el match tie-break decisivo (primero a 10, ganar por 2).</string>
+    <string name="announce_super_tiebreak_msg">Sets %1$d–%1$d. Comienza el match tie-break decisivo (primero a %2$d, ganar por 2).</string>
     <string name="continue_btn">Continuar</string>
+    <string name="dont_change_sides">No cambiar de lado</string>
     <string name="match_finished_title">¡Partido finalizado!</string>
     <string name="statistics">Estadísticas</string>
     <string name="aces">Aces</string>
@@ -177,4 +178,9 @@
     <string name="app_description">Aplicación profesional de árbitro de tenis para puntuación de partidos en tiempo real</string>
     <string name="version_format">Versión %1$s</string>
     <string name="version_unknown">Versión desconocida</string>
+
+    <!-- Bracket warnings -->
+    <string name="bracket_warning_title">Aviso del partido</string>
+    <string name="bracket_warning_different_groups">Estos jugadores son de grupos diferentes. ¿Es un partido de fase eliminatoria?</string>
+    <string name="bracket_warning_friendly">Estos jugadores no están asignados a ningún grupo del torneo. Este partido se registrará como amistoso.</string>
 </resources>

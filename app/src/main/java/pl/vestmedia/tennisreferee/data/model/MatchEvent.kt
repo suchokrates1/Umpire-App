@@ -24,6 +24,12 @@ data class MatchEvent(
     @SerializedName("stats")
     val stats: LiveStatsInfo? = null,
     
+    @SerializedName("battery_level")
+    val batteryLevel: Int? = null,
+    
+    @SerializedName("is_charging")
+    val isCharging: Boolean? = null,
+    
     @SerializedName("timestamp")
     val timestamp: Long = System.currentTimeMillis()
 )

@@ -20,6 +20,10 @@
     <color name="score_background">#1E1E1E</color>
     <color name="score_text">#FFFFFF</color>
     
+    <!-- TB Only / Advanced mode accent -->
+    <color name="tb_only_card_bg">#3E2723</color>
+    <color name="tb_only_accent">#FF8A65</color>
+    
     <!-- Button colors remain the same but slightly adjusted for dark backgrounds -->
     <color name="button_ace">#66BB6A</color>
     <color name="button_fault">#EF5350</color>

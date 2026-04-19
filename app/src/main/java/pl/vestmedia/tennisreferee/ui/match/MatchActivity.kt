@@ -2,6 +2,7 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -23,8 +24,12 @@ import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
 import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.data.model.MatchConfig
 import pl.vestmedia.tennisreferee.data.model.StatsMode
 import pl.vestmedia.tennisreferee.data.model.Player
+import pl.vestmedia.tennisreferee.TennisRefereeApp
+import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
 
 /**
  * Activity zarządzające przebiegiem meczu
@@ -82,6 +87,8 @@ class MatchActivity : AppCompatActivity() {
         }
         
         viewModel.initializeMatch(matchState)
+        AppLogger.screen("Match", "court=${matchState.courtId} p1=${matchState.player1.getDisplayName()} p2=${matchState.player2.getDisplayName()}")
+        (application as TennisRefereeApp).healthCheckManager.currentScreen = "Match"
         
         // Nie wyłączaj ekranu podczas meczu
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -137,88 +144,131 @@ class MatchActivity : AppCompatActivity() {
             }
         }
         
+        viewModel.bracketWarning.observe(this) { event ->
+            event?.let { showBracketWarningDialog(it) }
+        }
+        
         // Match announcements — now handled as inline ANNOUNCEMENT view
         // (no more AlertDialog popups)
+    }
+    
+    private fun showBracketWarningDialog(event: MatchViewModel.BracketWarningEvent) {
+        val (title, message) = when (event.type) {
+            "different_groups" -> Pair(
+                getString(R.string.bracket_warning_title),
+                getString(R.string.bracket_warning_different_groups)
+            )
+            "no_bracket" -> Pair(
+                getString(R.string.bracket_warning_title),
+                getString(R.string.bracket_warning_friendly)
+            )
+            else -> return
+        }
+        
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                viewModel.clearBracketWarning()
+            }
+            .setCancelable(false)
+            .show()
     }
     
     private fun setupListeners() {
         // Wybór serwującego
         serverSelectionBinding.buttonPlayer1Serves.setOnClickListener {
+            AppLogger.button("Match", "Player1Serves")
             viewModel.setFirstServer(true)
         }
         
         serverSelectionBinding.buttonPlayer2Serves.setOnClickListener {
+            AppLogger.button("Match", "Player2Serves")
             viewModel.setFirstServer(false)
         }
         
         // Zamiana stron z animacją
         serverSelectionBinding.buttonSwapSides.setOnClickListener {
+            AppLogger.button("Match", "SwapSides")
             animateSwapSides()
             viewModel.swapSides()
         }
         
         // Serwis - lewa strona (Player 1)
         serveBinding.buttonAceLeft.setOnClickListener {
+            AppLogger.button("Match", "Ace", "side=left")
             viewModel.handleAce()
         }
         
         serveBinding.buttonFaultLeft.setOnClickListener {
+            AppLogger.button("Match", "Fault", "side=left")
             viewModel.handleFault()
         }
         
         // Foot Fault - lewa strona
         serveBinding.buttonFootFaultLeft.setOnClickListener {
+            AppLogger.button("Match", "FootFault", "side=left")
             viewModel.handleFootFault()
         }
         
         // Serwis - prawa strona (Player 2)
         serveBinding.buttonAceRight.setOnClickListener {
+            AppLogger.button("Match", "Ace", "side=right")
             viewModel.handleAce()
         }
         
         serveBinding.buttonFaultRight.setOnClickListener {
+            AppLogger.button("Match", "Fault", "side=right")
             viewModel.handleFault()
         }
         
         // Foot Fault - prawa strona
         serveBinding.buttonFootFaultRight.setOnClickListener {
+            AppLogger.button("Match", "FootFault", "side=right")
             viewModel.handleFootFault()
         }
         
         // Ball in Play - wspólny przycisk dla obu graczy
         serveBinding.buttonBallInPlay.setOnClickListener {
+            AppLogger.button("Match", "BallInPlay")
             viewModel.handleBallInPlay()
         }
         
         // Rally - lewa strona (Player 1 lub Player 2 w zależności od sidesSwapped)
         rallyBinding.buttonWinnerLeft.setOnClickListener {
             val isPlayer1 = !(viewModel.matchState.value?.sidesSwapped ?: false)
+            AppLogger.button("Match", "Winner", "side=left isP1=$isPlayer1")
             viewModel.handleWinner(isPlayer1)
         }
         
         rallyBinding.buttonForcedErrorLeft.setOnClickListener {
             val isPlayer1 = !(viewModel.matchState.value?.sidesSwapped ?: false)
+            AppLogger.button("Match", "ForcedError", "side=left isP1=$isPlayer1")
             viewModel.handleForcedError(isPlayer1)
         }
         
         rallyBinding.buttonUnforcedErrorLeft.setOnClickListener {
             val isPlayer1 = !(viewModel.matchState.value?.sidesSwapped ?: false)
+            AppLogger.button("Match", "UnforcedError", "side=left isP1=$isPlayer1")
             viewModel.handleUnforcedError(isPlayer1)
         }
         
         // Rally - prawa strona (Player 2 lub Player 1 w zależności od sidesSwapped)
         rallyBinding.buttonWinnerRight.setOnClickListener {
             val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
+            AppLogger.button("Match", "Winner", "side=right isP1=$isPlayer1")
             viewModel.handleWinner(isPlayer1)
         }
         
         rallyBinding.buttonForcedErrorRight.setOnClickListener {
             val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
+            AppLogger.button("Match", "ForcedError", "side=right isP1=$isPlayer1")
             viewModel.handleForcedError(isPlayer1)
         }
         
         rallyBinding.buttonUnforcedErrorRight.setOnClickListener {
             val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
+            AppLogger.button("Match", "UnforcedError", "side=right isP1=$isPlayer1")
             viewModel.handleUnforcedError(isPlayer1)
         }
         
@@ -226,43 +276,58 @@ class MatchActivity : AppCompatActivity() {
         // Win buttons - serwujący (lewa strona)
         basicScoringBinding.buttonWinServerLeft.setOnClickListener {
             val isPlayer1 = !(viewModel.matchState.value?.sidesSwapped ?: false)
+            AppLogger.button("Match", "BasicWin", "side=serverLeft isP1=$isPlayer1")
             viewModel.handleBasicWin(isPlayer1)
         }
         basicScoringBinding.buttonFaultServerLeft.setOnClickListener {
+            AppLogger.button("Match", "BasicFault", "side=left")
             viewModel.handleBasicFault()
         }
         // Win buttons - odbierający (lewa strona)
         basicScoringBinding.buttonWinReceiverLeft.setOnClickListener {
             val isPlayer1 = !(viewModel.matchState.value?.sidesSwapped ?: false)
+            AppLogger.button("Match", "BasicWin", "side=receiverLeft isP1=$isPlayer1")
             viewModel.handleBasicWin(isPlayer1)
         }
         // Win buttons - serwujący (prawa strona)
         basicScoringBinding.buttonWinServerRight.setOnClickListener {
             val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
+            AppLogger.button("Match", "BasicWin", "side=serverRight isP1=$isPlayer1")
             viewModel.handleBasicWin(isPlayer1)
         }
         basicScoringBinding.buttonFaultServerRight.setOnClickListener {
+            AppLogger.button("Match", "BasicFault", "side=right")
             viewModel.handleBasicFault()
         }
         // Win buttons - odbierający (prawa strona)
         basicScoringBinding.buttonWinReceiverRight.setOnClickListener {
             val isPlayer1 = viewModel.matchState.value?.sidesSwapped ?: false
+            AppLogger.button("Match", "BasicWin", "side=receiverRight isP1=$isPlayer1")
             viewModel.handleBasicWin(isPlayer1)
         }
         
         // Przycisk Cofnij z potwierdzeniem
         binding.buttonUndo.setOnClickListener {
+            AppLogger.button("Match", "Undo")
             showUndoConfirmation()
         }
         
         // Przycisk zakończenia meczu z potwierdzeniem
         binding.buttonBack.setOnClickListener {
+            AppLogger.button("Match", "FinishMatch")
             showFinishMatchConfirmation()
         }
         
         // Przycisk "Dalej" na karcie ogłoszenia
         announcementBinding.buttonAnnouncementContinue.setOnClickListener {
+            AppLogger.button("Match", "AnnouncementContinue", viewModel.pendingAnnouncementType ?: "")
             viewModel.continueFromAnnouncement()
+        }
+        
+        // Przycisk "Nie zmieniaj stron" – cofnij swap i kontynuuj
+        announcementBinding.buttonAnnouncementSkipSideChange.setOnClickListener {
+            AppLogger.button("Match", "SkipSideChange")
+            viewModel.skipSideChange()
         }
     }
     
@@ -561,11 +626,11 @@ class MatchActivity : AppCompatActivity() {
         // Tryb gry
         when {
             state.isSuperTiebreak -> {
-                scoreboardBinding.textGameMode.text = getString(R.string.super_tiebreak_mode)
+                scoreboardBinding.textGameMode.text = getString(R.string.super_tiebreak_mode, state.matchConfig.superTiebreakPoints)
                 scoreboardBinding.textGameMode.visibility = View.VISIBLE
             }
             state.isTiebreak -> {
-                scoreboardBinding.textGameMode.text = getString(R.string.tiebreak_mode)
+                scoreboardBinding.textGameMode.text = getString(R.string.tiebreak_mode, state.matchConfig.tiebreakPoints)
                 scoreboardBinding.textGameMode.visibility = View.VISIBLE
             }
             else -> {
@@ -724,6 +789,8 @@ class MatchActivity : AppCompatActivity() {
     }
     
     private fun showView(view: MatchView) {
+        AppLogger.screen("Match:${view.name}")
+        (application as TennisRefereeApp).healthCheckManager.currentScreen = "Match:${view.name}"
         // Ukryj wszystkie widoki z animacją slide out
         animateViewTransition(binding.layoutServerSelection.root, View.GONE)
         animateViewTransition(binding.layoutServe.root, View.GONE)
@@ -754,12 +821,12 @@ class MatchActivity : AppCompatActivity() {
                         )
                         "tiebreak" -> Triple(
                             getString(R.string.announce_tiebreak),
-                            getString(R.string.announce_tiebreak_msg),
+                            getString(R.string.announce_tiebreak_msg, state.matchConfig.gamesPerSet, state.matchConfig.tiebreakPoints),
                             "\uD83C\uDFBE"  // 🎾
                         )
                         "super_tiebreak" -> Triple(
                             getString(R.string.announce_super_tiebreak),
-                            getString(R.string.announce_super_tiebreak_msg),
+                            getString(R.string.announce_super_tiebreak_msg, state.matchConfig.setsToWin - 1, state.matchConfig.superTiebreakPoints),
                             "\uD83C\uDFC6"  // 🏆
                         )
                         "deciding_point" -> Triple(
@@ -772,6 +839,8 @@ class MatchActivity : AppCompatActivity() {
                     announcementBinding.textAnnouncementIcon.text = icon
                     announcementBinding.textAnnouncementTitle.text = title
                     announcementBinding.textAnnouncementMessage.text = message
+                    announcementBinding.buttonAnnouncementSkipSideChange.visibility =
+                        if (viewModel.pendingAnnouncementType == "side_change") View.VISIBLE else View.GONE
                     animateViewTransition(binding.layoutAnnouncement.root, View.VISIBLE)
                 }
                 
@@ -862,8 +931,30 @@ class MatchActivity : AppCompatActivity() {
         matchFinishedBinding.textFirstServePctPlayer1.text = "${state.player1Stats.getFirstServePercentage()}%"
         matchFinishedBinding.textFirstServePctPlayer2.text = "${state.player2Stats.getFirstServePercentage()}%"
         
-        // Przycisk Nowy Mecz
-        matchFinishedBinding.buttonNewMatch.setOnClickListener {
+        // Przycisk: Następny mecz z tym samym setupem (domyślny)
+        matchFinishedBinding.buttonNextMatchSameSetup.setOnClickListener {
+            AppLogger.button("Match", "NextMatchSameSetup", "court=${state.courtId}")
+            AppLogger.navigate("Match", "PlayerSelection", "sameSetup=true")
+            val intent = Intent(this, PlayerSelectionActivity::class.java).apply {
+                putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, state.courtId)
+                putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, state.courtName)
+                putExtra(PlayerSelectionActivity.EXTRA_MATCH_CONFIG, state.matchConfig)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            startActivity(intent)
+            finish()
+        }
+        
+        // Przycisk: Nowy mecz z innymi ustawieniami
+        matchFinishedBinding.buttonNextMatchNewSetup.setOnClickListener {
+            AppLogger.button("Match", "NextMatchNewSetup", "court=${state.courtId}")
+            AppLogger.navigate("Match", "PlayerSelection", "sameSetup=false")
+            val intent = Intent(this, PlayerSelectionActivity::class.java).apply {
+                putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, state.courtId)
+                putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, state.courtName)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            startActivity(intent)
             finish()
         }
     }
@@ -932,13 +1023,17 @@ class MatchActivity : AppCompatActivity() {
      * Pokazuje dialog potwierdzenia cofnięcia akcji
      */
     private fun showUndoConfirmation() {
+        AppLogger.dialog("UndoConfirm", "show")
         AlertDialog.Builder(this)
             .setTitle(R.string.undo)
             .setMessage(R.string.confirm_undo)
             .setPositiveButton(R.string.yes) { _, _ ->
+                AppLogger.dialog("UndoConfirm", "YES")
                 viewModel.undoLastAction()
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.no) { _, _ ->
+                AppLogger.dialog("UndoConfirm", "NO")
+            }
             .show()
     }
     
@@ -946,13 +1041,17 @@ class MatchActivity : AppCompatActivity() {
      * Pokazuje dialog potwierdzenia zakończenia meczu
      */
     private fun showFinishMatchConfirmation() {
+        AppLogger.dialog("FinishMatchConfirm", "show")
         AlertDialog.Builder(this)
             .setTitle(R.string.finish_match)
             .setMessage(R.string.confirm_finish_match)
             .setPositiveButton(R.string.yes) { _, _ ->
+                AppLogger.dialog("FinishMatchConfirm", "YES")
                 finish()
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.no) { _, _ ->
+                AppLogger.dialog("FinishMatchConfirm", "NO")
+            }
             .show()
     }
     

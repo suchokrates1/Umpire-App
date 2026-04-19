@@ -97,17 +97,18 @@
     <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (to %1$d)</string>
     <string name="super_tiebreak">Match tie-break (to %1$d)</string>
-    <string name="tiebreak_mode">Tie-break (to 7, win by 2)</string>
-    <string name="super_tiebreak_mode">Match Tie-break (to 10, win by 2)</string>
+    <string name="tiebreak_mode">Tie-break (to %1$d, win by 2)</string>
+    <string name="super_tiebreak_mode">Match Tie-break (to %1$d, win by 2)</string>
 
     <!-- Match announcements -->
     <string name="announce_side_change">Change Sides!</string>
     <string name="announce_side_change_msg">Players change ends of the court.</string>
     <string name="announce_tiebreak">Tie-break!</string>
-    <string name="announce_tiebreak_msg">Score is 4–4. Starting tie-break (first to 7, win by 2).</string>
+    <string name="announce_tiebreak_msg">Score is %1$d–%1$d. Starting tie-break (first to %2$d, win by 2).</string>
     <string name="announce_super_tiebreak">Match Tie-break!</string>
-    <string name="announce_super_tiebreak_msg">Sets are 1–1. Starting deciding match tie-break (first to 10, win by 2).</string>
+    <string name="announce_super_tiebreak_msg">Sets are %1$d–%1$d. Starting deciding match tie-break (first to %2$d, win by 2).</string>
     <string name="continue_btn">Continue</string>
+    <string name="dont_change_sides">Don\'t change sides</string>
     <string name="match_finished_title">Match Finished!</string>
     <string name="statistics">Statistics</string>
     <string name="aces">Aces</string>
@@ -179,4 +180,9 @@
     <string name="unforced_errors_stat">Unforced Errors</string>
     <string name="first_serve_pct">1st Serve %</string>
     <string name="new_match_button">New Match</string>
+
+    <!-- Bracket warnings -->
+    <string name="bracket_warning_title">Match Notice</string>
+    <string name="bracket_warning_different_groups">These players are from different groups. Is this a knockout phase match?</string>
+    <string name="bracket_warning_friendly">These players are not assigned to any tournament group. This match will be recorded as a friendly.</string>
 </resources>
