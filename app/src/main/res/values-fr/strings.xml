@@ -183,5 +183,4 @@
     <string name="bracket_warning_title">Information sur le match</string>
     <string name="bracket_warning_different_groups">Ces joueurs sont de groupes différents. Est-ce un match de phase éliminatoire ?</string>
     <string name="bracket_warning_friendly">Ces joueurs ne sont assignés à aucun groupe de tournoi. Ce match sera enregistré comme amical.</string>
-    <string name="ok">OK</string>
 </resources>

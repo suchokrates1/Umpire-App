@@ -30,6 +30,9 @@ import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Activity zarządzające przebiegiem meczu
@@ -51,6 +54,7 @@ class MatchActivity : AppCompatActivity() {
     
     private val timerHandler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
+    private val metadataDateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
     
     companion object {
         const val EXTRA_MATCH_STATE = "match_state"
@@ -582,6 +586,7 @@ class MatchActivity : AppCompatActivity() {
         // Ikona serwisu (piłka tenisowa) po lewej od punktów
         scoreboardBinding.imagePlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
         scoreboardBinding.imagePlayer2ServerIcon.visibility = if (!state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
+        updateMatchMetadata(state)
         
         // Punkty z animacją
         animateScoreChange(scoreboardBinding.textPlayer1Points, state.getPlayer1PointsDisplay())
@@ -638,6 +643,26 @@ class MatchActivity : AppCompatActivity() {
                 scoreboardBinding.textGameMode.visibility = View.GONE
             }
         }
+    }
+
+    private fun updateMatchMetadata(state: MatchState) {
+        val metadataParts = mutableListOf(
+            when {
+                state.isMixedDoubles -> getString(R.string.match_type_mixed)
+                state.isDoubles -> getString(R.string.match_type_doubles)
+                else -> getString(R.string.match_type_singles)
+            }
+        )
+
+        state.umpireName?.takeIf { it.isNotBlank() }?.let {
+            metadataParts.add(getString(R.string.match_metadata_umpire, it))
+        }
+        state.manualStartTime?.let {
+            metadataParts.add(getString(R.string.match_metadata_datetime, metadataDateFormat.format(Date(it))))
+        }
+
+        scoreboardBinding.textMatchMetadata.text = metadataParts.joinToString(" • ")
+        scoreboardBinding.textMatchMetadata.visibility = if (metadataParts.isEmpty()) View.GONE else View.VISIBLE
     }
     
     private var lastActiveSet = 0

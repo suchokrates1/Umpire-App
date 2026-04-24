@@ -22,8 +22,11 @@ data class MatchState(
     
     // Debel
     val isDoubles: Boolean = false,
+    val isMixedDoubles: Boolean = false,
     val team1Name: String? = null,
     val team2Name: String? = null,
+    val umpireName: String? = null,
+    val manualStartTime: Long? = null,
     var currentServer: Int = 1, // 1-4, aktualny serwujący w deblu
     
     // No-Advantage (deciding point) mode — at deuce, next point wins the game
@@ -129,6 +132,17 @@ data class MatchState(
             3 -> player3?.getDisplayName() ?: player1.getDisplayName()
             4 -> player4?.getDisplayName() ?: player2.getDisplayName()
             else -> player1.getDisplayName()
+        }
+    }
+
+    /**
+     * Zwraca etykietę typu meczu do wyświetlenia w UI.
+     */
+    fun getMatchTypeLabel(): String {
+        return when {
+            isMixedDoubles -> "Mixed"
+            isDoubles -> "Doubles"
+            else -> "Singles"
         }
     }
     

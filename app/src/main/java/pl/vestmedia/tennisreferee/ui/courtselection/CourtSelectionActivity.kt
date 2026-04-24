@@ -15,6 +15,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,8 @@ import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
+import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
+import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
 import pl.vestmedia.tennisreferee.ui.history.MatchHistoryActivity
 import pl.vestmedia.tennisreferee.ui.settings.SettingsActivity
 import pl.vestmedia.tennisreferee.TennisRefereeApp
@@ -40,6 +44,8 @@ class CourtSelectionActivity : AppCompatActivity() {
     private val viewModel: CourtSelectionViewModel by viewModels()
     private lateinit var adapter: CourtAdapter
     private val repository = TennisRepository()
+    private var selectedTournamentId: Int? = null
+    private var selectedTournamentName: String? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +54,14 @@ class CourtSelectionActivity : AppCompatActivity() {
         if (!LanguageSelectionActivity.hasLanguageSelected(this)) {
             val intent = Intent(this, LanguageSelectionActivity::class.java)
             startActivity(intent)
+            finish()
+            return
+        }
+
+        selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this)
+        selectedTournamentName = TournamentSelectionStore.getSelectedTournamentNameForToday(this)
+        if (selectedTournamentId == null) {
+            startActivity(Intent(this, TournamentSelectionActivity::class.java))
             finish()
             return
         }
@@ -60,18 +74,32 @@ class CourtSelectionActivity : AppCompatActivity() {
         
         binding = ActivityCourtSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
+        // Podnieś zawartość nad pasek nawigacyjny
+        val rootPadding = binding.root.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val navBar = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            view.setPadding(
+                view.paddingLeft,
+                view.paddingTop,
+                view.paddingRight,
+                rootPadding + navBar
+            )
+            windowInsets
+        }
+
         AppLogger.screen("CourtSelection")
         (application as TennisRefereeApp).healthCheckManager.currentScreen = "CourtSelection"
         
         supportActionBar?.title = getString(R.string.select_court)
+        supportActionBar?.subtitle = selectedTournamentName
         
         setupRecyclerView()
         setupObservers()
         setupListeners()
         
         // Załaduj korty
-        viewModel.loadCourts()
+        viewModel.loadCourts(selectedTournamentId)
     }
     
     private fun setupRecyclerView() {
@@ -114,7 +142,7 @@ class CourtSelectionActivity : AppCompatActivity() {
     private fun setupListeners() {
         binding.buttonRefresh.setOnClickListener {
             AppLogger.button("CourtSelection", "Refresh")
-            viewModel.loadCourts()
+            viewModel.loadCourts(selectedTournamentId)
         }
     }
     
@@ -270,6 +298,16 @@ class CourtSelectionActivity : AppCompatActivity() {
                 AppLogger.button("CourtSelection", "Menu:History")
                 val intent = Intent(this, MatchHistoryActivity::class.java)
                 startActivity(intent)
+                true
+            }
+            R.id.action_change_tournament -> {
+                AppLogger.button("CourtSelection", "Menu:ChangeTournament")
+                startActivity(
+                    Intent(this, TournamentSelectionActivity::class.java).apply {
+                        putExtra(TournamentSelectionActivity.EXTRA_FORCE_SELECTION, true)
+                    }
+                )
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)

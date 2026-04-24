@@ -6,6 +6,7 @@ import pl.vestmedia.tennisreferee.data.model.Match
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.CourtPinRequest
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
+import pl.vestmedia.tennisreferee.data.model.TournamentOption
 
 /**
  * Repository obsługujące operacje na kortach i meczach
@@ -17,12 +18,28 @@ class TennisRepository {
     /**
      * Pobiera listę dostępnych kortów
      */
-    suspend fun getCourts(): Result<List<Court>> {
+    suspend fun getCourts(tournamentId: Int? = null): Result<List<Court>> {
         return try {
-            val response = apiService.getCourts()
+            val response = apiService.getCourts(tournamentId)
             if (response.isSuccessful) {
                 val courts = response.body()?.courts ?: emptyList()
                 Result.success(courts)
+            } else {
+                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Pobiera listę aktywnych turniejów
+     */
+    suspend fun getActiveTournaments(): Result<List<TournamentOption>> {
+        return try {
+            val response = apiService.getActiveTournaments()
+            if (response.isSuccessful) {
+                Result.success(response.body() ?: emptyList())
             } else {
                 Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
             }
@@ -34,9 +51,9 @@ class TennisRepository {
     /**
      * Pobiera listę zawodników
      */
-    suspend fun getPlayers(): Result<List<Player>> {
+    suspend fun getPlayers(courtId: String? = null): Result<List<Player>> {
         return try {
-            val response = apiService.getPlayers()
+            val response = apiService.getPlayers(courtId)
             if (response.isSuccessful) {
                 val players = response.body()?.players ?: emptyList()
                 Result.success(players)

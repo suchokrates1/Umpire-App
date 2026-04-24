@@ -1,5 +1,7 @@
 package pl.vestmedia.tennisreferee.ui.playerselection
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -11,6 +13,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputEditText
 import pl.vestmedia.tennisreferee.R
@@ -22,6 +26,9 @@ import pl.vestmedia.tennisreferee.data.model.StatsMode
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.ui.match.MatchActivity
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * Activity do wyboru zawodników (singiel lub debel)
@@ -45,12 +52,21 @@ class PlayerSelectionActivity : AppCompatActivity() {
     private var courtName: String = ""
     private var courtPin: String = ""
     private var savedMatchConfig: MatchConfig? = null
+    private val dateTimeFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
+        // Podnieś przyciski nad pasek nawigacyjny
+        val rootPaddingBottom = binding.root.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val navBar = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, rootPaddingBottom + navBar)
+            windowInsets
+        }
+
         AppLogger.screen("PlayerSelection")
         (application as TennisRefereeApp).healthCheckManager.currentScreen = "PlayerSelection"
         
@@ -75,7 +91,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         setupListeners()
         
         // Załaduj zawodników
-        viewModel.loadPlayers()
+        viewModel.loadPlayers(courtId)
     }
     
     private fun setupUI() {
@@ -263,6 +279,15 @@ class PlayerSelectionActivity : AppCompatActivity() {
     
     private fun showMatchConfigDialog(selectedPlayers: List<Player>) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_match_config, null)
+        val dialogContent = dialogView.findViewById<View>(R.id.dialogContent)
+        val editUmpireName = dialogView.findViewById<TextInputEditText>(R.id.editUmpireName)
+        val layoutMixedDoubles = dialogView.findViewById<View>(R.id.layoutMixedDoubles)
+        val switchMixedDoubles = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchMixedDoubles)
+        val textManualStartTime = dialogView.findViewById<android.widget.TextView>(R.id.textManualStartTime)
+        val buttonSelectManualDateTime = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.buttonSelectManualDateTime)
+        val buttonClearManualDateTime = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.buttonClearManualDateTime)
+        val isDoublesMatch = viewModel.isDoubles.value == true
+        var manualStartTime: Long? = null
         
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -270,6 +295,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
             .create()
         
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        applyBottomNavigationInset(dialogContent)
         
         // === Toggle groups ===
         val toggleGamesPerSet = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleGamesPerSet)
@@ -281,6 +307,55 @@ class PlayerSelectionActivity : AppCompatActivity() {
         val layoutMatchFormat = dialogView.findViewById<android.widget.LinearLayout>(R.id.layoutMatchFormat)
         val layoutTbOnlyPoints = dialogView.findViewById<android.widget.LinearLayout>(R.id.layoutTbOnlyPoints)
         val toggleTbOnlyPoints = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleTbOnlyPoints)
+        layoutMixedDoubles.visibility = if (isDoublesMatch) View.VISIBLE else View.GONE
+
+        fun updateManualStartTimeLabel() {
+            if (manualStartTime == null) {
+                textManualStartTime.setText(R.string.match_config_manual_datetime_empty)
+                buttonClearManualDateTime.visibility = View.GONE
+            } else {
+                textManualStartTime.text = dateTimeFormat.format(manualStartTime)
+                buttonClearManualDateTime.visibility = View.VISIBLE
+            }
+        }
+
+        buttonSelectManualDateTime.setOnClickListener {
+            val calendar = Calendar.getInstance().apply {
+                manualStartTime?.let { timeInMillis = it }
+            }
+            DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    calendar.set(Calendar.YEAR, year)
+                    calendar.set(Calendar.MONTH, month)
+                    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    TimePickerDialog(
+                        this,
+                        { _, hourOfDay, minute ->
+                            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                            calendar.set(Calendar.MINUTE, minute)
+                            calendar.set(Calendar.SECOND, 0)
+                            calendar.set(Calendar.MILLISECOND, 0)
+                            manualStartTime = calendar.timeInMillis
+                            updateManualStartTimeLabel()
+                        },
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
+                        true
+                    ).show()
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        buttonClearManualDateTime.setOnClickListener {
+            manualStartTime = null
+            updateManualStartTimeLabel()
+        }
+
+        updateManualStartTimeLabel()
         
         // Defaults: 4 games/set, 2 sets to win, TB to 7, super TB to 10
         toggleGamesPerSet.check(R.id.btnGames4)
@@ -312,6 +387,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
             }
             val gamesPerSet = when (toggleGamesPerSet.checkedButtonId) {
                 R.id.btnGames3 -> 3
+                R.id.btnGames5 -> 5
                 R.id.btnGames6 -> 6
                 else -> 4
             }
@@ -343,7 +419,13 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 dialog.dismiss()
                 val config = buildMatchConfig(StatsMode.BASIC)
                 AppLogger.dialog("MatchConfig", "BASIC | $config")
-                startMatchWithConfig(selectedPlayers, config)
+                startMatchWithConfig(
+                    selectedPlayers = selectedPlayers,
+                    config = config,
+                    umpireName = editUmpireName.text?.toString()?.trim().orEmpty(),
+                    isMixedDoubles = isDoublesMatch && switchMixedDoubles.isChecked,
+                    manualStartTime = manualStartTime
+                )
             }
         
         dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardAdvancedMode)
@@ -351,16 +433,54 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 dialog.dismiss()
                 val config = buildMatchConfig(StatsMode.ADVANCED)
                 AppLogger.dialog("MatchConfig", "ADVANCED | $config")
-                startMatchWithConfig(selectedPlayers, config)
+                startMatchWithConfig(
+                    selectedPlayers = selectedPlayers,
+                    config = config,
+                    umpireName = editUmpireName.text?.toString()?.trim().orEmpty(),
+                    isMixedDoubles = isDoublesMatch && switchMixedDoubles.isChecked,
+                    manualStartTime = manualStartTime
+                )
             }
         
+        dialog.setOnShowListener {
+            ViewCompat.requestApplyInsets(dialogContent)
+        }
+
         dialog.show()
     }
+
+    private fun applyBottomNavigationInset(contentView: View) {
+        val baseLeftPadding = contentView.paddingLeft
+        val baseTopPadding = contentView.paddingTop
+        val baseRightPadding = contentView.paddingRight
+        val baseBottomPadding = contentView.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(contentView) { view, windowInsets ->
+            val navigationInsets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            view.setPadding(
+                baseLeftPadding,
+                baseTopPadding,
+                baseRightPadding,
+                baseBottomPadding + navigationInsets
+            )
+            windowInsets
+        }
+    }
     
-    private fun startMatchWithConfig(selectedPlayers: List<Player>, config: MatchConfig) {
+    private fun startMatchWithConfig(
+        selectedPlayers: List<Player>,
+        config: MatchConfig,
+        umpireName: String = "",
+        isMixedDoubles: Boolean = false,
+        manualStartTime: Long? = null
+    ) {
         val isDoublesMatch = viewModel.isDoubles.value ?: false
         val playerNames = selectedPlayers.joinToString(", ") { it.getDisplayName() }
-        AppLogger.navigate("PlayerSelection", "Match", "players=[$playerNames] doubles=$isDoublesMatch config=$config")
+        AppLogger.navigate(
+            "PlayerSelection",
+            "Match",
+            "players=[$playerNames] doubles=$isDoublesMatch mixed=$isMixedDoubles umpire=${umpireName.ifBlank { "-" }} config=$config"
+        )
         
         // Utwórz stan meczu
         val matchState = if (isDoublesMatch && selectedPlayers.size == 4) {
@@ -373,6 +493,9 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 courtId = courtId,
                 courtName = courtName,
                 isDoubles = true,
+                isMixedDoubles = isMixedDoubles,
+                umpireName = umpireName.ifBlank { null },
+                manualStartTime = manualStartTime,
                 currentServer = 1,
                 statsMode = config.statsMode,
                 noAdvantage = config.noAdvantage,
@@ -386,6 +509,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 courtId = courtId,
                 courtName = courtName,
                 isDoubles = false,
+                umpireName = umpireName.ifBlank { null },
+                manualStartTime = manualStartTime,
                 statsMode = config.statsMode,
                 noAdvantage = config.noAdvantage,
                 matchConfig = config

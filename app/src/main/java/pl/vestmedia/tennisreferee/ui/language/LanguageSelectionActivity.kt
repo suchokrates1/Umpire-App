@@ -5,11 +5,13 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityLanguageSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Language
-import pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity
+import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import java.util.Locale
 
@@ -50,10 +52,26 @@ class LanguageSelectionActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (hasLanguageSelected(this)) {
+            setLanguage(this, getSelectedLanguage(this))
+            startActivity(Intent(this, TournamentSelectionActivity::class.java))
+            finish()
+            return
+        }
+
         AppLogger.screen("LanguageSelection")
         binding = ActivityLanguageSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
+        // Podnieś listę nad pasek nawigacyjny
+        val rootPaddingBottom = binding.root.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val navBar = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, rootPaddingBottom + navBar)
+            windowInsets
+        }
+
         supportActionBar?.title = getString(R.string.app_name)
         
         setupRecyclerView()
@@ -83,8 +101,8 @@ class LanguageSelectionActivity : AppCompatActivity() {
         AppLogger.button("LanguageSelection", "language", language.code)
         setLanguage(this, language.code)
         
-        // Przejdź do ekranu wyboru kortów
-        val intent = Intent(this, CourtSelectionActivity::class.java)
+        // Przejdź do ekranu wyboru turnieju
+        val intent = Intent(this, TournamentSelectionActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

@@ -24,6 +24,6 @@ data class Court(
     val currentMatchId: Int? = null
 ) {
     fun getDisplayName(context: Context): String {
-        return context.getString(R.string.court_name, id)
+        return name?.takeIf { it.isNotBlank() } ?: context.getString(R.string.court_name, id)
     }
 }

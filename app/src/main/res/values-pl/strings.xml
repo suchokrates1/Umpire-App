@@ -200,5 +200,4 @@
     <string name="bracket_warning_title">Informacja o meczu</string>
     <string name="bracket_warning_different_groups">Ci zawodnicy są z różnych grup. Czy to mecz fazy pucharowej?</string>
     <string name="bracket_warning_friendly">Ci zawodnicy nie są przypisani do żadnej grupy turniejowej. Mecz zostanie zapisany jako sparingowy.</string>
-    <string name="ok">OK</string>
 </resources>
