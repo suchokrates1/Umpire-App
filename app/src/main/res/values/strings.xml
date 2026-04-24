@@ -7,6 +7,11 @@
     <string name="language_selected">Language selected</string>
     
     <!-- Court Selection -->
+    <string name="select_tournament">Select Tournament</string>
+    <string name="change_tournament">Change tournament</string>
+    <string name="no_tournaments_available">No active tournaments available</string>
+    <string name="error_loading_tournaments">Error loading tournaments</string>
+    <string name="tournament_location_format">%1$s, %2$s</string>
     <string name="select_court">Select Court</string>
     <string name="refresh">Refresh</string>
     <string name="no_courts_available">No courts available</string>
@@ -85,6 +90,13 @@
     
     <!-- Match Configuration Dialog -->
     <string name="match_config_title">Match Setup</string>
+    <string name="match_config_umpire_hint">Umpire name or initials</string>
+    <string name="match_config_mixed_title">Mixed Doubles</string>
+    <string name="match_config_mixed_desc">Mark this doubles match as mixed</string>
+    <string name="match_config_manual_datetime_title">Manual date and time</string>
+    <string name="match_config_manual_datetime_empty">Automatic current date/time</string>
+    <string name="match_config_set_datetime">Set</string>
+    <string name="match_config_clear_datetime">Clear</string>
     <string name="match_config_format_header">Match Format</string>
     <string name="match_config_games_per_set">Games per set</string>
     <string name="match_config_sets_to_win">Sets to win</string>
@@ -134,6 +146,11 @@
     <string name="first_serve_pct">1st Serve %</string>
     <string name="new_match_button">New Match</string>
     <string name="player_serves_short">Serves</string>
+    <string name="match_metadata_umpire">Umpire: %1$s</string>
+    <string name="match_metadata_datetime">%1$s</string>
+    <string name="match_type_mixed">Mixed</string>
+    <string name="match_type_doubles">Doubles</string>
+    <string name="match_type_singles">Singles</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Error loading courts</string>
@@ -193,6 +210,7 @@
     <string name="app_description">Professional tennis referee application for real-time match scoring</string>
     <string name="version_format">Version %1$s</string>
     <string name="version_unknown">Version unknown</string>
+    <string name="tournament_dates">%1$s - %2$s</string>
 
     <!-- Bracket warnings -->
     <string name="bracket_warning_title">Match Notice</string>

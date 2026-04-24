@@ -26,9 +26,17 @@
         
         <!-- Court Selection -->
         <activity
+            android:name=".ui.tournamentselection.TournamentSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.language.LanguageSelectionActivity"/>
+
+        <!-- Court Selection -->
+        <activity
             android:name=".ui.courtselection.CourtSelectionActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.tournamentselection.TournamentSelectionActivity"/>
         
         <!-- Player Selection -->
         <activity

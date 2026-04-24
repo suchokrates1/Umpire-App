@@ -13,5 +13,10 @@
         android:title="@string/match_history"
         android:icon="@android:drawable/ic_menu_recent_history"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_change_tournament"
+        android:title="@string/change_tournament"
+        app:showAsAction="never" />
     
 </menu>

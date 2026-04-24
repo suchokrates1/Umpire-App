@@ -99,7 +99,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun setFirstServer(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
             state.isPlayer1Serving = isPlayer1
-            state.matchStartTime = System.currentTimeMillis()
+            state.matchStartTime = state.manualStartTime ?: System.currentTimeMillis()
             _matchState.value = state
             
             // W trybie basic przejdź do uproszczonego widoku

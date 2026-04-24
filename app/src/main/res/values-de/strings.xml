@@ -71,6 +71,14 @@
     <string name="finish">Beenden</string>
     <string name="finish_match">Spiel beenden</string>
     <string name="new_match">Neues Spiel</string>
+    <string name="match_config_title">Match-Konfiguration</string>
+    <string name="match_config_umpire_hint">Name oder Kürzel des Schiedsrichters</string>
+    <string name="match_config_mixed_title">Mixed</string>
+    <string name="match_config_mixed_desc">Dieses Doppel als Mixed kennzeichnen</string>
+    <string name="match_config_manual_datetime_title">Manuelles Datum und Uhrzeit</string>
+    <string name="match_config_manual_datetime_empty">Automatisches aktuelles Datum/Uhrzeit</string>
+    <string name="match_config_set_datetime">Setzen</string>
+    <string name="match_config_clear_datetime">Löschen</string>
     
     <!-- Scoreboard -->
     <string name="scoreboard_player">Spieler</string>
@@ -99,6 +107,11 @@
     <string name="aces">Asse</string>
     <string name="double_faults">Doppelfehler</string>
     <string name="player_serves_short">Aufschlag</string>
+    <string name="match_metadata_umpire">Schiedsrichter: %1$s</string>
+    <string name="match_metadata_datetime">%1$s</string>
+    <string name="match_type_mixed">Mixed</string>
+    <string name="match_type_doubles">Doppel</string>
+    <string name="match_type_singles">Einzel</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Fehler beim Laden der Plätze</string>
@@ -183,5 +196,4 @@
     <string name="bracket_warning_title">Spielhinweis</string>
     <string name="bracket_warning_different_groups">Diese Spieler sind aus verschiedenen Gruppen. Ist das ein K.O.-Rundenspiel?</string>
     <string name="bracket_warning_friendly">Diese Spieler sind keiner Turniergruppe zugeordnet. Das Spiel wird als Freundschaftsspiel gespeichert.</string>
-    <string name="ok">OK</string>
 </resources>

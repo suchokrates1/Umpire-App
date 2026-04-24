@@ -27,12 +27,12 @@ class CourtSelectionViewModel : ViewModel() {
     /**
      * Ładuje listę kortów z serwera (obecnie mock data)
      */
-    fun loadCourts() {
+    fun loadCourts(tournamentId: Int? = null) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             
-            val result = repository.getCourts()
+            val result = repository.getCourts(tournamentId)
             result.onSuccess { courtsList ->
                 _courts.value = courtsList
                 _isLoading.value = false

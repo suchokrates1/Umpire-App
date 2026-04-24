@@ -31,6 +31,18 @@
             tools:visibility="visible"
             tools:text="01:23:45"/>
 
+        <TextView
+            android:id="@+id/textMatchMetadata"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="12sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="Mixed • Umpire: AB • 24.04.2026 12:00"/>
+
         <!-- Tryb gry (Tiebreak/Super Tiebreak) -->
         <TextView
             android:id="@+id/textGameMode"

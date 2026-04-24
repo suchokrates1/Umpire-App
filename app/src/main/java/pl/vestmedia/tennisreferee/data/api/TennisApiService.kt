@@ -10,6 +10,7 @@ import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
 import pl.vestmedia.tennisreferee.data.model.MatchEvent
 import pl.vestmedia.tennisreferee.data.model.MatchEventResponse
 import pl.vestmedia.tennisreferee.data.model.MatchStatisticsRequest
+import pl.vestmedia.tennisreferee.data.model.TournamentOption
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -22,13 +23,19 @@ interface TennisApiService {
      * Pobiera listę dostępnych kortów
      */
     @GET("api/courts")
-    suspend fun getCourts(): Response<CourtsResponse>
+    suspend fun getCourts(@Query("tournament_id") tournamentId: Int? = null): Response<CourtsResponse>
+
+    /**
+     * Pobiera listę aktywnych turniejów
+     */
+    @GET("api/tournaments/active")
+    suspend fun getActiveTournaments(): Response<List<TournamentOption>>
     
     /**
      * Pobiera listę zawodników
      */
     @GET("api/players")
-    suspend fun getPlayers(): Response<PlayersResponse>
+    suspend fun getPlayers(@Query("court_id") courtId: String? = null): Response<PlayersResponse>
     
     /**
      * Weryfikuje PIN dla kortu

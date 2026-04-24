@@ -14,6 +14,7 @@ import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 class PlayerSelectionViewModel : ViewModel() {
     
     private val repository = TennisRepository()
+    private var currentCourtId: String? = null
     
     private val _players = MutableLiveData<List<Player>>()
     val players: LiveData<List<Player>> = _players
@@ -40,12 +41,13 @@ class PlayerSelectionViewModel : ViewModel() {
     /**
      * Ładuje listę zawodników z serwera
      */
-    fun loadPlayers() {
+    fun loadPlayers(courtId: String? = null) {
+        currentCourtId = courtId
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             
-            val result = repository.getPlayers()
+            val result = repository.getPlayers(currentCourtId)
             result.onSuccess { playersList ->
                 _players.value = playersList
                 _isLoading.value = false
@@ -143,7 +145,7 @@ class PlayerSelectionViewModel : ViewModel() {
             val result = repository.addPlayer(firstName, lastName, flagCode, category, courtId, courtPin)
             result.onSuccess { newPlayer ->
                 // Odśwież listę zawodników
-                val playersResult = repository.getPlayers()
+                val playersResult = repository.getPlayers(currentCourtId)
                 playersResult.onSuccess { playersList ->
                     _players.value = playersList
                     
