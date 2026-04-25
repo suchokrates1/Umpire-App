@@ -16,8 +16,7 @@
         <!-- Language Selection - ekran startowy -->
         <activity
             android:name=".ui.language.LanguageSelectionActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -28,49 +27,42 @@
         <activity
             android:name=".ui.tournamentselection.TournamentSelectionActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.language.LanguageSelectionActivity"/>
 
         <!-- Court Selection -->
         <activity
             android:name=".ui.courtselection.CourtSelectionActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.tournamentselection.TournamentSelectionActivity"/>
         
         <!-- Player Selection -->
         <activity
             android:name=".ui.playerselection.PlayerSelectionActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.courtselection.CourtSelectionActivity"/>
         
         <!-- Match -->
         <activity
             android:name=".ui.match.MatchActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.playerselection.PlayerSelectionActivity"/>
         
         <!-- Match History -->
         <activity
             android:name=".ui.history.MatchHistoryActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.courtselection.CourtSelectionActivity"/>
         
         <!-- Match Detail -->
         <activity
             android:name=".ui.history.MatchDetailActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.history.MatchHistoryActivity"/>
         
         <!-- Settings -->
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.courtselection.CourtSelectionActivity"/>
         
     </application>
