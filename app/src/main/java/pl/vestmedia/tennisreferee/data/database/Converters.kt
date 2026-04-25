@@ -21,6 +21,16 @@ class Converters {
     fun toPlayer(playerString: String): Player {
         return gson.fromJson(playerString, Player::class.java)
     }
+
+    @TypeConverter
+    fun fromNullablePlayer(player: Player?): String? {
+        return player?.let { gson.toJson(it) }
+    }
+
+    @TypeConverter
+    fun toNullablePlayer(playerString: String?): Player? {
+        return playerString?.let { gson.fromJson(it, Player::class.java) }
+    }
     
     @TypeConverter
     fun fromSetScoreList(setScores: List<SetScore>): String {

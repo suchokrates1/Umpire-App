@@ -128,6 +128,10 @@
     <string name="match_type_mixed">Mixed</string>
     <string name="match_type_doubles">Doppel</string>
     <string name="match_type_singles">Einzel</string>
+    <string name="sync_status_syncing">Synchronisierung...</string>
+    <string name="sync_status_synced">Synchronisiert</string>
+    <string name="sync_status_failed">Synchronisierung fehlgeschlagen</string>
+    <string name="sync_status_offline">Offline - erneuter Versuch folgt</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Fehler beim Laden der Plätze</string>
@@ -188,6 +192,12 @@
     <string name="all_matches_deleted">Alle Spiele gelöscht</string>
     <string name="match_details">Spieldetails</string>
     <string name="match_details_placeholder">Spieldetails werden hier angezeigt</string>
+    <string name="match_details_not_found">Spieldetails nicht gefunden</string>
+    <string name="match_details_court">Platz: %1$s</string>
+    <string name="match_details_started">Beginn: %1$s</string>
+    <string name="match_details_duration">Dauer: %1$s</string>
+    <string name="match_details_umpire">Schiedsrichter: %1$s</string>
+    <string name="match_details_sets">Sätze</string>
 
     <!-- Settings -->
     <string name="settings">Einstellungen</string>

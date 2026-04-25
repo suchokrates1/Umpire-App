@@ -160,6 +160,16 @@ class MatchActivity : AppCompatActivity() {
         viewModel.bracketWarning.observe(this) { event ->
             event?.let { showBracketWarningDialog(it) }
         }
+
+        viewModel.syncStatus.observe(this) { status ->
+            supportActionBar?.subtitle = when (status) {
+                SyncStatus.IDLE -> null
+                SyncStatus.SYNCING -> getString(R.string.sync_status_syncing)
+                SyncStatus.SYNCED -> getString(R.string.sync_status_synced)
+                SyncStatus.FAILED -> getString(R.string.sync_status_failed)
+                SyncStatus.OFFLINE -> getString(R.string.sync_status_offline)
+            }
+        }
         
         // Match announcements — now handled as inline ANNOUNCEMENT view
         // (no more AlertDialog popups)
