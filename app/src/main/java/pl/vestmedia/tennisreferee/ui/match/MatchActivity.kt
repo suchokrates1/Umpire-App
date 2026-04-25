@@ -2,11 +2,19 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.res.ColorStateList
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -14,6 +22,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.isVisible
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutScoreboardBinding
@@ -24,8 +35,6 @@ import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
 import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.MatchConfig
-import pl.vestmedia.tennisreferee.data.model.StatsMode
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -35,7 +44,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Activity zarządzające przebiegiem meczu
+ * Match activity that drives the live scoring flow.
  */
 class MatchActivity : AppCompatActivity() {
     
@@ -183,12 +192,22 @@ class MatchActivity : AppCompatActivity() {
         // Wybór serwującego
         serverSelectionBinding.buttonPlayer1Serves.setOnClickListener {
             AppLogger.button("Match", "Player1Serves")
-            viewModel.setFirstServer(true)
+            viewModel.setFirstServer(1)
         }
         
         serverSelectionBinding.buttonPlayer2Serves.setOnClickListener {
             AppLogger.button("Match", "Player2Serves")
-            viewModel.setFirstServer(false)
+            viewModel.setFirstServer(2)
+        }
+
+        serverSelectionBinding.buttonPlayer3Serves.setOnClickListener {
+            AppLogger.button("Match", "Player3Serves")
+            viewModel.setFirstServer(3)
+        }
+
+        serverSelectionBinding.buttonPlayer4Serves.setOnClickListener {
+            AppLogger.button("Match", "Player4Serves")
+            viewModel.setFirstServer(4)
         }
         
         // Zamiana stron z animacją
@@ -375,7 +394,7 @@ class MatchActivity : AppCompatActivity() {
                     .start()
             }
             View.GONE -> {
-                if (view.visibility == View.VISIBLE) {
+                if (view.isVisible) {
                     // Slide out w lewo (fade out)
                     view.animate()
                         .alpha(0f)
@@ -416,31 +435,15 @@ class MatchActivity : AppCompatActivity() {
         
         // Dla debla użyj nazw zespołów
         if (state.isDoubles) {
-            val team1Name = state.getTeam1DisplayName()
-            val team2Name = state.getTeam2DisplayName()
-            
-            serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.team_serves, team1Name)
-            serverSelectionBinding.buttonPlayer2Serves.text = getString(R.string.team_serves, team2Name)
-            
-            // W widoku serwisu pokaż aktualnego serwującego
-            serveBinding.textPlayerLeftName.text = if (!state.sidesSwapped) {
-                state.getCurrentServerName()
-            } else {
-                if (state.currentServer == 2 || state.currentServer == 4) state.getCurrentServerName() else ""
-            }
-            serveBinding.textPlayerRightName.text = if (state.sidesSwapped) {
-                state.getCurrentServerName()
-            } else {
-                if (state.currentServer == 2 || state.currentServer == 4) state.getCurrentServerName() else ""
-            }
-            
-            // Rally używa nazw zespołów
-            rallyBinding.textPlayerLeftName.text = if (!state.sidesSwapped) team1Name else team2Name
-            rallyBinding.textPlayerRightName.text = if (!state.sidesSwapped) team2Name else team1Name
-            
-            // Basic scoring - nazwy zespołów
-            basicScoringBinding.textPlayerLeftName.text = if (!state.sidesSwapped) team1Name else team2Name
-            basicScoringBinding.textPlayerRightName.text = if (!state.sidesSwapped) team2Name else team1Name
+            val leftTeamLabel = if (!state.sidesSwapped) state.getTeam1ServerAwareDisplayName() else state.getTeam2ServerAwareDisplayName()
+            val rightTeamLabel = if (!state.sidesSwapped) state.getTeam2ServerAwareDisplayName() else state.getTeam1ServerAwareDisplayName()
+
+            serveBinding.textPlayerLeftName.text = leftTeamLabel
+            serveBinding.textPlayerRightName.text = rightTeamLabel
+            rallyBinding.textPlayerLeftName.text = leftTeamLabel
+            rallyBinding.textPlayerRightName.text = rightTeamLabel
+            basicScoringBinding.textPlayerLeftName.text = leftTeamLabel
+            basicScoringBinding.textPlayerRightName.text = rightTeamLabel
         } else {
             // Singiel - normalna logika
             serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.player_serves, state.player1.getDisplayName())
@@ -503,25 +506,25 @@ class MatchActivity : AppCompatActivity() {
             basicScoringBinding.textServeInfo.text = getString(R.string.first_serve)
         } else {
             val fullText = getString(R.string.second_serve)
-            val styledText = android.text.SpannableString(fullText)
+            val styledText = SpannableString(fullText)
             val firstServeEnd = fullText.indexOf(">")
             if (firstServeEnd > 0) {
                 styledText.setSpan(
-                    android.text.style.ForegroundColorSpan(android.graphics.Color.GRAY),
+                    ForegroundColorSpan(Color.GRAY),
                     0, firstServeEnd,
-                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 // Pogrub "2nd serve" po strzałce
                 styledText.setSpan(
-                    android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                    StyleSpan(Typeface.BOLD),
                     firstServeEnd + 1, fullText.length,
-                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 // Powiększ "2nd serve"
                 styledText.setSpan(
-                    android.text.style.RelativeSizeSpan(1.3f),
+                    RelativeSizeSpan(1.3f),
                     firstServeEnd + 1, fullText.length,
-                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
             basicScoringBinding.textServeInfo.text = styledText
@@ -572,8 +575,8 @@ class MatchActivity : AppCompatActivity() {
             scoreboardBinding.textPlayer1Flag.text = "👥"  // Ikona zespołu
             scoreboardBinding.textPlayer2Flag.text = "👥"
             
-            scoreboardBinding.textPlayer1Name.text = state.getTeam1DisplayName()
-            scoreboardBinding.textPlayer2Name.text = state.getTeam2DisplayName()
+            scoreboardBinding.textPlayer1Name.text = state.getTeam1ServerAwareDisplayName()
+            scoreboardBinding.textPlayer2Name.text = state.getTeam2ServerAwareDisplayName()
         } else {
             // Singiel - flagi i nazwiska
             scoreboardBinding.textPlayer1Flag.text = getCountryFlag(state.player1.flag)
@@ -583,9 +586,14 @@ class MatchActivity : AppCompatActivity() {
             scoreboardBinding.textPlayer2Name.text = state.player2.getDisplayName()
         }
         
-        // Ikona serwisu (piłka tenisowa) po lewej od punktów
-        scoreboardBinding.imagePlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
-        scoreboardBinding.imagePlayer2ServerIcon.visibility = if (!state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
+        // W deblu piłka jest częścią etykiety zespołu; w singlu zostaje osobną ikoną.
+        if (state.isDoubles) {
+            scoreboardBinding.imagePlayer1ServerIcon.visibility = View.GONE
+            scoreboardBinding.imagePlayer2ServerIcon.visibility = View.GONE
+        } else {
+            scoreboardBinding.imagePlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
+            scoreboardBinding.imagePlayer2ServerIcon.visibility = if (!state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
+        }
         updateMatchMetadata(state)
         
         // Punkty z animacją
@@ -603,9 +611,16 @@ class MatchActivity : AppCompatActivity() {
         } else {
             // Pierwszy set zakończony — pokaż z wynikiem tiebreak jeśli był
             val set1 = state.setsHistory[0]
-            val tbSuffix1 = if (set1.tiebreakLoserPoints != null) "(${set1.tiebreakLoserPoints})" else ""
-            scoreboardBinding.textPlayer1Set1.text = "${set1.player1Games}${ if (set1.player1Games < set1.player2Games) tbSuffix1 else "" }"
-            scoreboardBinding.textPlayer2Set1.text = "${set1.player2Games}${ if (set1.player2Games < set1.player1Games) tbSuffix1 else "" }"
+            scoreboardBinding.textPlayer1Set1.text = formatSetScore(
+                games = set1.player1Games,
+                opponentGames = set1.player2Games,
+                tiebreakLoserPoints = set1.tiebreakLoserPoints
+            )
+            scoreboardBinding.textPlayer2Set1.text = formatSetScore(
+                games = set1.player2Games,
+                opponentGames = set1.player1Games,
+                tiebreakLoserPoints = set1.tiebreakLoserPoints
+            )
         }
         
         // Set 2 - zawsze widoczny
@@ -616,9 +631,16 @@ class MatchActivity : AppCompatActivity() {
         } else if (state.setsHistory.size > 1) {
             // Drugi set zakończony — pokaż z wynikiem tiebreak jeśli był
             val set2 = state.setsHistory[1]
-            val tbSuffix2 = if (set2.tiebreakLoserPoints != null) "(${set2.tiebreakLoserPoints})" else ""
-            scoreboardBinding.textPlayer1Set2.text = "${set2.player1Games}${ if (set2.player1Games < set2.player2Games) tbSuffix2 else "" }"
-            scoreboardBinding.textPlayer2Set2.text = "${set2.player2Games}${ if (set2.player2Games < set2.player1Games) tbSuffix2 else "" }"
+            scoreboardBinding.textPlayer1Set2.text = formatSetScore(
+                games = set2.player1Games,
+                opponentGames = set2.player2Games,
+                tiebreakLoserPoints = set2.tiebreakLoserPoints
+            )
+            scoreboardBinding.textPlayer2Set2.text = formatSetScore(
+                games = set2.player2Games,
+                opponentGames = set2.player1Games,
+                tiebreakLoserPoints = set2.tiebreakLoserPoints
+            )
         } else {
             // Przed drugim setem - pokaż 0
             scoreboardBinding.textPlayer1Set2.text = getString(R.string.zero_score)
@@ -699,7 +721,7 @@ class MatchActivity : AppCompatActivity() {
                 scoreboardBinding.backgroundPlayer2Set2.setBackgroundColor(transparentColor)
                 
                 // Animuj pojawienie się jeśli to zmiana
-                if (setIndex != lastActiveSet) {
+                if (lastActiveSet != 0) {
                     scoreboardBinding.backgroundPlayer1Set1.alpha = 0f
                     scoreboardBinding.backgroundPlayer2Set1.alpha = 0f
                     scoreboardBinding.backgroundPlayer1Set1.animate().alpha(0.3f).setDuration(300).start()
@@ -717,7 +739,7 @@ class MatchActivity : AppCompatActivity() {
                 scoreboardBinding.backgroundPlayer2Set2.alpha = 0.3f
                 
                 // Animuj pojawienie się jeśli to zmiana
-                if (setIndex != lastActiveSet) {
+                if (lastActiveSet != 1) {
                     scoreboardBinding.backgroundPlayer1Set2.alpha = 0f
                     scoreboardBinding.backgroundPlayer2Set2.alpha = 0f
                     scoreboardBinding.backgroundPlayer1Set2.animate().alpha(0.3f).setDuration(300).start()
@@ -737,37 +759,64 @@ class MatchActivity : AppCompatActivity() {
     }
     
     private fun updateServerSelectionButtons(state: MatchState) {
-        // Zaktualizuj teksty przycisków wyboru serwującego w zależności od sidesSwapped
-        val leftPlayerName = if (!state.sidesSwapped) {
-            state.player1.getDisplayName()
-        } else {
-            state.player2.getDisplayName()
-        }
-        
-        val rightPlayerName = if (!state.sidesSwapped) {
-            state.player2.getDisplayName()
-        } else {
-            state.player1.getDisplayName()
-        }
-        
-        serverSelectionBinding.buttonPlayer1Serves.text = getString(R.string.player_serves, leftPlayerName)
-        serverSelectionBinding.buttonPlayer2Serves.text = getString(R.string.player_serves, rightPlayerName)
-        
-        // Zastosuj kolory drużyn dla debla
-        val isDoublesMatch = intent.getBooleanExtra(EXTRA_IS_DOUBLES, false)
-        if (isDoublesMatch) {
-            val team1Color = intent.getIntExtra(EXTRA_TEAM1_COLOR, 0)
-            val team2Color = intent.getIntExtra(EXTRA_TEAM2_COLOR, 0)
-            
-            if (team1Color != 0 && team2Color != 0) {
-                serverSelectionBinding.buttonPlayer1Serves.setBackgroundColor(
-                    androidx.core.content.ContextCompat.getColor(this, team1Color)
-                )
-                serverSelectionBinding.buttonPlayer2Serves.setBackgroundColor(
-                    androidx.core.content.ContextCompat.getColor(this, team2Color)
-                )
+        fun playerLabel(player: Player, selected: Boolean): String {
+            val prefix = if (selected) {
+                if (state.isDoubles) "🎾 " else "• "
+            } else {
+                ""
             }
+            val genderLabel = player.getGenderShortLabel()?.let { "$it " }.orEmpty()
+            return "$prefix$genderLabel${player.getDisplayName()}"
         }
+
+        fun applyServerButtonStyle(
+            button: com.google.android.material.button.MaterialButton,
+            colorRes: Int,
+            selected: Boolean,
+            textColorRes: Int? = null
+        ) {
+            button.setBackgroundColor(ContextCompat.getColor(this, colorRes))
+            textColorRes?.let { button.setTextColor(ContextCompat.getColor(this, it)) }
+            button.strokeWidth = if (selected) 3 else 1
+            button.strokeColor = ColorStateList.valueOf(
+                ColorUtils.setAlphaComponent(Color.WHITE, if (selected) 224 else 104)
+            )
+            button.alpha = if (selected) 1.0f else 0.9f
+        }
+
+        if (state.isDoubles) {
+            val leftTop = if (!state.sidesSwapped) Pair(1, state.player1) else Pair(2, state.player2)
+            val leftBottom = if (!state.sidesSwapped) Pair(3, state.player3) else Pair(4, state.player4)
+            val rightTop = if (!state.sidesSwapped) Pair(2, state.player2) else Pair(1, state.player1)
+            val rightBottom = if (!state.sidesSwapped) Pair(4, state.player4) else Pair(3, state.player3)
+
+            serverSelectionBinding.buttonPlayer3Serves.visibility = View.VISIBLE
+            serverSelectionBinding.buttonPlayer4Serves.visibility = View.VISIBLE
+
+            serverSelectionBinding.buttonPlayer1Serves.text = playerLabel(leftTop.second, state.currentServer == leftTop.first)
+            serverSelectionBinding.buttonPlayer2Serves.text = playerLabel(rightTop.second, state.currentServer == rightTop.first)
+            serverSelectionBinding.buttonPlayer3Serves.text = playerLabel(leftBottom.second ?: leftTop.second, state.currentServer == leftBottom.first)
+            serverSelectionBinding.buttonPlayer4Serves.text = playerLabel(rightBottom.second ?: rightTop.second, state.currentServer == rightBottom.first)
+
+            applyServerButtonStyle(serverSelectionBinding.buttonPlayer1Serves, if (leftTop.first == 1 || leftTop.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == leftTop.first, R.color.team_button_text_color)
+            applyServerButtonStyle(serverSelectionBinding.buttonPlayer2Serves, if (rightTop.first == 1 || rightTop.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == rightTop.first, R.color.team_button_text_color)
+            applyServerButtonStyle(serverSelectionBinding.buttonPlayer3Serves, if (leftBottom.first == 1 || leftBottom.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == leftBottom.first, R.color.team_button_text_color)
+            applyServerButtonStyle(serverSelectionBinding.buttonPlayer4Serves, if (rightBottom.first == 1 || rightBottom.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == rightBottom.first, R.color.team_button_text_color)
+            return
+        }
+
+        serverSelectionBinding.buttonPlayer3Serves.visibility = View.GONE
+        serverSelectionBinding.buttonPlayer4Serves.visibility = View.GONE
+
+        val leftPlayer = if (!state.sidesSwapped) state.player1 else state.player2
+        val rightPlayer = if (!state.sidesSwapped) state.player2 else state.player1
+        val leftServerNumber = if (!state.sidesSwapped) 1 else 2
+        val rightServerNumber = if (!state.sidesSwapped) 2 else 1
+
+        serverSelectionBinding.buttonPlayer1Serves.text = playerLabel(leftPlayer, state.currentServer == leftServerNumber)
+        serverSelectionBinding.buttonPlayer2Serves.text = playerLabel(rightPlayer, state.currentServer == rightServerNumber)
+        applyServerButtonStyle(serverSelectionBinding.buttonPlayer1Serves, R.color.player_selected, state.currentServer == leftServerNumber)
+        applyServerButtonStyle(serverSelectionBinding.buttonPlayer2Serves, R.color.player_selected, state.currentServer == rightServerNumber)
     }
     
     private fun updateServeView(state: MatchState) {
@@ -792,14 +841,14 @@ class MatchActivity : AppCompatActivity() {
         } else {
             // Przy 2 serwisie pokaż: "1. serwis > 2. serwis" z szarym pierwszym
             val fullText = getString(R.string.second_serve)
-            val styledText = android.text.SpannableString(fullText)
+            val styledText = SpannableString(fullText)
             // Znajdź pozycję pierwszego serwisu do pokolorowania na szaro
             val firstServeEnd = fullText.indexOf(">")
             if (firstServeEnd > 0) {
                 styledText.setSpan(
-                    android.text.style.ForegroundColorSpan(android.graphics.Color.GRAY),
+                    ForegroundColorSpan(Color.GRAY),
                     0, firstServeEnd,
-                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
             serveBinding.textServeInfo.text = styledText
@@ -892,14 +941,14 @@ class MatchActivity : AppCompatActivity() {
                     } else {
                         // Przy 2 serwisie pokaż: "1. serwis > 2. serwis" z szarym pierwszym
                         val fullText = getString(R.string.second_serve)
-                        val styledText = android.text.SpannableString(fullText)
+                        val styledText = SpannableString(fullText)
                         // Znajdź pozycję pierwszego serwisu do pokolorowania na szaro
                         val firstServeEnd = fullText.indexOf(">")
                         if (firstServeEnd > 0) {
                             styledText.setSpan(
-                                android.text.style.ForegroundColorSpan(android.graphics.Color.GRAY),
+                                ForegroundColorSpan(Color.GRAY),
                                 0, firstServeEnd,
-                                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
                         }
                         serveBinding.textServeInfo.text = styledText
@@ -926,7 +975,6 @@ class MatchActivity : AppCompatActivity() {
                     }
                     
                     matchFinishedBinding.textWinner.text = getString(R.string.winner_label, winner)
-                    matchFinishedBinding.textWinner.setTextColor(android.graphics.Color.parseColor("#FFD700")) // Gold highlight
                     
                     // Wyświetl statystyki
                     updateMatchStatistics(state)
@@ -953,8 +1001,8 @@ class MatchActivity : AppCompatActivity() {
         matchFinishedBinding.textUnforcedErrorsPlayer1.text = state.player1Stats.unforcedErrors.toString()
         matchFinishedBinding.textUnforcedErrorsPlayer2.text = state.player2Stats.unforcedErrors.toString()
         
-        matchFinishedBinding.textFirstServePctPlayer1.text = "${state.player1Stats.getFirstServePercentage()}%"
-        matchFinishedBinding.textFirstServePctPlayer2.text = "${state.player2Stats.getFirstServePercentage()}%"
+        matchFinishedBinding.textFirstServePctPlayer1.text = formatPercentage(state.player1Stats.getFirstServePercentage())
+        matchFinishedBinding.textFirstServePctPlayer2.text = formatPercentage(state.player2Stats.getFirstServePercentage())
         
         // Przycisk: Następny mecz z tym samym setupem (domyślny)
         matchFinishedBinding.buttonNextMatchSameSetup.setOnClickListener {
@@ -1028,6 +1076,19 @@ class MatchActivity : AppCompatActivity() {
             timerRunnable = null
         }
     }
+
+    private fun formatSetScore(games: Int, opponentGames: Int, tiebreakLoserPoints: Int?): String {
+        val suffix = if (tiebreakLoserPoints != null && games < opponentGames) {
+            getString(R.string.scoreboard_tiebreak_suffix, tiebreakLoserPoints)
+        } else {
+            ""
+        }
+        return getString(R.string.scoreboard_set_score, games, suffix)
+    }
+
+    private fun formatPercentage(value: Int): String {
+        return getString(R.string.percentage_value, value)
+    }
     
     /**
      * Formatuje czas trwania na format HH:MM:SS lub MM:SS
@@ -1038,9 +1099,9 @@ class MatchActivity : AppCompatActivity() {
         val hours = (durationMs / (1000 * 60 * 60))
         
         return if (hours > 0) {
-            String.format(java.util.Locale.US, "%d:%02d:%02d", hours, minutes, seconds)
+            String.format(Locale.US, "%d:%02d:%02d", hours, minutes, seconds)
         } else {
-            String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
+            String.format(Locale.US, "%02d:%02d", minutes, seconds)
         }
     }
     
@@ -1084,30 +1145,31 @@ class MatchActivity : AppCompatActivity() {
      * Łagodna animacja zamiany stron - fade out + slide
      */
     private fun animateSwapSides() {
-        val button1 = serverSelectionBinding.buttonPlayer1Serves
-        val button2 = serverSelectionBinding.buttonPlayer2Serves
-        
-        // Fade out oba przyciski
-        val fadeOut1 = ObjectAnimator.ofFloat(button1, "alpha", 1f, 0f)
-        val fadeOut2 = ObjectAnimator.ofFloat(button2, "alpha", 1f, 0f)
-        
-        fadeOut1.duration = 150
-        fadeOut2.duration = 150
-        
-        // Po fade out - zaktualizuj i fade in
-        val fadeIn1 = ObjectAnimator.ofFloat(button1, "alpha", 0f, 1f)
-        val fadeIn2 = ObjectAnimator.ofFloat(button2, "alpha", 0f, 1f)
-        
-        fadeIn1.duration = 150
-        fadeIn2.duration = 150
-        
-        // Sekwencja: fade out -> fade in
-        val animatorSet = AnimatorSet()
-        animatorSet.play(fadeOut1).with(fadeOut2)
-        animatorSet.play(fadeIn1).after(fadeOut1)
-        animatorSet.play(fadeIn2).after(fadeOut2)
-        
-        animatorSet.start()
+        val animatedButtons = listOf(
+            serverSelectionBinding.buttonPlayer1Serves,
+            serverSelectionBinding.buttonPlayer2Serves,
+            serverSelectionBinding.buttonPlayer3Serves,
+            serverSelectionBinding.buttonPlayer4Serves
+        ).filter { it.isVisible }
+
+        val fadeOut = animatedButtons.map { button ->
+            ObjectAnimator.ofFloat(button, "alpha", 1f, 0f).apply {
+                duration = 150
+            }
+        }
+
+        val fadeIn = animatedButtons.map { button ->
+            ObjectAnimator.ofFloat(button, "alpha", 0f, 1f).apply {
+                duration = 150
+            }
+        }
+
+        AnimatorSet().apply {
+            playTogether(fadeOut)
+            playTogether(fadeIn)
+            fadeIn.forEach { play(it).after(fadeOut.first()) }
+            start()
+        }
     }
     
     override fun onDestroy() {

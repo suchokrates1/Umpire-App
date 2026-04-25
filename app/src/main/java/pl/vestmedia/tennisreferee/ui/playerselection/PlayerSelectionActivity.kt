@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -138,6 +139,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         viewModel.selectedPlayers.observe(this) { selectedPlayers ->
             updateSelectedPlayersInfo(selectedPlayers)
+            updateRequiredPlayersText(viewModel.isDoubles.value ?: false)
             // Odswież adapter aby pokazać checkmarki
             adapter.notifyDataSetChanged()
             
@@ -242,8 +244,11 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         // Pokaż listę wybranych graczy
         if (selectedPlayers.isNotEmpty()) {
-            val names = selectedPlayers.joinToString(", ") { it.getFullName() }
-            binding.textSelectedPlayers.text = names
+            binding.textSelectedPlayers.text = if (isDoubles) {
+                buildDoublesSelectionText(selectedPlayers)
+            } else {
+                selectedPlayers.joinToString(", ") { formatPlayerSelectionLabel(it) }
+            }
             binding.textSelectedPlayers.visibility = View.VISIBLE
         } else {
             binding.textSelectedPlayers.visibility = View.GONE
@@ -252,7 +257,13 @@ class PlayerSelectionActivity : AppCompatActivity() {
     
     private fun updateRequiredPlayersText(isDoubles: Boolean) {
         binding.textGameType.text = if (isDoubles) {
-            getString(R.string.game_type_doubles)
+            buildString {
+                append(getString(R.string.game_type_doubles))
+                if (isMixedDoublesSelection(viewModel.getSelectedPlayersList())) {
+                    append(" • ")
+                    append(getString(R.string.match_type_mixed))
+                }
+            }
         } else {
             getString(R.string.game_type_singles)
         }
@@ -282,11 +293,13 @@ class PlayerSelectionActivity : AppCompatActivity() {
         val dialogContent = dialogView.findViewById<View>(R.id.dialogContent)
         val editUmpireName = dialogView.findViewById<TextInputEditText>(R.id.editUmpireName)
         val layoutMixedDoubles = dialogView.findViewById<View>(R.id.layoutMixedDoubles)
-        val switchMixedDoubles = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchMixedDoubles)
+        val textMixedStatus = dialogView.findViewById<android.widget.TextView>(R.id.textMixedStatus)
+        val textMixedDoublesSummary = dialogView.findViewById<android.widget.TextView>(R.id.textMixedDoublesSummary)
         val textManualStartTime = dialogView.findViewById<android.widget.TextView>(R.id.textManualStartTime)
         val buttonSelectManualDateTime = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.buttonSelectManualDateTime)
         val buttonClearManualDateTime = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.buttonClearManualDateTime)
         val isDoublesMatch = viewModel.isDoubles.value == true
+        val isMixedDoublesMatch = isDoublesMatch && isMixedDoublesSelection(selectedPlayers)
         var manualStartTime: Long? = null
         
         val dialog = AlertDialog.Builder(this)
@@ -308,6 +321,10 @@ class PlayerSelectionActivity : AppCompatActivity() {
         val layoutTbOnlyPoints = dialogView.findViewById<android.widget.LinearLayout>(R.id.layoutTbOnlyPoints)
         val toggleTbOnlyPoints = dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleTbOnlyPoints)
         layoutMixedDoubles.visibility = if (isDoublesMatch) View.VISIBLE else View.GONE
+        if (isDoublesMatch) {
+            textMixedStatus.text = if (isMixedDoublesMatch) getString(R.string.match_type_mixed) else getString(R.string.match_type_doubles)
+            textMixedDoublesSummary.text = buildDoublesTeamsPlainText(selectedPlayers)
+        }
 
         fun updateManualStartTimeLabel() {
             if (manualStartTime == null) {
@@ -423,7 +440,6 @@ class PlayerSelectionActivity : AppCompatActivity() {
                     selectedPlayers = selectedPlayers,
                     config = config,
                     umpireName = editUmpireName.text?.toString()?.trim().orEmpty(),
-                    isMixedDoubles = isDoublesMatch && switchMixedDoubles.isChecked,
                     manualStartTime = manualStartTime
                 )
             }
@@ -437,7 +453,6 @@ class PlayerSelectionActivity : AppCompatActivity() {
                     selectedPlayers = selectedPlayers,
                     config = config,
                     umpireName = editUmpireName.text?.toString()?.trim().orEmpty(),
-                    isMixedDoubles = isDoublesMatch && switchMixedDoubles.isChecked,
                     manualStartTime = manualStartTime
                 )
             }
@@ -471,10 +486,10 @@ class PlayerSelectionActivity : AppCompatActivity() {
         selectedPlayers: List<Player>,
         config: MatchConfig,
         umpireName: String = "",
-        isMixedDoubles: Boolean = false,
         manualStartTime: Long? = null
     ) {
         val isDoublesMatch = viewModel.isDoubles.value ?: false
+        val isMixedDoubles = isDoublesMatch && isMixedDoublesSelection(selectedPlayers)
         val playerNames = selectedPlayers.joinToString(", ") { it.getDisplayName() }
         AppLogger.navigate(
             "PlayerSelection",
@@ -487,8 +502,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
             // Debel - 4 graczy
             MatchState(
                 player1 = selectedPlayers[0],
-                player2 = selectedPlayers[1],
-                player3 = selectedPlayers[2],
+                player2 = selectedPlayers[2],
+                player3 = selectedPlayers[1],
                 player4 = selectedPlayers[3],
                 courtId = courtId,
                 courtName = courtName,
@@ -534,6 +549,93 @@ class PlayerSelectionActivity : AppCompatActivity() {
             }
         }
         startActivity(intent)
+    }
+
+    private fun isMixedDoublesSelection(selectedPlayers: List<Player>): Boolean {
+        if (selectedPlayers.size != 4) {
+            return false
+        }
+
+        val team1Genders = selectedPlayers.take(2)
+            .mapNotNull { normalizeGender(it.gender) }
+            .toSet()
+        val team2Genders = selectedPlayers.drop(2).take(2)
+            .mapNotNull { normalizeGender(it.gender) }
+            .toSet()
+
+        return team1Genders.size == 2 && team2Genders.size == 2
+    }
+
+    private fun normalizeGender(gender: String?): String? {
+        return gender?.trim()?.uppercase()?.takeIf { it == "M" || it == "F" }
+    }
+
+    private fun formatPlayerSelectionLabel(player: Player): String {
+        val genderLabel = player.getGenderShortLabel()
+        return if (genderLabel != null) "$genderLabel ${player.getFullName()}" else player.getFullName()
+    }
+
+    private fun buildDoublesTeamsPlainText(selectedPlayers: List<Player>): String {
+        val lines = mutableListOf<String>()
+        val team1 = selectedPlayers.take(2)
+        val team2 = selectedPlayers.drop(2).take(2)
+
+        if (team1.isNotEmpty()) {
+            lines += "• ${team1.joinToString(" / ") { formatPlayerSelectionLabel(it) }}"
+        }
+        if (team2.isNotEmpty()) {
+            lines += "• ${team2.joinToString(" / ") { formatPlayerSelectionLabel(it) }}"
+        }
+
+        return lines.joinToString("\n")
+    }
+
+    private fun buildDoublesSelectionText(selectedPlayers: List<Player>): CharSequence {
+        val builder = android.text.SpannableStringBuilder()
+
+        fun appendTeamLine(text: String, colorRes: Int) {
+            if (builder.isNotEmpty()) {
+                builder.append('\n')
+            }
+            val start = builder.length
+            builder.append(text)
+            builder.setSpan(
+                android.text.style.ForegroundColorSpan(ContextCompat.getColor(this, colorRes)),
+                start,
+                builder.length,
+                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            builder.setSpan(
+                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                start,
+                builder.length,
+                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        val team1 = selectedPlayers.take(2)
+        val team2 = selectedPlayers.drop(2).take(2)
+        if (team1.isNotEmpty()) {
+            appendTeamLine("• ${team1.joinToString(" / ") { formatPlayerSelectionLabel(it) }}", R.color.team1_color)
+        }
+        if (team2.isNotEmpty()) {
+            appendTeamLine("• ${team2.joinToString(" / ") { formatPlayerSelectionLabel(it) }}", R.color.team2_color)
+        }
+        if (isMixedDoublesSelection(selectedPlayers)) {
+            if (builder.isNotEmpty()) {
+                builder.append('\n')
+            }
+            val start = builder.length
+            builder.append(getString(R.string.match_type_mixed))
+            builder.setSpan(
+                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                start,
+                builder.length,
+                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        return builder
     }
     
     private fun filterPlayers(query: String) {

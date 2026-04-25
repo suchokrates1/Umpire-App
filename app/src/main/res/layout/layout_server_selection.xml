@@ -20,11 +20,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <!-- Duży przycisk zmiany stron - 40% wysokości -->
+    <!-- Duży przycisk zmiany stron nad wyborem serwującego -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonSwapSides"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/swap_sides"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -34,46 +34,82 @@
         app:iconSize="36dp"
         app:cornerRadius="16dp"
         app:layout_constraintTop_toBottomOf="@id/textTitle"
-        app:layout_constraintBottom_toTopOf="@id/buttonPlayer1Serves"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_weight="4"
-        app:layout_constraintVertical_chainStyle="spread"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"/>
 
-    <!-- Przycisk - Gracz 1 serwuje (30% wysokości) -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/buttonPlayer1Serves"
+    <LinearLayout
+        android:id="@+id/layoutServerChoices"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        tools:text="[Player 1]\nServes"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:cornerRadius="16dp"
-        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/buttonSwapSides"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/buttonPlayer2Serves"
-        app:layout_constraintVertical_weight="3"
-        app:layout_constraintWidth_percent="0.48"/>
-
-    <!-- Przycisk - Gracz 2 serwuje (30% wysokości) -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/buttonPlayer2Serves"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        tools:text="[Player 2]\nServes"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:cornerRadius="16dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintTop_toBottomOf="@id/buttonSwapSides"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/buttonPlayer1Serves"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_weight="3"
-        app:layout_constraintWidth_percent="0.48"/>
+        android:layout_marginTop="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonPlayer1Serves"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="8dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                tools:text="Player 1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonPlayer3Serves"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                tools:text="Player 3" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonPlayer2Serves"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="8dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                tools:text="Player 2" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonPlayer4Serves"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                tools:text="Player 4" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

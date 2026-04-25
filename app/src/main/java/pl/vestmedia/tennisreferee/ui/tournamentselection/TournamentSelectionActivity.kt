@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -52,6 +53,15 @@ class TournamentSelectionActivity : AppCompatActivity() {
 
         AppLogger.screen("TournamentSelection")
         supportActionBar?.title = getString(R.string.select_tournament)
+
+        onBackPressedDispatcher.addCallback(this) {
+            startActivity(
+                Intent(this@TournamentSelectionActivity, LanguageSelectionActivity::class.java).apply {
+                    putExtra(LanguageSelectionActivity.EXTRA_FORCE_SELECTION, true)
+                }
+            )
+            finish()
+        }
 
         setupRecyclerView()
         binding.buttonRefresh.setOnClickListener {

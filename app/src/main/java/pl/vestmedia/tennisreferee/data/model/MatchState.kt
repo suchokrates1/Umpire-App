@@ -135,6 +135,34 @@ data class MatchState(
         }
     }
 
+    fun getTeam1ServerAwareDisplayName(): String {
+        return formatTeamDisplay(player1, player3, currentServer == 1, currentServer == 3)
+    }
+
+    fun getTeam2ServerAwareDisplayName(): String {
+        return formatTeamDisplay(player2, player4, currentServer == 2, currentServer == 4)
+    }
+
+    private fun formatTeamDisplay(
+        primaryPlayer: Player,
+        partnerPlayer: Player?,
+        isPrimaryServer: Boolean,
+        isPartnerServer: Boolean
+    ): String {
+        if (partnerPlayer == null) {
+            return markServer(primaryPlayer.getDisplayName(), isPrimaryServer)
+        }
+
+        return listOf(
+            markServer(primaryPlayer.getDisplayName(), isPrimaryServer),
+            markServer(partnerPlayer.getDisplayName(), isPartnerServer)
+        ).joinToString(" / ")
+    }
+
+    private fun markServer(name: String, isServer: Boolean): String {
+        return if (isServer) "🎾 $name" else name
+    }
+
     /**
      * Zwraca etykietę typu meczu do wyświetlenia w UI.
      */

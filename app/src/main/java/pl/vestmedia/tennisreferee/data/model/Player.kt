@@ -31,6 +31,9 @@ data class Player(
     @SerializedName(value = "group", alternate = ["category"])
     val group: String? = null,
 
+    @SerializedName("gender")
+    val gender: String? = null,
+
     @SerializedName("list")
     val list: String? = null
 ) : Parcelable {
@@ -47,5 +50,13 @@ data class Player(
     fun getFullName(): String {
         val full = "$firstName $lastName".trim()
         return full.ifEmpty { name }
+    }
+
+    fun getGenderShortLabel(): String? {
+        return when (gender?.trim()?.uppercase()) {
+            "F" -> "K"
+            "M" -> "M"
+            else -> null
+        }
     }
 }

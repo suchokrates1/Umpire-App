@@ -118,6 +118,8 @@
     <string name="scoreboard_points">Points</string>
     <string name="scoreboard_set1">Set 1</string>
     <string name="scoreboard_set2">Set 2</string>
+    <string name="scoreboard_set_score">%1$d%2$s</string>
+    <string name="scoreboard_tiebreak_suffix">(%1$d)</string>
     <string name="zero_score">0</string>
     <string name="player_name">Name</string>
     <string name="points">Points</string>
@@ -144,6 +146,7 @@
     <string name="forced_errors_stat">Forced Errors</string>
     <string name="unforced_errors_stat">Unforced Errors</string>
     <string name="first_serve_pct">1st Serve %</string>
+    <string name="percentage_value">%1$d%%</string>
     <string name="new_match_button">New Match</string>
     <string name="player_serves_short">Serves</string>
     <string name="match_metadata_umpire">Umpire: %1$s</string>

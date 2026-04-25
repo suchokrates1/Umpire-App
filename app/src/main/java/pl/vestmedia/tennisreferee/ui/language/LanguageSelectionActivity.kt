@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.LocaleListCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +28,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
     companion object {
         private const val PREFS_NAME = "TennisRefereePrefs"
         private const val KEY_LANGUAGE = "selected_language"
+        const val EXTRA_FORCE_SELECTION = "force_language_selection"
         
         fun getSelectedLanguage(context: Context): String {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -38,10 +41,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
             
             val locale = Locale(languageCode)
             Locale.setDefault(locale)
-            
-            val config = Configuration(context.resources.configuration)
-            config.setLocale(locale)
-            context.resources.updateConfiguration(config, context.resources.displayMetrics)
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageCode))
         }
         
         fun hasLanguageSelected(context: Context): Boolean {
@@ -53,7 +53,8 @@ class LanguageSelectionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (hasLanguageSelected(this)) {
+        val forceSelection = intent.getBooleanExtra(EXTRA_FORCE_SELECTION, false)
+        if (!forceSelection && hasLanguageSelected(this)) {
             setLanguage(this, getSelectedLanguage(this))
             startActivity(Intent(this, TournamentSelectionActivity::class.java))
             finish()

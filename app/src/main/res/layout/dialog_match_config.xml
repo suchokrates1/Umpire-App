@@ -67,6 +67,7 @@
                 android:textColor="?attr/colorPrimaryVariant"/>
 
             <TextView
+                android:id="@+id/textMixedDoublesSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -76,11 +77,12 @@
 
         </LinearLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchMixedDoubles"
+        <TextView
+            android:id="@+id/textMixedStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:trackTintMode="src_in"/>
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"/>
 
     </LinearLayout>
 
