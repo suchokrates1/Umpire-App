@@ -578,40 +578,45 @@ class UmpireTournamentE2ETest {
 
         fun createTournamentFixture(marker: String): TournamentFixture {
             val today = LocalDate.now()
-            val tournament = postJson(
-                "/admin/api/tournaments",
-                JSONObject()
-                    .put("name", "$marker Android Emulator Open")
-                    .put("start_date", today.toString())
-                    .put("end_date", today.plusDays(1).toString())
-                    .put("active", false)
-                    .put("city", "E2E")
-                    .put("country", "PL")
-                    .put("court_count", 8)
-            )
-            val tournamentId = tournament.getInt("id")
-            val players = createPlayers(marker, tournamentId)
-            putJson(
-                "/admin/api/tournaments/$tournamentId/bracket/groups",
-                JSONObject().put(
-                    "groups",
-                    JSONArray()
-                        .put(JSONObject().put("name", "Group A").put("players", JSONArray(listOf(players[0].id, players[1].id, players[2].id, players[3].id))))
-                        .put(JSONObject().put("name", "Group B").put("players", JSONArray(listOf(players[4].id, players[5].id, players[6].id, players[7].id))))
+            try {
+                val tournament = postJson(
+                    "/admin/api/tournaments",
+                    JSONObject()
+                        .put("name", "$marker Android Emulator Open")
+                        .put("start_date", today.toString())
+                        .put("end_date", today.plusDays(1).toString())
+                        .put("active", true)
+                        .put("city", "E2E")
+                        .put("country", "PL")
+                        .put("court_count", 8)
                 )
-            )
-            putJson(
-                "/admin/api/tournaments/$tournamentId/bracket/knockout",
-                JSONObject().put(
-                    "knockout",
-                    JSONArray()
-                        .put(JSONObject().put("phase", "semifinal").put("position", 1).put("player1_name", players[0].fullName).put("player2_name", players[4].fullName))
-                        .put(JSONObject().put("phase", "semifinal").put("position", 2).put("player1_name", players[1].fullName).put("player2_name", players[5].fullName))
-                        .put(JSONObject().put("phase", "final").put("position", 1))
-                        .put(JSONObject().put("phase", "third_place").put("position", 1))
+                val tournamentId = tournament.getInt("id")
+                val players = createPlayers(marker, tournamentId)
+                putJson(
+                    "/admin/api/tournaments/$tournamentId/bracket/groups",
+                    JSONObject().put(
+                        "groups",
+                        JSONArray()
+                            .put(JSONObject().put("name", "Group A").put("players", JSONArray(listOf(players[0].id, players[1].id, players[2].id, players[3].id))))
+                            .put(JSONObject().put("name", "Group B").put("players", JSONArray(listOf(players[4].id, players[5].id, players[6].id, players[7].id))))
+                    )
                 )
-            )
-            return TournamentFixture(marker, tournamentId, players)
+                putJson(
+                    "/admin/api/tournaments/$tournamentId/bracket/knockout",
+                    JSONObject().put(
+                        "knockout",
+                        JSONArray()
+                            .put(JSONObject().put("phase", "semifinal").put("position", 1).put("player1_name", players[0].fullName).put("player2_name", players[4].fullName))
+                            .put(JSONObject().put("phase", "semifinal").put("position", 2).put("player1_name", players[1].fullName).put("player2_name", players[5].fullName))
+                            .put(JSONObject().put("phase", "final").put("position", 1))
+                            .put(JSONObject().put("phase", "third_place").put("position", 1))
+                    )
+                )
+                return TournamentFixture(marker, tournamentId, players)
+            } catch (error: Throwable) {
+                cleanup(marker)
+                throw error
+            }
         }
 
         fun cleanup(marker: String) {
