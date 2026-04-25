@@ -7,6 +7,10 @@
     <string name="language_selected">Język wybrany</string>
     
     <!-- Court Selection -->
+    <string name="select_tournament">Wybierz turniej</string>
+    <string name="change_tournament">Zmień turniej</string>
+    <string name="no_tournaments_available">Brak aktywnych turniejów</string>
+    <string name="error_loading_tournaments">Błąd wczytywania turniejów</string>
     <string name="select_court">Wybierz kort</string>
     <string name="refresh">Odśwież</string>
     <string name="no_courts_available">Brak dostępnych kortów</string>
@@ -20,7 +24,7 @@
     <string name="stats_mode_basic_desc">Uproszczone punktowanie: tylko przyciski Win i Fault.\nŚledzi: podwójne błędy.</string>
     <string name="stats_mode_basic_short">WIN + FAULT\nSzybko i prosto</string>
     <string name="stats_mode_advanced">Zaawansowany</string>
-    <string name="stats_mode_advanced_desc">Pełne punktowanie: As, Błąd, Piłka w grze, Wygrany, Wymuszony błąd, Niewymuszony błąd.\nŚledzi: asy, podwójne błędy, zagrania wygrywające, błędy wymuszone/niewymuszone, % serwisu.</string>
+    <string name="stats_mode_advanced_desc">Pełne punktowanie: As, Błąd, Piłka w grze, Wygrany, Wymuszony błąd, Niewymuszony błąd.\nŚledzi: asy, podwójne błędy, zagrania wygrywające, błędy wymuszone/niewymuszone, %% serwisu.</string>
     <string name="stats_mode_advanced_short">As, Winner, Błędy…\nPełne statystyki</string>
     
     <!-- Match Configuration Dialog -->
@@ -136,6 +140,10 @@
     <string name="aces">Asy</string>
     <string name="double_faults">Podwójne błędy</string>
     <string name="player_serves_short">Serwuje</string>
+    <string name="match_metadata_umpire">Sędzia: %1$s</string>
+    <string name="match_type_mixed">Mikst</string>
+    <string name="match_type_doubles">Debel</string>
+    <string name="match_type_singles">Singiel</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Błąd wczytywania kortów</string>

@@ -7,6 +7,10 @@
     <string name="language_selected">Sprache ausgewählt</string>
     
     <!-- Court Selection -->
+    <string name="select_tournament">Turnier auswählen</string>
+    <string name="change_tournament">Turnier wechseln</string>
+    <string name="no_tournaments_available">Keine aktiven Turniere verfügbar</string>
+    <string name="error_loading_tournaments">Fehler beim Laden der Turniere</string>
     <string name="select_court">Platz auswählen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="no_courts_available">Keine Plätze verfügbar</string>
@@ -71,6 +75,8 @@
     <string name="finish">Beenden</string>
     <string name="finish_match">Spiel beenden</string>
     <string name="new_match">Neues Spiel</string>
+    <string name="next_match_same_setup">▶ Nächstes Spiel (gleiche Einstellungen)</string>
+    <string name="next_match_new_setup">⚙ Neues Spiel (andere Einstellungen)</string>
     <string name="match_config_title">Match-Konfiguration</string>
     <string name="match_config_umpire_hint">Name oder Kürzel des Schiedsrichters</string>
     <string name="match_config_mixed_title">Mixed</string>
@@ -150,8 +156,10 @@
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Statistikmodus</string>
     <string name="stats_mode_basic">Einfach</string>
+    <string name="stats_mode_basic_desc">Vereinfachte Wertung: nur Win- und Fehler-Tasten.\nErfasst: Doppelfehler.</string>
     <string name="stats_mode_basic_short">WIN + FAULT\nSchnell &amp; einfach</string>
     <string name="stats_mode_advanced">Erweitert</string>
+    <string name="stats_mode_advanced_desc">Volle Wertung: Ass, Fehler, Ball im Spiel, Winner, erzwungener Fehler, unerzwungener Fehler.\nErfasst: Asse, Doppelfehler, Winner, erzwungene/unerzwungene Fehler, Aufschlag %%.</string>
     <string name="stats_mode_advanced_short">Ass, Winner, Fehler…\nVolle Statistiken</string>
     <string name="win_point">WIN</string>
     <string name="no_advantage_mode">Ohne Vorteil (Entscheidungspunkt)</string>

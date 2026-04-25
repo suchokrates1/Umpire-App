@@ -7,6 +7,10 @@
     <string name="language_selected">Lingua selezionata</string>
     
     <!-- Court Selection -->
+    <string name="select_tournament">Seleziona torneo</string>
+    <string name="change_tournament">Cambia torneo</string>
+    <string name="no_tournaments_available">Nessun torneo attivo disponibile</string>
+    <string name="error_loading_tournaments">Errore nel caricamento dei tornei</string>
     <string name="select_court">Seleziona campo</string>
     <string name="refresh">Aggiorna</string>
     <string name="no_courts_available">Nessun campo disponibile</string>
@@ -71,6 +75,8 @@
     <string name="finish">Fine</string>
     <string name="finish_match">Termina partita</string>
     <string name="new_match">Nuova partita</string>
+    <string name="next_match_same_setup">▶ Prossima partita (stessa configurazione)</string>
+    <string name="next_match_new_setup">⚙ Nuova partita (altra configurazione)</string>
     
     <!-- Scoreboard -->
     <string name="scoreboard_player">Giocatore</string>
@@ -127,8 +133,10 @@
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Modalità statistiche</string>
     <string name="stats_mode_basic">Base</string>
+    <string name="stats_mode_basic_desc">Punteggio semplificato: solo pulsanti Win e Fallo.\nTiene traccia: doppi falli.</string>
     <string name="stats_mode_basic_short">WIN + FALLO\nVeloce e semplice</string>
     <string name="stats_mode_advanced">Avanzata</string>
+    <string name="stats_mode_advanced_desc">Punteggio completo: Ace, Fallo, Palla in gioco, Vincente, Errore forzato, Errore non forzato.\nTiene traccia: ace, doppi falli, vincenti, errori forzati/non forzati, %% di servizio.</string>
     <string name="stats_mode_advanced_short">Ace, Vincente, Errori…\nStatistiche complete</string>
         <string name="match_config_title">Configurazione partita</string>
             <string name="match_config_umpire_hint">Nome o iniziali arbitro</string>
@@ -194,6 +202,10 @@
     <string name="unforced_errors_stat">Errori non forzati</string>
     <string name="first_serve_pct">1° servizio %</string>
     <string name="new_match_button">Nuova partita</string>
+    <string name="match_metadata_umpire">Arbitro: %1$s</string>
+    <string name="match_type_mixed">Misto</string>
+    <string name="match_type_doubles">Doppio</string>
+    <string name="match_type_singles">Singolo</string>
     <string name="confirm_exit_title">Lasciare la partita?</string>
     <string name="confirm_exit_message">La partita è ancora in corso. Sei sicuro di voler uscire?</string>
 

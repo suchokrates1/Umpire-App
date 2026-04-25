@@ -145,7 +145,7 @@ class PlayerSelectionViewModel : ViewModel() {
             val result = repository.addPlayer(firstName, lastName, flagCode, category, courtId, courtPin)
             result.onSuccess { newPlayer ->
                 // Odśwież listę zawodników
-                val playersResult = repository.getPlayers(currentCourtId)
+                val playersResult = repository.getPlayers(currentCourtId, forceRefresh = true)
                 playersResult.onSuccess { playersList ->
                     _players.value = playersList
                     

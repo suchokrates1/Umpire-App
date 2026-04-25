@@ -30,7 +30,7 @@ abstract class TennisDatabase : RoomDatabase() {
                     TennisDatabase::class.java,
                     "tennis_referee_database"
                 )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
                 INSTANCE = instance
                 instance

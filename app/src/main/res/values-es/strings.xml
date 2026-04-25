@@ -7,6 +7,10 @@
     <string name="language_selected">Idioma seleccionado</string>
     
     <!-- Court Selection -->
+    <string name="select_tournament">Seleccionar torneo</string>
+    <string name="change_tournament">Cambiar torneo</string>
+    <string name="no_tournaments_available">No hay torneos activos disponibles</string>
+    <string name="error_loading_tournaments">Error al cargar torneos</string>
     <string name="select_court">Seleccionar cancha</string>
     <string name="refresh">Actualizar</string>
     <string name="no_courts_available">No hay canchas disponibles</string>
@@ -71,6 +75,8 @@
     <string name="finish">Finalizar</string>
     <string name="finish_match">Finalizar partido</string>
     <string name="new_match">Nuevo partido</string>
+    <string name="next_match_same_setup">▶ Siguiente partido (misma configuración)</string>
+    <string name="next_match_new_setup">⚙ Nuevo partido (otra configuración)</string>
 
         <!-- Match Configuration Dialog -->
         <string name="match_config_title">Configuración del partido</string>
@@ -98,7 +104,7 @@
     <string name="stats_mode_basic_desc">Puntuación simplificada: solo botones Win y Falta.\nRegistra: dobles faltas.</string>
     <string name="stats_mode_basic_short">WIN + FALTA\nRápido y simple</string>
     <string name="stats_mode_advanced">Avanzado</string>
-    <string name="stats_mode_advanced_desc">Puntuación completa: Ace, Falta, Pelota en juego, Ganador, Error forzado, Error no forzado.\nRegistra: aces, dobles faltas, ganadores, errores forzados/no forzados, % de saque.</string>
+    <string name="stats_mode_advanced_desc">Puntuación completa: Ace, Falta, Pelota en juego, Ganador, Error forzado, Error no forzado.\nRegistra: aces, dobles faltas, ganadores, errores forzados/no forzados, %% de saque.</string>
     <string name="stats_mode_advanced_short">Ace, Ganador, Errores…\nEstadísticas completas</string>
     <string name="win_point">WIN</string>
     <string name="no_advantage_mode">Sin ventaja (Punto decisivo)</string>
@@ -139,6 +145,10 @@
     <string name="first_serve_pct">1er saque %</string>
     <string name="new_match_button">Nuevo partido</string>
     <string name="player_serves_short">Saca</string>
+    <string name="match_metadata_umpire">Árbitro: %1$s</string>
+    <string name="match_type_mixed">Mixto</string>
+    <string name="match_type_doubles">Dobles</string>
+    <string name="match_type_singles">Individual</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Error al cargar las canchas</string>

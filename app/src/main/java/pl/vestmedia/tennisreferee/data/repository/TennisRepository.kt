@@ -7,6 +7,7 @@ import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.CourtPinRequest
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
 import pl.vestmedia.tennisreferee.data.model.TournamentOption
+import retrofit2.Response
 
 /**
  * Repository obsługujące operacje na kortach i meczach
@@ -14,140 +15,79 @@ import pl.vestmedia.tennisreferee.data.model.TournamentOption
 class TennisRepository {
     
     private val apiService = RetrofitClient.apiService
+    private val playersCache = mutableMapOf<String?, List<Player>>()
     
     /**
      * Pobiera listę dostępnych kortów
      */
     suspend fun getCourts(tournamentId: Int? = null): Result<List<Court>> {
-        return try {
-            val response = apiService.getCourts(tournamentId)
-            if (response.isSuccessful) {
-                val courts = response.body()?.courts ?: emptyList()
-                Result.success(courts)
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return request { apiService.getCourts(tournamentId) }
+            .map { it.courts }
     }
 
     /**
      * Pobiera listę aktywnych turniejów
      */
     suspend fun getActiveTournaments(): Result<List<TournamentOption>> {
-        return try {
-            val response = apiService.getActiveTournaments()
-            if (response.isSuccessful) {
-                Result.success(response.body() ?: emptyList())
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return request { apiService.getActiveTournaments() }
     }
     
     /**
      * Pobiera listę zawodników
      */
-    suspend fun getPlayers(courtId: String? = null): Result<List<Player>> {
-        return try {
-            val response = apiService.getPlayers(courtId)
-            if (response.isSuccessful) {
-                val players = response.body()?.players ?: emptyList()
-                Result.success(players)
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+    suspend fun getPlayers(courtId: String? = null, forceRefresh: Boolean = false): Result<List<Player>> {
+        if (!forceRefresh) {
+            playersCache[courtId]?.let { return Result.success(it) }
         }
+
+        return request { apiService.getPlayers(courtId) }
+            .map { it.players }
+            .onSuccess { playersCache[courtId] = it }
     }
     
     /**
      * Weryfikuje PIN dla kortu
      */
     suspend fun verifyCourtPin(courtId: String, pin: String): Result<CourtAuthResponse> {
-        return try {
-            val response = apiService.verifyCourtPin(courtId, CourtPinRequest(pin))
-            if (response.isSuccessful && response.body() != null) {
-                val authResponse = response.body()!!
+        return request { apiService.verifyCourtPin(courtId, CourtPinRequest(pin)) }
+            .fold(
+                onSuccess = { authResponse ->
                 if (authResponse.authorized) {
                     Result.success(authResponse)
                 } else {
                     Result.failure(Exception(authResponse.error ?: "Authorization failed"))
                 }
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+                },
+                onFailure = { Result.failure(it) }
+            )
     }
     
     /**
      * Pobiera szczegóły meczu
      */
     suspend fun getMatch(matchId: Int): Result<Match> {
-        return try {
-            val response = apiService.getMatch(matchId)
-            if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return request { apiService.getMatch(matchId) }
     }
     
     /**
      * Tworzy nowy mecz
      */
     suspend fun createMatch(match: Match): Result<Match> {
-        return try {
-            val response = apiService.createMatch(match)
-            if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return request { apiService.createMatch(match) }
     }
     
     /**
      * Aktualizuje wynik meczu
      */
     suspend fun updateMatch(matchId: Int, match: Match): Result<Match> {
-        return try {
-            val response = apiService.updateMatch(matchId, match)
-            if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return request { apiService.updateMatch(matchId, match) }
     }
     
     /**
      * Kończy mecz
      */
     suspend fun finishMatch(matchId: Int): Result<Match> {
-        return try {
-            val response = apiService.finishMatch(matchId)
-            if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return request { apiService.finishMatch(matchId) }
     }
     
     /**
@@ -170,19 +110,41 @@ class TennisRepository {
                 playerRequest["pin"] = courtPin
             }
             
-            val response = apiService.addPlayer(playerRequest)
-            if (response.isSuccessful && response.body() != null) {
-                val addPlayerResponse = response.body()!!
-                if (addPlayerResponse.ok && addPlayerResponse.player != null) {
-                    Result.success(addPlayerResponse.player)
+            request { apiService.addPlayer(playerRequest) }.fold(
+                onSuccess = { addPlayerResponse ->
+                    if (addPlayerResponse.ok && addPlayerResponse.player != null) {
+                        playersCache.clear()
+                        Result.success(addPlayerResponse.player)
+                    } else {
+                        Result.failure(Exception(addPlayerResponse.error ?: "Error adding player"))
+                    }
+                },
+                onFailure = { Result.failure(it) }
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private suspend fun <T> request(call: suspend () -> Response<T>): Result<T> {
+        return try {
+            val response = call()
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Result.success(body)
                 } else {
-                    Result.failure(Exception(addPlayerResponse.error ?: "Error adding player"))
+                    Result.failure(Exception("Empty response body"))
                 }
             } else {
-                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
+                Result.failure(Exception(response.toErrorMessage()))
             }
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    private fun Response<*>.toErrorMessage(): String {
+        return "Error: ${code()} - ${message()}"
     }
 }
