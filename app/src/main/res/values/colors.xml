@@ -20,8 +20,11 @@
     <!-- Player colors -->
     <color name="player_selected">#C8E6C9</color>
     <color name="player_unselected">#FFFFFF</color>
-    <color name="team1_color">#BBDEFB</color>
-    <color name="team2_color">#FFCCBC</color>
+    <color name="team1_color">#2F6FD6</color>
+    <color name="team2_color">#BF5B2C</color>
+    <color name="team1_tint_color">#1F2F6FD6</color>
+    <color name="team2_tint_color">#1FBF5B2C</color>
+    <color name="team_button_text_color">#FFFFFFFF</color>
     
     <!-- Score colors -->
     <color name="score_background">#212121</color>

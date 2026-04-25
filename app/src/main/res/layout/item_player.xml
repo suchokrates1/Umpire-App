@@ -19,6 +19,16 @@
         android:padding="12dp"
         android:background="@android:color/transparent">
 
+        <View
+            android:id="@+id/viewSelectionStripe"
+            android:layout_width="6dp"
+            android:layout_height="0dp"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- Country Flag -->
         <TextView
             android:id="@+id/textPlayerCountry"
@@ -27,7 +37,8 @@
             android:textSize="32sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/viewSelectionStripe"
+            android:layout_marginStart="8dp"
             tools:text="🇵🇱"/>
 
         <!-- Player Name -->
@@ -42,8 +53,28 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/textPlayerCountry"
-            app:layout_constraintEnd_toStartOf="@id/textPlayerRanking"
+            app:layout_constraintEnd_toStartOf="@id/textPlayerGender"
             tools:text="Jan Kowalski"/>
+
+        <TextView
+            android:id="@+id/textPlayerGender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/dialog_rounded_bg"
+            android:paddingStart="8dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="2dp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/textPlayerRanking"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="K"
+            tools:visibility="visible" />
 
         <!-- Player Group/Ranking -->
         <TextView

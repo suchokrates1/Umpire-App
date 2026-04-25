@@ -96,9 +96,18 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Ustawia który gracz serwuje pierwszy
      */
-    fun setFirstServer(isPlayer1: Boolean) {
+    fun setFirstServer(serverNumber: Int) {
         _matchState.value?.let { state ->
-            state.isPlayer1Serving = isPlayer1
+            state.currentServer = when {
+                state.isDoubles -> serverNumber.coerceIn(1, 4)
+                serverNumber == 2 -> 2
+                else -> 1
+            }
+            state.isPlayer1Serving = if (state.isDoubles) {
+                state.currentServer == 1 || state.currentServer == 3
+            } else {
+                state.currentServer == 1
+            }
             state.matchStartTime = state.manualStartTime ?: System.currentTimeMillis()
             _matchState.value = state
             
@@ -228,7 +237,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleAce() {
         _matchState.value?.let { state ->
-            val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+            val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
             saveStateBeforeAction(ActionType.ACE, str(R.string.undo_ace, serverName))
             
             if (state.isPlayer1Serving) {
@@ -266,7 +275,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 _matchState.value = state
             } else {
                 // Podwójny błąd
-                val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
                 saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
                 
                 if (state.isPlayer1Serving) {
@@ -302,7 +311,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 state.isFirstServe = false
                 _matchState.value = state
             } else {
-                val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
                 saveStateBeforeAction(ActionType.FOOT_FAULT, str(R.string.undo_foot_fault_double, serverName))
                 
                 if (state.isPlayer1Serving) {
@@ -472,7 +481,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 _matchState.value = state
             } else {
                 // Podwójny błąd
-                val serverName = if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
                 saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
                 
                 if (state.isPlayer1Serving) {
@@ -776,18 +785,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     val event = MatchEvent(
                         courtId = state.courtId,
                         eventType = "match_end",
-                        player1 = PlayerInfo(
-                            name = state.player1.getDisplayName(),
-                            fullName = state.player1.getFullName(),
-                            flag = state.player1.flag,
-                            isServing = state.isPlayer1Serving
-                        ),
-                        player2 = PlayerInfo(
-                            name = state.player2.getDisplayName(),
-                            fullName = state.player2.getFullName(),
-                            flag = state.player2.flag,
-                            isServing = !state.isPlayer1Serving
-                        ),
+                        player1 = buildSidePlayerInfo(state, isPlayer1Side = true),
+                        player2 = buildSidePlayerInfo(state, isPlayer1Side = false),
                         score = ScoreInfo(
                             player1Sets = state.player1Sets,
                             player2Sets = state.player2Sets,
@@ -865,18 +864,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 val event = MatchEvent(
                     courtId = state.courtId,
                     eventType = eventType,
-                    player1 = PlayerInfo(
-                        name = state.player1.getDisplayName(),
-                        fullName = state.player1.getFullName(),
-                        flag = state.player1.flag,
-                        isServing = state.isPlayer1Serving
-                    ),
-                    player2 = PlayerInfo(
-                        name = state.player2.getDisplayName(),
-                        fullName = state.player2.getFullName(),
-                        flag = state.player2.flag,
-                        isServing = !state.isPlayer1Serving
-                    ),
+                    player1 = buildSidePlayerInfo(state, isPlayer1Side = true),
+                    player2 = buildSidePlayerInfo(state, isPlayer1Side = false),
                     score = ScoreInfo(
                         player1Sets = state.player1Sets,
                         player2Sets = state.player2Sets,
@@ -915,6 +904,30 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 // Nie przerywamy działania aplikacji przy błędzie logowania
             }
         }
+    }
+
+    private fun buildSidePlayerInfo(state: MatchState, isPlayer1Side: Boolean): PlayerInfo {
+        val player = if (isPlayer1Side) state.player1 else state.player2
+        val serving = if (isPlayer1Side) state.isPlayer1Serving else !state.isPlayer1Serving
+
+        if (!state.isDoubles) {
+            return PlayerInfo(
+                name = player.getDisplayName(),
+                fullName = player.getFullName(),
+                flag = player.flag,
+                isServing = serving
+            )
+        }
+
+        val displayName = if (isPlayer1Side) state.getTeam1DisplayName() else state.getTeam2DisplayName()
+        val fullName = if (isPlayer1Side) state.getTeam1FullName() else state.getTeam2FullName()
+
+        return PlayerInfo(
+            name = displayName,
+            fullName = fullName,
+            flag = player.flag,
+            isServing = serving
+        )
     }
     
     /**

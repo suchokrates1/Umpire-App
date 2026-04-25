@@ -15,6 +15,11 @@
     <!-- Player colors for dark mode -->
     <color name="player_selected">#1B5E20</color>
     <color name="player_unselected">#2C2C2C</color>
+    <color name="team1_color">#4B8FFF</color>
+    <color name="team2_color">#C7652B</color>
+    <color name="team1_tint_color">#264B8FFF</color>
+    <color name="team2_tint_color">#26C7652B</color>
+    <color name="team_button_text_color">#FFFFFFFF</color>
     
     <!-- Score colors for dark mode -->
     <color name="score_background">#1E1E1E</color>

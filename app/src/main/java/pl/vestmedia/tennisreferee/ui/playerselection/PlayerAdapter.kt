@@ -42,7 +42,12 @@ class PlayerAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         
         fun bind(player: Player) {
+            val context = binding.root.context
+            val transparent = ContextCompat.getColor(context, android.R.color.transparent)
+
             binding.textPlayerName.text = player.getFullName()
+            binding.textPlayerGender.text = player.getGenderShortLabel().orEmpty()
+            binding.textPlayerGender.visibility = if (player.getGenderShortLabel() != null) android.view.View.VISIBLE else android.view.View.GONE
             
             // Pokaż grupę jeśli dostępna
             if (player.group != null) {
@@ -64,15 +69,26 @@ class PlayerAdapter(
             val doubles = isDoublesMode()
             
             if (isSelected) {
-                // Określ kolor drużyny w trybie debla
-                val backgroundColor = when {
-                    doubles && selectionIndex < 2 -> R.color.team1_color  // Drużyna 1 (gracze 0,1)
-                    doubles && selectionIndex >= 2 -> R.color.team2_color // Drużyna 2 (gracze 2,3)
-                    else -> R.color.player_selected // Singles lub brak info
+                val accentColorRes = when {
+                    doubles && selectionIndex < 2 -> R.color.team1_color
+                    doubles && selectionIndex >= 2 -> R.color.team2_color
+                    else -> R.color.primary
                 }
-                
-                binding.containerPlayer.setBackgroundColor(
-                    ContextCompat.getColor(binding.root.context, backgroundColor)
+                val backgroundColorRes = when {
+                    doubles && selectionIndex < 2 -> R.color.team1_tint_color
+                    doubles && selectionIndex >= 2 -> R.color.team2_tint_color
+                    else -> R.color.player_selected
+                }
+
+                binding.cardPlayer.setCardBackgroundColor(
+                    ContextCompat.getColor(context, backgroundColorRes)
+                )
+                binding.cardPlayer.strokeColor = ContextCompat.getColor(context, accentColorRes)
+                binding.cardPlayer.strokeWidth = if (doubles) 2 else 0
+                binding.containerPlayer.setBackgroundColor(transparent)
+                binding.viewSelectionStripe.visibility = android.view.View.VISIBLE
+                binding.viewSelectionStripe.setBackgroundColor(
+                    ContextCompat.getColor(context, accentColorRes)
                 )
                 
                 // Lekkie powiększenie
@@ -80,9 +96,13 @@ class PlayerAdapter(
                 binding.cardPlayer.scaleY = 1.05f
                 binding.cardPlayer.cardElevation = 8f
             } else {
-                binding.containerPlayer.setBackgroundColor(
-                    ContextCompat.getColor(binding.root.context, android.R.color.transparent)
+                binding.cardPlayer.setCardBackgroundColor(
+                    ContextCompat.getColor(context, R.color.card_background)
                 )
+                binding.cardPlayer.strokeColor = transparent
+                binding.cardPlayer.strokeWidth = 0
+                binding.containerPlayer.setBackgroundColor(transparent)
+                binding.viewSelectionStripe.visibility = android.view.View.GONE
                 
                 // Normalna wielkość
                 binding.cardPlayer.scaleX = 1.0f
