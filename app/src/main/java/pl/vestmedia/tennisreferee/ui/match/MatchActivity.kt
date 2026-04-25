@@ -86,6 +86,8 @@ class MatchActivity : AppCompatActivity() {
         matchFinishedBinding = LayoutMatchFinishedBinding.bind(binding.layoutMatchFinished.root)
         announcementBinding = LayoutAnnouncementBinding.bind(binding.layoutAnnouncement.root)
         
+        intent.extras?.classLoader = MatchState::class.java.classLoader
+
         // Pobierz stan meczu z Intent
         val matchState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(EXTRA_MATCH_STATE, MatchState::class.java)

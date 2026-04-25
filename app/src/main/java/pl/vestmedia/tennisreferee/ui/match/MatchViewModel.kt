@@ -561,7 +561,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 
                 // Zmiana stron co 6 punktów
-                if (totalPoints > 0 && totalPoints % 6 == 0) {
+                if (totalPoints > 0 && totalPoints % 6 == 0 && !state.isGameWon()) {
                     state.sidesSwapped = !state.sidesSwapped
                     logMatchEvent("side_change")
                     pendingAnnouncementType = "side_change"
@@ -782,14 +782,26 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private fun finalizeMatchOnServer(state: MatchState) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // 1. Wyślij aktualny stan meczu z sets_history (PUT /matches/{id})
-                state.matchId?.let { matchId ->
-                    try {
-                        val match = state.toMatch()
-                        requestWithRetry("sync final state") { apiService.updateMatch(matchId, match) }
-                    } catch (e: Exception) {
-                        AppLogger.error("finalizeMatch", "sync final state: ${e.message}")
+                // 1. Upewnij się, że krótki mecz (np. sam TB) istnieje na serwerze, a potem wyślij finalny stan.
+                try {
+                    val match = state.toMatch()
+                    if (state.matchId == null) {
+                        val response = requestWithRetry("create final match") { apiService.createMatch(match) }
+                        if (response.isSuccessful && response.body() != null) {
+                            state.matchId = response.body()!!.id
+                            AppLogger.api("createFinalMatch", "OK id=${state.matchId}")
+                        }
                     }
+
+                    state.matchId?.let { matchId ->
+                        requestWithRetry("sync final state") { apiService.updateMatch(matchId, state.toMatch()) }
+                    }
+                } catch (e: Exception) {
+                    AppLogger.error("finalizeMatch", "sync final state: ${e.message}")
+                }
+
+                if (state.matchId == null) {
+                    AppLogger.error("finalizeMatch", "match id missing after final sync")
                 }
 
                 // 2. Wyślij event match_end (POST /match-events) z pełnym sets_history
