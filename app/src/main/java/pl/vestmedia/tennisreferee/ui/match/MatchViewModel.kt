@@ -9,17 +9,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.*
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import retrofit2.Response
 
 /**
  * ViewModel zarządzający logiką meczu tenisowego
  */
 class MatchViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        private const val MAX_UNDO_HISTORY = 100
+    }
+
     
     private val _matchState = MutableLiveData<MatchState>()
     val matchState: LiveData<MatchState> = _matchState
@@ -35,6 +41,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     
     private val _bracketWarning = MutableLiveData<BracketWarningEvent?>()
     val bracketWarning: LiveData<BracketWarningEvent?> = _bracketWarning
+
+    private val _syncStatus = MutableLiveData<SyncStatus>(SyncStatus.IDLE)
+    val syncStatus: LiveData<SyncStatus> = _syncStatus
     
     data class BracketWarningEvent(val type: String, val matchId: Int)
     
@@ -160,6 +169,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 description = description
             )
             state.actionsHistory.add(action)
+            if (state.actionsHistory.size > MAX_UNDO_HISTORY) {
+                state.actionsHistory.removeAt(0)
+            }
             _canUndo.value = true
         }
     }
@@ -774,7 +786,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 state.matchId?.let { matchId ->
                     try {
                         val match = state.toMatch()
-                        apiService.updateMatch(matchId, match)
+                        requestWithRetry("sync final state") { apiService.updateMatch(matchId, match) }
                     } catch (e: Exception) {
                         AppLogger.error("finalizeMatch", "sync final state: ${e.message}")
                     }
@@ -815,7 +827,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         batteryLevel = getBatteryLevel(),
                         isCharging = isBatteryCharging()
                     )
-                    apiService.logMatchEvent(event)
+                    requestWithRetry("match_end event") { apiService.logMatchEvent(event) }
                 } catch (e: Exception) {
                     AppLogger.error("finalizeMatch", "match_end event: ${e.message}")
                 }
@@ -823,7 +835,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 // 3. Zakończ mecz na serwerze (POST /matches/{id}/finish)
                 state.matchId?.let { matchId ->
                     try {
-                        apiService.finishMatch(matchId)
+                        requestWithRetry("finish match") { apiService.finishMatch(matchId) }
                     } catch (e: Exception) {
                         AppLogger.error("finalizeMatch", "finish: ${e.message}")
                     }
@@ -833,7 +845,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 val statisticsRequest = state.toMatchStatisticsRequest()
                 if (statisticsRequest != null) {
                     try {
-                        apiService.sendMatchStatistics(statisticsRequest)
+                        requestWithRetry("send statistics") { apiService.sendMatchStatistics(statisticsRequest) }
                     } catch (e: Exception) {
                         AppLogger.error("finalizeMatch", "statistics: ${e.message}")
                     }
@@ -895,7 +907,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     isCharging = isBatteryCharging()
                 )
                 
-                val response = apiService.logMatchEvent(event)
+                val response = requestWithRetry("log $eventType") { apiService.logMatchEvent(event) }
                 if (!response.isSuccessful) {
                     AppLogger.error("logMatchEvent", "HTTP ${response.code()} for $eventType")
                 }
@@ -954,7 +966,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     if (state.matchId == null) {
                         // Pierwszy sync - utwórz mecz na serwerze
                         val match = state.toMatch()
-                        val response = apiService.createMatch(match)
+                        val response = requestWithRetry("create match") { apiService.createMatch(match) }
                         
                         if (response.isSuccessful && response.body() != null) {
                             val created = response.body()!!
@@ -971,7 +983,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     } else {
                         // Aktualizuj istniejący mecz
                         val match = state.toMatch()
-                        val response = apiService.updateMatch(state.matchId!!, match)
+                        val response = requestWithRetry("update match") { apiService.updateMatch(state.matchId!!, match) }
                         
                         if (!response.isSuccessful) {
                             AppLogger.api("updateMatch", "FAIL ${response.code()}")
@@ -997,7 +1009,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             state.matchId?.let { matchId ->
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
-                        val response = apiService.finishMatch(matchId)
+                        val response = requestWithRetry("finish match") { apiService.finishMatch(matchId) }
                         if (!response.isSuccessful) {
                             AppLogger.api("finishMatch", "FAIL ${response.code()}")
                         }
@@ -1018,7 +1030,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             if (statisticsRequest != null) {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
-                        val response = apiService.sendMatchStatistics(statisticsRequest)
+                        val response = requestWithRetry("send statistics") { apiService.sendMatchStatistics(statisticsRequest) }
                         if (response.isSuccessful) {
                             AppLogger.api("sendStatistics", "OK")
                         } else {
@@ -1030,6 +1042,48 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+    }
+
+    private suspend fun <T> requestWithRetry(
+        operation: String,
+        maxAttempts: Int = 3,
+        call: suspend () -> Response<T>
+    ): Response<T> {
+        _syncStatus.postValue(SyncStatus.SYNCING)
+        var lastException: Exception? = null
+        var lastResponse: Response<T>? = null
+
+        repeat(maxAttempts) { attempt ->
+            try {
+                val response = call()
+                if (response.isSuccessful) {
+                    _syncStatus.postValue(SyncStatus.SYNCED)
+                    return response
+                }
+
+                lastResponse = response
+                if (!response.shouldRetry()) {
+                    _syncStatus.postValue(SyncStatus.FAILED)
+                    return response
+                }
+                AppLogger.api(operation, "retryable HTTP ${response.code()} attempt=${attempt + 1}")
+            } catch (e: Exception) {
+                lastException = e
+                AppLogger.error(operation, "attempt=${attempt + 1}: ${e.message}")
+            }
+
+            if (attempt < maxAttempts - 1) {
+                delay(500L * (attempt + 1))
+            }
+        }
+
+        _syncStatus.postValue(SyncStatus.OFFLINE)
+        lastResponse?.let { return it }
+        throw lastException ?: IllegalStateException("$operation failed")
+    }
+
+    private fun Response<*>.shouldRetry(): Boolean {
+        return code() in 500..599 || code() == 408 || code() == 429
     }
 }
 
@@ -1043,4 +1097,12 @@ enum class MatchView {
     BASIC_SCORING,     // Uproszczony widok (Win/Fault)
     ANNOUNCEMENT,      // Ogłoszenie (zmiana stron, tiebreak, super tiebreak)
     MATCH_FINISHED     // Koniec meczu
+}
+
+enum class SyncStatus {
+    IDLE,
+    SYNCING,
+    SYNCED,
+    FAILED,
+    OFFLINE
 }

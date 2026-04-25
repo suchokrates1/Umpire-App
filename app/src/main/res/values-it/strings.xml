@@ -183,6 +183,12 @@
     <string name="all_matches_deleted">Tutte le partite eliminate</string>
     <string name="match_details">Dettagli partita</string>
     <string name="match_details_placeholder">I dettagli della partita verranno visualizzati qui</string>
+    <string name="match_details_not_found">Dettagli partita non trovati</string>
+    <string name="match_details_court">Campo: %1$s</string>
+    <string name="match_details_started">Inizio: %1$s</string>
+    <string name="match_details_duration">Durata: %1$s</string>
+    <string name="match_details_umpire">Arbitro: %1$s</string>
+    <string name="match_details_sets">Set</string>
 
     <!-- Settings -->
     <string name="settings">Impostazioni</string>
@@ -206,6 +212,10 @@
     <string name="match_type_mixed">Misto</string>
     <string name="match_type_doubles">Doppio</string>
     <string name="match_type_singles">Singolo</string>
+    <string name="sync_status_syncing">Sincronizzazione...</string>
+    <string name="sync_status_synced">Sincronizzato</string>
+    <string name="sync_status_failed">Sincronizzazione fallita</string>
+    <string name="sync_status_offline">Offline - nuovo tentativo previsto</string>
     <string name="confirm_exit_title">Lasciare la partita?</string>
     <string name="confirm_exit_message">La partita è ancora in corso. Sei sicuro di voler uscire?</string>
 

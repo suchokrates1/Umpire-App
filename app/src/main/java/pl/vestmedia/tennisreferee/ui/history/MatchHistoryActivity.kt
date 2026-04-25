@@ -43,7 +43,7 @@ class MatchHistoryActivity : AppCompatActivity() {
             onMatchClick = { match ->
                 // Otwórz szczegóły meczu
                 val intent = Intent(this, MatchDetailActivity::class.java).apply {
-                    putExtra("MATCH_ID", match.id)
+                    putExtra(MatchDetailActivity.EXTRA_MATCH_ID, match.id)
                 }
                 startActivity(intent)
             },

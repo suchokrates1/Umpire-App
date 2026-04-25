@@ -183,6 +183,12 @@
     <string name="all_matches_deleted">Tous les matchs supprimés</string>
     <string name="match_details">Détails du match</string>
     <string name="match_details_placeholder">Les détails du match seront affichés ici</string>
+    <string name="match_details_not_found">Détails du match introuvables</string>
+    <string name="match_details_court">Court : %1$s</string>
+    <string name="match_details_started">Début : %1$s</string>
+    <string name="match_details_duration">Durée : %1$s</string>
+    <string name="match_details_umpire">Arbitre : %1$s</string>
+    <string name="match_details_sets">Sets</string>
 
     <!-- Settings -->
     <string name="settings">Paramètres</string>
@@ -206,6 +212,10 @@
     <string name="match_type_mixed">Mixte</string>
     <string name="match_type_doubles">Double</string>
     <string name="match_type_singles">Simple</string>
+    <string name="sync_status_syncing">Synchronisation...</string>
+    <string name="sync_status_synced">Synchronisé</string>
+    <string name="sync_status_failed">Échec de synchronisation</string>
+    <string name="sync_status_offline">Hors ligne - nouvel essai prévu</string>
     <string name="confirm_exit_title">Quitter le match ?</string>
     <string name="confirm_exit_message">Le match est encore en cours. Voulez-vous vraiment quitter ?</string>
 

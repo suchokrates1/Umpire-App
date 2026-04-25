@@ -1,5 +1,6 @@
 package pl.vestmedia.tennisreferee.data.repository
 
+import kotlinx.coroutines.delay
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.model.Match
@@ -8,6 +9,7 @@ import pl.vestmedia.tennisreferee.data.model.CourtPinRequest
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
 import pl.vestmedia.tennisreferee.data.model.TournamentOption
 import retrofit2.Response
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Repository obsługujące operacje na kortach i meczach
@@ -15,7 +17,7 @@ import retrofit2.Response
 class TennisRepository {
     
     private val apiService = RetrofitClient.apiService
-    private val playersCache = mutableMapOf<String?, List<Player>>()
+    private val playersCache = ConcurrentHashMap<String, List<Player>>()
     
     /**
      * Pobiera listę dostępnych kortów
@@ -37,12 +39,12 @@ class TennisRepository {
      */
     suspend fun getPlayers(courtId: String? = null, forceRefresh: Boolean = false): Result<List<Player>> {
         if (!forceRefresh) {
-            playersCache[courtId]?.let { return Result.success(it) }
+            playersCache[cacheKey(courtId)]?.let { return Result.success(it) }
         }
 
         return request { apiService.getPlayers(courtId) }
             .map { it.players }
-            .onSuccess { playersCache[courtId] = it }
+            .onSuccess { playersCache[cacheKey(courtId)] = it }
     }
     
     /**
@@ -126,25 +128,47 @@ class TennisRepository {
         }
     }
 
-    private suspend fun <T> request(call: suspend () -> Response<T>): Result<T> {
-        return try {
-            val response = call()
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    Result.success(body)
-                } else {
-                    Result.failure(Exception("Empty response body"))
+    private suspend fun <T> request(maxAttempts: Int = 3, call: suspend () -> Response<T>): Result<T> {
+        var lastFailure: Exception? = null
+        repeat(maxAttempts) { attempt ->
+            try {
+                val response = call()
+                if (response.isSuccessful || !response.shouldRetry()) {
+                    return response.toResult()
                 }
-            } else {
-                Result.failure(Exception(response.toErrorMessage()))
+                lastFailure = Exception(response.toErrorMessage())
+            } catch (e: Exception) {
+                lastFailure = e
             }
-        } catch (e: Exception) {
-            Result.failure(e)
+
+            if (attempt < maxAttempts - 1) {
+                delay(500L * (attempt + 1))
+            }
         }
+
+        return Result.failure(lastFailure ?: Exception("Network request failed"))
+    }
+
+    private fun <T> Response<T>.toResult(): Result<T> {
+        return if (isSuccessful) {
+            val body = body()
+            if (body != null) {
+                Result.success(body)
+            } else {
+                Result.failure(Exception("Empty response body"))
+            }
+        } else {
+            Result.failure(Exception(toErrorMessage()))
+        }
+    }
+
+    private fun Response<*>.shouldRetry(): Boolean {
+        return code() in 500..599 || code() == 408 || code() == 429
     }
 
     private fun Response<*>.toErrorMessage(): String {
         return "Error: ${code()} - ${message()}"
     }
+
+    private fun cacheKey(courtId: String?): String = courtId ?: "__all__"
 }

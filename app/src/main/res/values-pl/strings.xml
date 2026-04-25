@@ -144,6 +144,10 @@
     <string name="match_type_mixed">Mikst</string>
     <string name="match_type_doubles">Debel</string>
     <string name="match_type_singles">Singiel</string>
+    <string name="sync_status_syncing">Synchronizacja...</string>
+    <string name="sync_status_synced">Zsynchronizowano</string>
+    <string name="sync_status_failed">Błąd synchronizacji</string>
+    <string name="sync_status_offline">Offline - ponowimy próbę</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Błąd wczytywania kortów</string>
@@ -189,6 +193,12 @@
     <string name="all_matches_deleted">Wszystkie mecze usunięte</string>
     <string name="match_details">Szczegóły meczu</string>
     <string name="match_details_placeholder">Szczegóły meczu będą wyświetlone tutaj</string>
+    <string name="match_details_not_found">Nie znaleziono szczegółów meczu</string>
+    <string name="match_details_court">Kort: %1$s</string>
+    <string name="match_details_started">Start: %1$s</string>
+    <string name="match_details_duration">Czas trwania: %1$s</string>
+    <string name="match_details_umpire">Sędzia: %1$s</string>
+    <string name="match_details_sets">Sety</string>
     
     <!-- Settings -->
     <string name="settings">Ustawienia</string>

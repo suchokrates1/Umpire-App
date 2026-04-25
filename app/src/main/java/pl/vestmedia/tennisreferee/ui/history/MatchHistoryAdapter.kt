@@ -39,8 +39,8 @@ class MatchHistoryAdapter(
         fun bind(match: MatchEntity) {
             binding.apply {
                 // Gracze
-                textViewPlayer1.text = match.player1.getDisplayName()
-                textViewPlayer2.text = match.player2.getDisplayName()
+                textViewPlayer1.text = match.getPlayer1SideDisplayName()
+                textViewPlayer2.text = match.getPlayer2SideDisplayName()
                 
                 // Wynik
                 textViewScore.text = root.context.getString(

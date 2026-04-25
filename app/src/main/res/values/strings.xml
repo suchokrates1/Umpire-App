@@ -154,6 +154,10 @@
     <string name="match_type_mixed">Mixed</string>
     <string name="match_type_doubles">Doubles</string>
     <string name="match_type_singles">Singles</string>
+    <string name="sync_status_syncing">Syncing...</string>
+    <string name="sync_status_synced">Synced</string>
+    <string name="sync_status_failed">Sync failed</string>
+    <string name="sync_status_offline">Offline - will retry</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Error loading courts</string>
@@ -201,6 +205,15 @@
     <string name="all_matches_deleted">All matches deleted</string>
     <string name="match_details">Match Details</string>
     <string name="match_details_placeholder">Match details will be displayed here</string>
+    <string name="match_details_not_found">Match details not found</string>
+    <string name="match_details_players" translatable="false">%1$s vs %2$s</string>
+    <string name="match_details_score" translatable="false">Score: %1$d:%2$d</string>
+    <string name="match_details_court">Court: %1$s</string>
+    <string name="match_details_started">Started: %1$s</string>
+    <string name="match_details_duration">Duration: %1$s</string>
+    <string name="match_details_umpire">Umpire: %1$s</string>
+    <string name="match_details_sets">Sets</string>
+    <string name="match_details_stat_line" translatable="false">%1$s: aces %2$d, DF %3$d, winners %4$d, 1st serve %5$d%%</string>
     
     <!-- Settings -->
     <string name="settings">Settings</string>

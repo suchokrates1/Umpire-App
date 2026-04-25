@@ -25,6 +25,11 @@ data class MatchEntity(
     // Gracze
     val player1: Player,
     val player2: Player,
+    val player3: Player? = null,
+    val player4: Player? = null,
+    val isDoubles: Boolean = false,
+    val isMixedDoubles: Boolean = false,
+    val umpireName: String? = null,
     
     // Wynik końcowy
     val player1Sets: Int,
@@ -57,10 +62,42 @@ data class MatchEntity(
     val isCompleted: Boolean = true,
     val winnerId: Int?
 ) {
+    fun getPlayer1SideDisplayName(): String {
+        return if (isDoubles && player3 != null) {
+            "${player1.getDisplayName()} / ${player3.getDisplayName()}"
+        } else {
+            player1.getDisplayName()
+        }
+    }
+
+    fun getPlayer2SideDisplayName(): String {
+        return if (isDoubles && player4 != null) {
+            "${player2.getDisplayName()} / ${player4.getDisplayName()}"
+        } else {
+            player2.getDisplayName()
+        }
+    }
+
+    fun getPlayer1SideFullName(): String {
+        return if (isDoubles && player3 != null) {
+            "${player1.getFullName()} / ${player3.getFullName()}"
+        } else {
+            player1.getFullName()
+        }
+    }
+
+    fun getPlayer2SideFullName(): String {
+        return if (isDoubles && player4 != null) {
+            "${player2.getFullName()} / ${player4.getFullName()}"
+        } else {
+            player2.getFullName()
+        }
+    }
+
     fun getWinnerName(): String? {
         return when (winnerId) {
-            player1.id -> player1.getDisplayName()
-            player2.id -> player2.getDisplayName()
+            player1.id -> getPlayer1SideDisplayName()
+            player2.id -> getPlayer2SideDisplayName()
             else -> null
         }
     }
