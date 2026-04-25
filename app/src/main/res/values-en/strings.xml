@@ -7,6 +7,10 @@
     <string name="language_selected">Language selected</string>
     
     <!-- Court Selection -->
+    <string name="select_tournament">Select Tournament</string>
+    <string name="change_tournament">Change tournament</string>
+    <string name="no_tournaments_available">No active tournaments available</string>
+    <string name="error_loading_tournaments">Error loading tournaments</string>
     <string name="select_court">Select Court</string>
     <string name="refresh">Refresh</string>
     <string name="no_courts_available">No courts available</string>
@@ -71,6 +75,8 @@
     <string name="finish">Finish</string>
     <string name="finish_match">Finish Match</string>
     <string name="new_match">New Match</string>
+    <string name="next_match_same_setup">▶ Next Match (same setup)</string>
+    <string name="next_match_new_setup">⚙ New Match (different setup)</string>
 
         <!-- Match Configuration Dialog -->
         <string name="match_config_title">Match Setup</string>
@@ -98,7 +104,7 @@
     <string name="stats_mode_basic_desc">Simplified scoring: only Win and Fault buttons.\nTracks: double faults.</string>
     <string name="stats_mode_basic_short">WIN + FAULT only\nQuick &amp; simple</string>
     <string name="stats_mode_advanced">Advanced</string>
-    <string name="stats_mode_advanced_desc">Full scoring: Ace, Fault, Ball in Play, Winner, Forced Error, Unforced Error.\nTracks: aces, double faults, winners, forced/unforced errors, serve %.</string>
+    <string name="stats_mode_advanced_desc">Full scoring: Ace, Fault, Ball in Play, Winner, Forced Error, Unforced Error.\nTracks: aces, double faults, winners, forced/unforced errors, serve %%.</string>
     <string name="stats_mode_advanced_short">Ace, Winner, Errors…\nFull statistics</string>
     <string name="win_point">WIN</string>
     <string name="no_advantage_mode">No-Advantage (Deciding Point)</string>
@@ -200,6 +206,10 @@
     <string name="unforced_errors_stat">Unforced Errors</string>
     <string name="first_serve_pct">1st Serve %</string>
     <string name="new_match_button">New Match</string>
+    <string name="match_metadata_umpire">Umpire: %1$s</string>
+    <string name="match_type_mixed">Mixed</string>
+    <string name="match_type_doubles">Doubles</string>
+    <string name="match_type_singles">Singles</string>
 
     <!-- Bracket warnings -->
     <string name="bracket_warning_title">Match Notice</string>

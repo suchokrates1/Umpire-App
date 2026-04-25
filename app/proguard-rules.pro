@@ -59,6 +59,10 @@
 -keep class pl.vestmedia.tennisreferee.data.model.** { *; }
 -keepclassmembers class pl.vestmedia.tennisreferee.data.model.** { *; }
 
+# ── Room database/entities ──
+-keep class pl.vestmedia.tennisreferee.data.database.** { *; }
+-keepnames class * extends androidx.room.RoomDatabase
+
 # ── Keep API service interface with full type info ──
 -keep interface pl.vestmedia.tennisreferee.data.api.** { *; }
 
