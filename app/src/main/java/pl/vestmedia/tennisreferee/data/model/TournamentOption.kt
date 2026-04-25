@@ -23,7 +23,4 @@ data class TournamentOption(
 
     @SerializedName("end_date")
     val endDate: String? = null,
-
-    @SerializedName("active")
-    val active: Boolean = true,
 )
