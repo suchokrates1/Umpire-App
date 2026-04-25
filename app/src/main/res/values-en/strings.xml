@@ -71,6 +71,26 @@
     <string name="finish">Finish</string>
     <string name="finish_match">Finish Match</string>
     <string name="new_match">New Match</string>
+
+        <!-- Match Configuration Dialog -->
+        <string name="match_config_title">Match Setup</string>
+        <string name="match_config_umpire_hint">Umpire name or initials</string>
+        <string name="match_config_mixed_title">Mixed Doubles</string>
+        <string name="match_config_mixed_desc">Mark this doubles match as mixed</string>
+        <string name="match_config_manual_datetime_title">Manual date and time</string>
+        <string name="match_config_manual_datetime_empty">Automatic current date/time</string>
+        <string name="match_config_set_datetime">Set</string>
+        <string name="match_config_clear_datetime">Clear</string>
+        <string name="match_config_format_header">Match Format</string>
+        <string name="match_config_games_per_set">Games per set</string>
+        <string name="match_config_sets_to_win">Sets to win</string>
+        <string name="match_config_tiebreak_to">Tiebreak to</string>
+        <string name="match_config_super_tiebreak_to">Match tiebreak to</string>
+        <string name="match_config_options_header">Options</string>
+        <string name="match_config_stats_header">Statistics Mode</string>
+        <string name="match_config_tb_only">Tiebreak Only</string>
+        <string name="match_config_tb_only_desc">Play a single tiebreak instead of sets</string>
+        <string name="match_config_tb_only_points">Tiebreak to</string>
     
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Statistics Mode</string>

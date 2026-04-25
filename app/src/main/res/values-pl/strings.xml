@@ -25,6 +25,13 @@
     
     <!-- Match Configuration Dialog -->
     <string name="match_config_title">Konfiguracja meczu</string>
+        <string name="match_config_umpire_hint">Imię i nazwisko lub inicjały sędziego</string>
+        <string name="match_config_mixed_title">Debel mieszany</string>
+        <string name="match_config_mixed_desc">Oznacz ten mecz deblowy jako mixed</string>
+        <string name="match_config_manual_datetime_title">Ręczna data i godzina</string>
+        <string name="match_config_manual_datetime_empty">Automatyczna bieżąca data/godzina</string>
+        <string name="match_config_set_datetime">Ustaw</string>
+        <string name="match_config_clear_datetime">Wyczyść</string>
     <string name="match_config_format_header">Format meczu</string>
     <string name="match_config_games_per_set">Gemów do seta</string>
     <string name="match_config_sets_to_win">Setów do wygranej</string>

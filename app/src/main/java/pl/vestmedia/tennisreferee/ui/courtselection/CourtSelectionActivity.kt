@@ -193,9 +193,10 @@ class CourtSelectionActivity : AppCompatActivity() {
                             AppLogger.action("CourtSelection", "PIN_OK", "court=${court.id}")
                             (application as TennisRefereeApp).healthCheckManager.courtId = court.id
                             dialog.dismiss()
+                            val courtDisplayName = court.getDisplayName(this@CourtSelectionActivity)
                             val intent = Intent(this@CourtSelectionActivity, PlayerSelectionActivity::class.java).apply {
                                 putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, court.id)
-                                putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, court.name)
+                                putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, courtDisplayName)
                                 putExtra(PlayerSelectionActivity.EXTRA_COURT_PIN, pin)
                             }
                             AppLogger.navigate("CourtSelection", "PlayerSelection", "court=${court.id}")
@@ -263,9 +264,10 @@ class CourtSelectionActivity : AppCompatActivity() {
                 
                 result.onSuccess { _ ->
                     // PIN poprawny - przejdź do wyboru zawodników
+                    val courtDisplayName = court.getDisplayName(this@CourtSelectionActivity)
                     val intent = Intent(this@CourtSelectionActivity, PlayerSelectionActivity::class.java).apply {
                         putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, court.id)
-                        putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, court.name)
+                        putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, courtDisplayName)
                         putExtra(PlayerSelectionActivity.EXTRA_COURT_PIN, pin)
                     }
                     startActivity(intent)

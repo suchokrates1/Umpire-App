@@ -79,6 +79,16 @@
     <string name="match_config_manual_datetime_empty">Automatisches aktuelles Datum/Uhrzeit</string>
     <string name="match_config_set_datetime">Setzen</string>
     <string name="match_config_clear_datetime">Löschen</string>
+        <string name="match_config_format_header">Spielformat</string>
+        <string name="match_config_games_per_set">Spiele pro Satz</string>
+        <string name="match_config_sets_to_win">Sätze zum Sieg</string>
+        <string name="match_config_tiebreak_to">Tiebreak bis</string>
+        <string name="match_config_super_tiebreak_to">Entscheidender Match-Tiebreak bis</string>
+        <string name="match_config_options_header">Optionen</string>
+        <string name="match_config_stats_header">Statistikmodus</string>
+        <string name="match_config_tb_only">Nur Tiebreak</string>
+        <string name="match_config_tb_only_desc">Einen einzelnen Tiebreak statt Sätzen spielen</string>
+        <string name="match_config_tb_only_points">Tiebreak bis</string>
     
     <!-- Scoreboard -->
     <string name="scoreboard_player">Spieler</string>

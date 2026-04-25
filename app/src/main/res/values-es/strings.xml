@@ -71,6 +71,26 @@
     <string name="finish">Finalizar</string>
     <string name="finish_match">Finalizar partido</string>
     <string name="new_match">Nuevo partido</string>
+
+        <!-- Match Configuration Dialog -->
+        <string name="match_config_title">Configuración del partido</string>
+        <string name="match_config_umpire_hint">Nombre o iniciales del árbitro</string>
+        <string name="match_config_mixed_title">Dobles mixtos</string>
+        <string name="match_config_mixed_desc">Marcar este partido de dobles como mixto</string>
+        <string name="match_config_manual_datetime_title">Fecha y hora manuales</string>
+        <string name="match_config_manual_datetime_empty">Fecha/hora actual automática</string>
+        <string name="match_config_set_datetime">Establecer</string>
+        <string name="match_config_clear_datetime">Borrar</string>
+        <string name="match_config_format_header">Formato del partido</string>
+        <string name="match_config_games_per_set">Juegos por set</string>
+        <string name="match_config_sets_to_win">Sets para ganar</string>
+        <string name="match_config_tiebreak_to">Tie-break a</string>
+        <string name="match_config_super_tiebreak_to">Tie-break decisivo a</string>
+        <string name="match_config_options_header">Opciones</string>
+        <string name="match_config_stats_header">Modo de estadísticas</string>
+        <string name="match_config_tb_only">Solo tie-break</string>
+        <string name="match_config_tb_only_desc">Jugar un único tie-break en lugar de sets</string>
+        <string name="match_config_tb_only_points">Tie-break a</string>
     
     <!-- Stats Mode Selection -->
     <string name="stats_mode_title">Modo de estadísticas</string>
