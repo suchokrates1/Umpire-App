@@ -1,9 +1,6 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import android.app.Application
-import android.content.Intent
-import android.content.IntentFilter
-import android.os.BatteryManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,18 +19,14 @@ import pl.vestmedia.tennisreferee.domain.match.MatchProgressEvent
 import pl.vestmedia.tennisreferee.domain.match.MatchProgressReducer
 import pl.vestmedia.tennisreferee.domain.match.MatchProgressScreen
 import pl.vestmedia.tennisreferee.domain.match.MatchStartReducer
-import pl.vestmedia.tennisreferee.domain.match.MatchUndoRestorer
+import pl.vestmedia.tennisreferee.domain.match.MatchUndoManager
+import pl.vestmedia.tennisreferee.domain.match.MatchUndoResult
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * ViewModel zarządzający logiką meczu tenisowego
  */
 class MatchViewModel(application: Application) : AndroidViewModel(application) {
-    companion object {
-        private const val MAX_UNDO_HISTORY = 100
-    }
-
-    
     private val _matchState = MutableLiveData<MatchState>()
     val matchState: LiveData<MatchState> = _matchState
     
@@ -51,23 +44,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _syncStatus = MutableLiveData<SyncStatus>(SyncStatus.IDLE)
     val syncStatus: LiveData<SyncStatus> = _syncStatus
-    
-    data class BracketWarningEvent(val type: String, val matchId: Int)
-    
-    private fun getBatteryLevel(): Int? {
-        val batteryStatus = getApplication<Application>().registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        return batteryStatus?.let {
-            val level = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale = it.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            if (level >= 0 && scale > 0) (level * 100 / scale) else null
-        }
-    }
-    
-    private fun isBatteryCharging(): Boolean {
-        val batteryStatus = getApplication<Application>().registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        val status = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-        return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
-    }
+
+    private val batteryInfoProvider = DeviceBatteryInfoProvider(application)
     
     /** Helper: get localized string from resources */
     private fun str(resId: Int, vararg args: Any): String =
@@ -102,7 +80,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private val matchSyncCoordinator = MatchSyncCoordinator(
         apiService = RetrofitClient.apiService,
         matchHistoryRepository = (application as TennisRefereeApp).matchHistoryRepository,
-        batteryInfoProvider = { MatchBatteryInfo(getBatteryLevel(), isBatteryCharging()) },
+        batteryInfoProvider = { batteryInfoProvider.current() },
         onSyncStatus = { status -> _syncStatus.postValue(status) },
         onBracketWarning = { warning, matchId -> _bracketWarning.postValue(BracketWarningEvent(warning, matchId)) }
     )
@@ -144,31 +122,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     private fun saveStateBeforeAction(actionType: ActionType, description: String) {
         _matchState.value?.let { state ->
-            val action = MatchAction(
-                actionType = actionType,
-                previousPlayer1Points = state.player1Points,
-                previousPlayer2Points = state.player2Points,
-                previousPlayer1Games = state.player1Games,
-                previousPlayer2Games = state.player2Games,
-                previousPlayer1Sets = state.player1Sets,
-                previousPlayer2Sets = state.player2Sets,
-                previousIsPlayer1Serving = state.isPlayer1Serving,
-                previousIsFirstServe = state.isFirstServe,
-                previousIsTiebreak = state.isTiebreak,
-                previousIsSuperTiebreak = state.isSuperTiebreak,
-                previousSetsHistorySize = state.setsHistory.size,
-                previousSidesSwapped = state.sidesSwapped,
-                previousTotalGamesPlayed = state.totalGamesPlayed,
-                previousCurrentServer = state.currentServer,
-                previousIsMatchFinished = state.isMatchFinished,
-                previousPlayer1Stats = state.player1Stats.copy(),
-                previousPlayer2Stats = state.player2Stats.copy(),
-                description = description
-            )
-            state.actionsHistory.add(action)
-            if (state.actionsHistory.size > MAX_UNDO_HISTORY) {
-                state.actionsHistory.removeAt(0)
-            }
+            MatchUndoManager.saveStateBeforeAction(state, actionType, description)
             _canUndo.value = true
         }
     }
@@ -178,18 +132,17 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun undoLastAction() {
         _matchState.value?.let { state ->
-            if (state.actionsHistory.isEmpty()) {
-                _undoMessage.value = getApplication<Application>().getString(R.string.no_actions_to_undo)
-                return
+            when (val result = MatchUndoManager.undoLastAction(state)) {
+                MatchUndoResult.NoAction -> {
+                    _undoMessage.value = getApplication<Application>().getString(R.string.no_actions_to_undo)
+                }
+                is MatchUndoResult.Restored -> {
+                    _canUndo.value = result.canUndo
+                    _undoMessage.value = getApplication<Application>().getString(R.string.undo_action_format, result.description)
+                    _matchState.value = state
+                    _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+                }
             }
-            
-            val lastAction = state.actionsHistory.removeAt(state.actionsHistory.size - 1)
-            MatchUndoRestorer.restore(state, lastAction)
-            
-            _canUndo.value = state.actionsHistory.isNotEmpty()
-            _undoMessage.value = getApplication<Application>().getString(R.string.undo_action_format, lastAction.description)
-            _matchState.value = state
-            _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
         }
     }
     
@@ -482,24 +435,4 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-}
-
-/**
- * Enum definiujący różne widoki w trakcie meczu
- */
-enum class MatchView {
-    SERVER_SELECTION,  // Wybór pierwszego serwującego
-    SERVE,             // Widok serwisu (Ace/Fault/Ball in play)
-    RALLY,             // Widok wymiany (Winner/Forced/Unforced)
-    BASIC_SCORING,     // Uproszczony widok (Win/Fault)
-    ANNOUNCEMENT,      // Ogłoszenie (zmiana stron, tiebreak, super tiebreak)
-    MATCH_FINISHED     // Koniec meczu
-}
-
-enum class SyncStatus {
-    IDLE,
-    SYNCING,
-    SYNCED,
-    FAILED,
-    OFFLINE
 }

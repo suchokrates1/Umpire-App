@@ -21,7 +21,7 @@ class MatchDialogsController(
             .show()
     }
 
-    fun showBracketWarning(event: MatchViewModel.BracketWarningEvent) {
+    fun showBracketWarning(event: BracketWarningEvent) {
         val (title, message) = when (event.type) {
             "different_groups" -> Pair(
                 activity.getString(R.string.bracket_warning_title),
