@@ -1,4 +1,4 @@
-package pl.vestmedia.tennisreferee.ui.match
+package pl.vestmedia.tennisreferee.domain.match
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

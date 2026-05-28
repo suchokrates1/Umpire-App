@@ -15,6 +15,13 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.*
+import pl.vestmedia.tennisreferee.domain.match.MatchPointEvent
+import pl.vestmedia.tennisreferee.domain.match.MatchPointReducer
+import pl.vestmedia.tennisreferee.domain.match.MatchProgressEvent
+import pl.vestmedia.tennisreferee.domain.match.MatchProgressReducer
+import pl.vestmedia.tennisreferee.domain.match.MatchProgressScreen
+import pl.vestmedia.tennisreferee.domain.match.MatchStartReducer
+import pl.vestmedia.tennisreferee.domain.match.MatchUndoRestorer
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import retrofit2.Response
 
@@ -107,25 +114,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun setFirstServer(serverNumber: Int) {
         _matchState.value?.let { state ->
-            state.currentServer = when {
-                state.isDoubles -> serverNumber.coerceIn(1, 4)
-                serverNumber == 2 -> 2
-                else -> 1
-            }
-            state.isPlayer1Serving = if (state.isDoubles) {
-                DoublesServeRotation.isTeamOneServing(state.currentServer)
-            } else {
-                state.currentServer == 1
-            }
-            state.matchStartTime = state.manualStartTime ?: System.currentTimeMillis()
+            MatchStartReducer.start(state, serverNumber, System.currentTimeMillis())
             _matchState.value = state
             
-            // W trybie basic przejdź do uproszczonego widoku
-            if (state.statsMode == StatsMode.BASIC) {
-                _currentView.value = MatchView.BASIC_SCORING
-            } else {
-                _currentView.value = MatchView.SERVE
-            }
+            _currentView.value = scoringViewFor(state)
             
             // Log match start event
             logMatchEvent("match_start")
@@ -476,40 +468,20 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     private fun addPoint(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
-            if (isPlayer1) {
-                state.player1Points++
-            } else {
-                state.player2Points++
+            val result = MatchPointReducer.addPoint(state, isPlayer1)
+
+            result.events.forEach { event ->
+                when (event) {
+                    MatchPointEvent.Point -> logMatchEvent("point")
+                    MatchPointEvent.ServeChange -> logMatchEvent("serve_change")
+                    MatchPointEvent.SideChange -> logMatchEvent("side_change")
+                }
             }
-            
-            // Loguj punkt do serwera
-            logMatchEvent("point")
-            
-            // W tiebreak i super tiebreak: zmiana serwisu co 2 punkty
-            if (state.isTiebreak || state.isSuperTiebreak) {
-                val totalPoints = state.player1Points + state.player2Points
-                
-                // Zmiana serwisu co 2 punkty (po 1,3,5,7,9... punkcie)
-                if (totalPoints % 2 == 1) {
-                    if (state.isDoubles) {
-                        // W deblu rotuj serwującego zgodnie z kolejnością
-                        DoublesServeRotation.rotate(state)
-                    } else {
-                        // W singlu zwykła zmiana
-                        state.isPlayer1Serving = !state.isPlayer1Serving
-                    }
-                    logMatchEvent("serve_change")
-                }
-                
-                // Zmiana stron co 6 punktów
-                if (totalPoints > 0 && totalPoints % 6 == 0 && !state.isGameWon()) {
-                    state.sidesSwapped = !state.sidesSwapped
-                    logMatchEvent("side_change")
-                    pendingAnnouncementType = "side_change"
-                    _matchState.value = state
-                    _currentView.value = MatchView.ANNOUNCEMENT
-                    return
-                }
+
+            result.announcementType?.let { pendingAnnouncementType = it }
+            if (result.showAnnouncementImmediately) {
+                _matchState.value = state
+                _currentView.value = MatchView.ANNOUNCEMENT
             }
         }
     }
@@ -519,189 +491,42 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     private fun checkGameAndSetStatus() {
         _matchState.value?.let { state ->
-            if (state.isGameWon()) {
-                // Ktoś wygrał gema
-                val player1Won = state.player1Points > state.player2Points
-                
-                if (state.isTiebreak || state.isSuperTiebreak) {
-                    val wasSuperTiebreak = state.isSuperTiebreak
-                    
-                    // Oblicz punkty przegranego tiebreak (do wyświetlenia np. 5-4(7))
-                    val tiebreakLoserPts = if (player1Won) state.player2Points else state.player1Points
-                    
-                    if (wasSuperTiebreak) {
-                        // Super tiebreak: zapisz rzeczywiste punkty (np. 10:5)
-                        // Nie dodajemy gemu — super TB nie ma gemów
-                        if (player1Won) state.player1Sets++ else state.player2Sets++
-                        
-                        state.setsHistory.add(
-                            SetScore(
-                                setNumber = state.setsHistory.size + 1,
-                                player1Games = state.player1Points,
-                                player2Games = state.player2Points,
-                                tiebreakLoserPoints = tiebreakLoserPts,
-                                isSuperTiebreak = true
-                            )
-                        )
-                    } else {
-                        // Zwykły tiebreak: dodaj gem zwycięzcy (aby było 5:4 zamiast 4:4)
-                        if (player1Won) state.player1Games++ else state.player2Games++
-                        if (player1Won) state.player1Sets++ else state.player2Sets++
-                        
-                        state.setsHistory.add(
-                            SetScore(
-                                setNumber = state.setsHistory.size + 1,
-                                player1Games = state.player1Games,
-                                player2Games = state.player2Games,
-                                tiebreakLoserPoints = tiebreakLoserPts
-                            )
-                        )
-                    }
-                    
-                    // Resetuj gemy i punkty
-                    state.player1Games = 0
-                    state.player2Games = 0
-                    state.isTiebreak = false
-                    state.isSuperTiebreak = false
-                    
-                    // Zmiana stron i reset gemów po tiebreaku
-                    state.sidesSwapped = !state.sidesSwapped
-                    state.totalGamesPlayed = 0
-                    pendingAnnouncementType = "side_change"
-                    
-                    // Sprawdź czy mecz się skończył (szczególnie ważne dla Super TB)
-                    if (state.shouldEndMatch()) {
-                        state.isMatchFinished = true
-                        state.matchDuration = System.currentTimeMillis() - state.matchStartTime
-                        _matchState.value = state
-                        
-                        // Sekwencyjne zakończenie meczu
-                        finalizeMatchOnServer(state)
-                        
-                        _currentView.value = MatchView.MATCH_FINISHED
-                        return
-                    }
-                    
-                    // Sprawdź czy należy rozpocząć super tiebreak po wygranym tiebreaku
-                    // (gdy sety są np. 1:1 przy setsToWin=2)
-                    val setsToWinTB = state.matchConfig.setsToWin
-                    if (state.player1Sets == (setsToWinTB - 1) && state.player2Sets == (setsToWinTB - 1)) {
-                        state.isSuperTiebreak = true
-                        pendingAnnouncementType = "super_tiebreak"
-                    }
-                } else {
-                    // Normalny gem
-                    if (player1Won) {
-                        state.player1Games++
-                    } else {
-                        state.player2Games++
-                    }
-                    
-                    // Zwiększ liczbę rozegranych gemów
-                    state.totalGamesPlayed++
-                    
-                    // Automatyczna zmiana stron co nieparzyste gemy (1, 3, 5, 7...)
-                    if (state.totalGamesPlayed % 2 == 1) {
-                        state.sidesSwapped = !state.sidesSwapped
-                        pendingAnnouncementType = "side_change"
-                    }
-                }
-                
-                // Reset punktów
-                state.player1Points = 0
-                state.player2Points = 0
-                
-                // Zmiana serwującego po gemie
-                if (state.isDoubles) {
-                    // W deblu rotacja serwisów: 1 -> 2 -> 3 -> 4 -> 1
-                    DoublesServeRotation.rotate(state)
-                } else {
-                    // W singlu zwykła zmiana
-                    state.isPlayer1Serving = !state.isPlayer1Serving
-                }
-                
-                // Log game won event
-                logMatchEvent("game")
-                
-                // Sprawdź czy set został wygrany
-                if (state.isSetWon()) {
-                    val setWinner = if (state.player1Games > state.player2Games) 1 else 2
-                    
-                    if (setWinner == 1) {
-                        state.player1Sets++
-                    } else {
-                        state.player2Sets++
-                    }
-                    
-                    // Zapisz wynik seta
-                    state.setsHistory.add(
-                        SetScore(
-                            setNumber = state.setsHistory.size + 1,
-                            player1Games = state.player1Games,
-                            player2Games = state.player2Games
-                        )
-                    )
-                    
-                    // Log set won event
-                    logMatchEvent("set")
-                    
-                    // Sprawdź czy mecz się skończył
-                    if (state.shouldEndMatch()) {
-                        state.isMatchFinished = true
-                        state.matchDuration = System.currentTimeMillis() - state.matchStartTime
-                        _matchState.value = state
-                        
-                        // Sekwencyjne zakończenie meczu
-                        finalizeMatchOnServer(state)
-                        
-                        _currentView.value = MatchView.MATCH_FINISHED
-                        return
-                    }
-                    
-                    // Sprawdź czy należy rozpocząć super tiebreak (remis w setach, np. 1:1 przy setsToWin=2)
-                    val setsToWin = state.matchConfig.setsToWin
-                    if (state.player1Sets == (setsToWin - 1) && state.player2Sets == (setsToWin - 1)) {
-                        state.isSuperTiebreak = true
-                        pendingAnnouncementType = "super_tiebreak"
-                    }
-                    
-                    // Resetuj gemy i licznik rozegranych gemów na nowy set
-                    state.player1Games = 0
-                    state.player2Games = 0
-                    state.totalGamesPlayed = 0
-                }
-                
-                // Sprawdź czy należy rozpocząć tiebreak (6:6)
-                if (state.shouldStartTiebreak() && !state.isSuperTiebreak) {
-                    state.isTiebreak = true
-                    pendingAnnouncementType = "tiebreak"
-                }
-                
-                _matchState.value = state
-                
-                // Jeśli jest ogłoszenie, pokaż kartę ogłoszenia zamiast od razu wracać do gry
-                if (pendingAnnouncementType != null) {
-                    _currentView.value = MatchView.ANNOUNCEMENT
-                } else {
-                    _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
-                }
-                
-                // Synchronizuj wynik z serwerem po każdym gemie
-                syncMatchWithServer()
-            } else {
-                // Gem trwa dalej
-                
-                // W trybie no-advantage, przy 40-40 (3-3) pokaż ogłoszenie "deciding point"
-                if (state.noAdvantage && state.player1Points == 3 && state.player2Points == 3
-                    && !state.isTiebreak && !state.isSuperTiebreak) {
-                    pendingAnnouncementType = "deciding_point"
-                    _matchState.value = state
-                    _currentView.value = MatchView.ANNOUNCEMENT
-                } else {
-                    _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+            val result = MatchProgressReducer.reduceAfterPoint(
+                state = state,
+                currentAnnouncementType = pendingAnnouncementType,
+                nowMs = System.currentTimeMillis()
+            )
+
+            result.events.forEach { event ->
+                when (event) {
+                    MatchProgressEvent.Game -> logMatchEvent("game")
+                    MatchProgressEvent.Set -> logMatchEvent("set")
                 }
             }
+            pendingAnnouncementType = result.announcementType
+
+            if (result.publishState) {
+                _matchState.value = state
+            }
+
+            if (result.finalizeMatch) {
+                finalizeMatchOnServer(state)
+            }
+
+            _currentView.value = when (result.nextScreen) {
+                MatchProgressScreen.Announcement -> MatchView.ANNOUNCEMENT
+                MatchProgressScreen.MatchFinished -> MatchView.MATCH_FINISHED
+                MatchProgressScreen.Scoring -> scoringViewFor(state)
+            }
+
+            if (result.syncMatch) {
+                syncMatchWithServer()
+            }
         }
+    }
+
+    private fun scoringViewFor(state: MatchState): MatchView {
+        return if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
     }
     
     /**
