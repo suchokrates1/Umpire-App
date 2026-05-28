@@ -35,8 +35,6 @@ import pl.vestmedia.tennisreferee.data.model.MatchState
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 /**
@@ -53,6 +51,7 @@ class MatchActivity : AppCompatActivity() {
     private lateinit var matchFinishedBinding: LayoutMatchFinishedBinding
     private lateinit var announcementBinding: LayoutAnnouncementBinding
     private lateinit var serverSelectionViewBinder: ServerSelectionViewBinder
+    private lateinit var scoreboardRenderer: ScoreboardRenderer
     private val viewModel: MatchViewModel by viewModels()
     
     // Śledzenie stanu serwisu do animacji przejścia na 2. serwis
@@ -60,7 +59,6 @@ class MatchActivity : AppCompatActivity() {
     
     private val timerHandler = Handler(Looper.getMainLooper())
     private var timerRunnable: Runnable? = null
-    private val metadataDateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
     
     companion object {
         const val EXTRA_MATCH_STATE = "match_state"
@@ -82,6 +80,7 @@ class MatchActivity : AppCompatActivity() {
         basicScoringBinding = LayoutBasicScoringBinding.bind(binding.layoutBasicScoring.root)
         matchFinishedBinding = LayoutMatchFinishedBinding.bind(binding.layoutMatchFinished.root)
         announcementBinding = LayoutAnnouncementBinding.bind(binding.layoutAnnouncement.root)
+        scoreboardRenderer = ScoreboardRenderer(this, scoreboardBinding)
         serverSelectionViewBinder = ServerSelectionViewBinder(
             context = this,
             binding = serverSelectionBinding,
@@ -349,28 +348,6 @@ class MatchActivity : AppCompatActivity() {
     }
     
     /**
-     * Animuje zmianę wyniku z delikatnym efektem scale
-     */
-    private fun animateScoreChange(view: View, newText: String) {
-        if (view is android.widget.TextView) {
-            view.text = newText
-        }
-        
-        view.animate()
-            .scaleX(1.2f)
-            .scaleY(1.2f)
-            .setDuration(150)
-            .withEndAction {
-                view.animate()
-                    .scaleX(1.0f)
-                    .scaleY(1.0f)
-                    .setDuration(150)
-                    .start()
-            }
-            .start()
-    }
-    
-    /**
      * Animuje przejście między widokami z efektem slide/fade
      */
     private fun animateViewTransition(view: View, newVisibility: Int) {
@@ -406,20 +383,6 @@ class MatchActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-    
-    /**
-     * Konwertuje kod kraju (ISO) na emoji flagi
-     */
-    private fun getCountryFlag(countryCode: String?): String {
-        if (countryCode.isNullOrEmpty() || countryCode.length != 2) return ""
-        
-        // Konwertuj na wielkie litery
-        val upperCode = countryCode.uppercase()
-        
-        val firstChar = Character.codePointAt(upperCode, 0) - 0x41 + 0x1F1E6
-        val secondChar = Character.codePointAt(upperCode, 1) - 0x41 + 0x1F1E6
-        return String(Character.toChars(firstChar)) + String(Character.toChars(secondChar))
     }
     
     private fun updatePlayerNames(state: MatchState) {
@@ -563,193 +526,7 @@ class MatchActivity : AppCompatActivity() {
     }
     
     private fun updateScoreboard(state: MatchState) {
-        // Flagi i nazwy graczy/zespołów
-        if (state.isDoubles) {
-            // Dla debla pokaż nazwy zespołów zamiast pojedynczych graczy
-            scoreboardBinding.textPlayer1Flag.text = "👥"  // Ikona zespołu
-            scoreboardBinding.textPlayer2Flag.text = "👥"
-            
-            scoreboardBinding.textPlayer1Name.text = state.getTeam1ServerAwareDisplayName()
-            scoreboardBinding.textPlayer2Name.text = state.getTeam2ServerAwareDisplayName()
-        } else {
-            // Singiel - flagi i nazwiska
-            scoreboardBinding.textPlayer1Flag.text = getCountryFlag(state.player1.flag)
-            scoreboardBinding.textPlayer2Flag.text = getCountryFlag(state.player2.flag)
-            
-            scoreboardBinding.textPlayer1Name.text = state.player1.getDisplayName()
-            scoreboardBinding.textPlayer2Name.text = state.player2.getDisplayName()
-        }
-        
-        // W deblu piłka jest częścią etykiety zespołu; w singlu zostaje osobną ikoną.
-        if (state.isDoubles) {
-            scoreboardBinding.imagePlayer1ServerIcon.visibility = View.GONE
-            scoreboardBinding.imagePlayer2ServerIcon.visibility = View.GONE
-        } else {
-            scoreboardBinding.imagePlayer1ServerIcon.visibility = if (state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
-            scoreboardBinding.imagePlayer2ServerIcon.visibility = if (!state.isPlayer1Serving) View.VISIBLE else View.INVISIBLE
-        }
-        updateMatchMetadata(state)
-        
-        // Punkty z animacją
-        animateScoreChange(scoreboardBinding.textPlayer1Points, state.getPlayer1PointsDisplay())
-        animateScoreChange(scoreboardBinding.textPlayer2Points, state.getPlayer2PointsDisplay())
-        
-        // Określ aktywny set (0 = Set 1, 1 = Set 2)
-        val currentSetIndex = state.setsHistory.size
-        
-        // Set 1 - zawsze widoczny
-        if (state.setsHistory.isEmpty()) {
-            // Trwa pierwszy set
-            scoreboardBinding.textPlayer1Set1.text = state.player1Games.toString()
-            scoreboardBinding.textPlayer2Set1.text = state.player2Games.toString()
-        } else {
-            // Pierwszy set zakończony — pokaż z wynikiem tiebreak jeśli był
-            val set1 = state.setsHistory[0]
-            scoreboardBinding.textPlayer1Set1.text = formatSetScore(
-                games = set1.player1Games,
-                opponentGames = set1.player2Games,
-                tiebreakLoserPoints = set1.tiebreakLoserPoints
-            )
-            scoreboardBinding.textPlayer2Set1.text = formatSetScore(
-                games = set1.player2Games,
-                opponentGames = set1.player1Games,
-                tiebreakLoserPoints = set1.tiebreakLoserPoints
-            )
-        }
-        
-        // Set 2 - zawsze widoczny
-        if (state.setsHistory.size == 1) {
-            // Trwa drugi set
-            scoreboardBinding.textPlayer1Set2.text = state.player1Games.toString()
-            scoreboardBinding.textPlayer2Set2.text = state.player2Games.toString()
-        } else if (state.setsHistory.size > 1) {
-            // Drugi set zakończony — pokaż z wynikiem tiebreak jeśli był
-            val set2 = state.setsHistory[1]
-            scoreboardBinding.textPlayer1Set2.text = formatSetScore(
-                games = set2.player1Games,
-                opponentGames = set2.player2Games,
-                tiebreakLoserPoints = set2.tiebreakLoserPoints
-            )
-            scoreboardBinding.textPlayer2Set2.text = formatSetScore(
-                games = set2.player2Games,
-                opponentGames = set2.player1Games,
-                tiebreakLoserPoints = set2.tiebreakLoserPoints
-            )
-        } else {
-            // Przed drugim setem - pokaż 0
-            scoreboardBinding.textPlayer1Set2.text = getString(R.string.zero_score)
-            scoreboardBinding.textPlayer2Set2.text = getString(R.string.zero_score)
-        }
-        
-        // Zaznacz aktywny set pomarańczowym tłem
-        highlightActiveSet(currentSetIndex)
-        
-        // Tryb gry
-        when {
-            state.isSuperTiebreak -> {
-                scoreboardBinding.textGameMode.text = getString(R.string.super_tiebreak_mode, state.matchConfig.superTiebreakPoints)
-                scoreboardBinding.textGameMode.visibility = View.VISIBLE
-            }
-            state.isTiebreak -> {
-                scoreboardBinding.textGameMode.text = getString(R.string.tiebreak_mode, state.matchConfig.tiebreakPoints)
-                scoreboardBinding.textGameMode.visibility = View.VISIBLE
-            }
-            else -> {
-                scoreboardBinding.textGameMode.text = ""
-                scoreboardBinding.textGameMode.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun updateMatchMetadata(state: MatchState) {
-        val metadataParts = mutableListOf(
-            when {
-                state.isMixedDoubles -> getString(R.string.match_type_mixed)
-                state.isDoubles -> getString(R.string.match_type_doubles)
-                else -> getString(R.string.match_type_singles)
-            }
-        )
-
-        state.umpireName?.takeIf { it.isNotBlank() }?.let {
-            metadataParts.add(getString(R.string.match_metadata_umpire, it))
-        }
-        state.manualStartTime?.let {
-            metadataParts.add(getString(R.string.match_metadata_datetime, metadataDateFormat.format(Date(it))))
-        }
-
-        scoreboardBinding.textMatchMetadata.text = metadataParts.joinToString(" • ")
-        scoreboardBinding.textMatchMetadata.visibility = if (metadataParts.isEmpty()) View.GONE else View.VISIBLE
-    }
-    
-    private var lastActiveSet = 0
-    
-    private fun highlightActiveSet(setIndex: Int) {
-        val accentColor = resources.getColor(R.color.accent, theme)
-        val transparentColor = android.graphics.Color.TRANSPARENT
-        
-        // Jeśli set się zmienił, animuj przejście
-        if (setIndex != lastActiveSet && lastActiveSet < 2) {
-            // Animuj wygaszenie starego seta
-            when (lastActiveSet) {
-                0 -> {
-                    scoreboardBinding.backgroundPlayer1Set1.animate().alpha(0f).setDuration(200).start()
-                    scoreboardBinding.backgroundPlayer2Set1.animate().alpha(0f).setDuration(200).start()
-                }
-                1 -> {
-                    scoreboardBinding.backgroundPlayer1Set2.animate().alpha(0f).setDuration(200).start()
-                    scoreboardBinding.backgroundPlayer2Set2.animate().alpha(0f).setDuration(200).start()
-                }
-            }
-        }
-        
-        // Ustaw tła
-        when (setIndex) {
-            0 -> {
-                // Aktywny Set 1
-                scoreboardBinding.backgroundPlayer1Set1.setBackgroundColor(accentColor)
-                scoreboardBinding.backgroundPlayer2Set1.setBackgroundColor(accentColor)
-                scoreboardBinding.backgroundPlayer1Set1.alpha = 0.3f
-                scoreboardBinding.backgroundPlayer2Set1.alpha = 0.3f
-                
-                scoreboardBinding.backgroundPlayer1Set2.setBackgroundColor(transparentColor)
-                scoreboardBinding.backgroundPlayer2Set2.setBackgroundColor(transparentColor)
-                
-                // Animuj pojawienie się jeśli to zmiana
-                if (lastActiveSet != 0) {
-                    scoreboardBinding.backgroundPlayer1Set1.alpha = 0f
-                    scoreboardBinding.backgroundPlayer2Set1.alpha = 0f
-                    scoreboardBinding.backgroundPlayer1Set1.animate().alpha(0.3f).setDuration(300).start()
-                    scoreboardBinding.backgroundPlayer2Set1.animate().alpha(0.3f).setDuration(300).start()
-                }
-            }
-            1 -> {
-                // Aktywny Set 2
-                scoreboardBinding.backgroundPlayer1Set1.setBackgroundColor(transparentColor)
-                scoreboardBinding.backgroundPlayer2Set1.setBackgroundColor(transparentColor)
-                
-                scoreboardBinding.backgroundPlayer1Set2.setBackgroundColor(accentColor)
-                scoreboardBinding.backgroundPlayer2Set2.setBackgroundColor(accentColor)
-                scoreboardBinding.backgroundPlayer1Set2.alpha = 0.3f
-                scoreboardBinding.backgroundPlayer2Set2.alpha = 0.3f
-                
-                // Animuj pojawienie się jeśli to zmiana
-                if (lastActiveSet != 1) {
-                    scoreboardBinding.backgroundPlayer1Set2.alpha = 0f
-                    scoreboardBinding.backgroundPlayer2Set2.alpha = 0f
-                    scoreboardBinding.backgroundPlayer1Set2.animate().alpha(0.3f).setDuration(300).start()
-                    scoreboardBinding.backgroundPlayer2Set2.animate().alpha(0.3f).setDuration(300).start()
-                }
-            }
-            else -> {
-                // Mecz zakończony - bez zaznaczenia
-                scoreboardBinding.backgroundPlayer1Set1.setBackgroundColor(transparentColor)
-                scoreboardBinding.backgroundPlayer2Set1.setBackgroundColor(transparentColor)
-                scoreboardBinding.backgroundPlayer1Set2.setBackgroundColor(transparentColor)
-                scoreboardBinding.backgroundPlayer2Set2.setBackgroundColor(transparentColor)
-            }
-        }
-        
-        lastActiveSet = setIndex
+        scoreboardRenderer.render(state)
     }
     
     private fun updateServerSelectionButtons(state: MatchState) {
@@ -1012,15 +789,6 @@ class MatchActivity : AppCompatActivity() {
             timerHandler.removeCallbacks(it)
             timerRunnable = null
         }
-    }
-
-    private fun formatSetScore(games: Int, opponentGames: Int, tiebreakLoserPoints: Int?): String {
-        val suffix = if (tiebreakLoserPoints != null && games < opponentGames) {
-            getString(R.string.scoreboard_tiebreak_suffix, tiebreakLoserPoints)
-        } else {
-            ""
-        }
-        return getString(R.string.scoreboard_set_score, games, suffix)
     }
 
     private fun formatPercentage(value: Int): String {
