@@ -9,12 +9,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.*
+import pl.vestmedia.tennisreferee.domain.match.MatchActionReducer
+import pl.vestmedia.tennisreferee.domain.match.MatchCommand
 import pl.vestmedia.tennisreferee.domain.match.MatchPointEvent
 import pl.vestmedia.tennisreferee.domain.match.MatchPointReducer
 import pl.vestmedia.tennisreferee.domain.match.MatchProgressEvent
@@ -23,7 +24,6 @@ import pl.vestmedia.tennisreferee.domain.match.MatchProgressScreen
 import pl.vestmedia.tennisreferee.domain.match.MatchStartReducer
 import pl.vestmedia.tennisreferee.domain.match.MatchUndoRestorer
 import pl.vestmedia.tennisreferee.utils.AppLogger
-import retrofit2.Response
 
 /**
  * ViewModel zarządzający logiką meczu tenisowego
@@ -99,8 +99,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         continueFromAnnouncement()
     }
     
-    private val apiService = RetrofitClient.apiService
-    private val matchHistoryRepository = (application as TennisRefereeApp).matchHistoryRepository
+    private val matchSyncCoordinator = MatchSyncCoordinator(
+        apiService = RetrofitClient.apiService,
+        matchHistoryRepository = (application as TennisRefereeApp).matchHistoryRepository,
+        batteryInfoProvider = { MatchBatteryInfo(getBatteryLevel(), isBatteryCharging()) },
+        onSyncStatus = { status -> _syncStatus.postValue(status) },
+        onBracketWarning = { warning, matchId -> _bracketWarning.postValue(BracketWarningEvent(warning, matchId)) }
+    )
     
     /**
      * Inicjalizuje nowy mecz
@@ -200,23 +205,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleAce() {
         _matchState.value?.let { state ->
-            val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+            val serverName = serverName(state)
             saveStateBeforeAction(ActionType.ACE, str(R.string.undo_ace, serverName))
-            
-            if (state.isPlayer1Serving) {
-                state.player1Stats.aces++
-                state.player1Stats.firstServesIn++
-                state.player1Stats.firstServesTotal++
-                addPoint(true)
-            } else {
-                state.player2Stats.aces++
-                state.player2Stats.firstServesIn++
-                state.player2Stats.firstServesTotal++
-                addPoint(false)
-            }
-            state.isFirstServe = true
-            _matchState.value = state
-            checkGameAndSetStatus()
+            applyMatchCommand(state, MatchCommand.Ace)
         }
     }
     
@@ -228,32 +219,12 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             if (state.isFirstServe) {
                 // Pierwszy serwis nieudany - przejdź na 2. serwis
                 saveStateBeforeAction(ActionType.FAULT, str(R.string.undo_fault_first))
-                
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.firstServesTotal++
-                } else {
-                    state.player2Stats.firstServesTotal++
-                }
-                state.isFirstServe = false
-                _matchState.value = state
             } else {
                 // Podwójny błąd
-                val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                val serverName = serverName(state)
                 saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
-                
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.doubleFaults++
-                    state.player1Stats.secondServesTotal++
-                    addPoint(false) // Punkt dla przeciwnika
-                } else {
-                    state.player2Stats.doubleFaults++
-                    state.player2Stats.secondServesTotal++
-                    addPoint(true) // Punkt dla przeciwnika
-                }
-                state.isFirstServe = true
-                _matchState.value = state
-                checkGameAndSetStatus()
             }
+            applyMatchCommand(state, MatchCommand.Fault)
         }
     }
     
@@ -265,31 +236,11 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         _matchState.value?.let { state ->
             if (state.isFirstServe) {
                 saveStateBeforeAction(ActionType.FOOT_FAULT, str(R.string.undo_foot_fault_first))
-                
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.firstServesTotal++
-                } else {
-                    state.player2Stats.firstServesTotal++
-                }
-                state.isFirstServe = false
-                _matchState.value = state
             } else {
-                val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                val serverName = serverName(state)
                 saveStateBeforeAction(ActionType.FOOT_FAULT, str(R.string.undo_foot_fault_double, serverName))
-                
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.doubleFaults++
-                    state.player1Stats.secondServesTotal++
-                    addPoint(false)
-                } else {
-                    state.player2Stats.doubleFaults++
-                    state.player2Stats.secondServesTotal++
-                    addPoint(true)
-                }
-                state.isFirstServe = true
-                _matchState.value = state
-                checkGameAndSetStatus()
             }
+            applyMatchCommand(state, MatchCommand.FootFault)
         }
     }
     
@@ -298,26 +249,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleBallInPlay() {
         _matchState.value?.let { state ->
-            if (state.isFirstServe) {
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.firstServesIn++
-                    state.player1Stats.firstServesTotal++
-                } else {
-                    state.player2Stats.firstServesIn++
-                    state.player2Stats.firstServesTotal++
-                }
-            } else {
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.secondServesIn++
-                    state.player1Stats.secondServesTotal++
-                } else {
-                    state.player2Stats.secondServesIn++
-                    state.player2Stats.secondServesTotal++
-                }
-            }
-            state.isFirstServe = true
-            _matchState.value = state
-            _currentView.value = MatchView.RALLY
+            applyMatchCommand(state, MatchCommand.BallInPlay)
         }
     }
     
@@ -326,17 +258,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleWinner(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
-            val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
+            val playerName = playerName(state, isPlayer1)
             saveStateBeforeAction(ActionType.WINNER, str(R.string.undo_winner, playerName))
-            
-            if (isPlayer1) {
-                state.player1Stats.winners++
-            } else {
-                state.player2Stats.winners++
-            }
-            addPoint(isPlayer1)
-            _matchState.value = state
-            checkGameAndSetStatus()
+            applyMatchCommand(state, MatchCommand.Winner(isPlayer1))
         }
     }
     
@@ -345,18 +269,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleForcedError(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
-            val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
+            val playerName = playerName(state, isPlayer1)
             saveStateBeforeAction(ActionType.FORCED_ERROR, str(R.string.undo_forced_error, playerName))
-            
-            if (isPlayer1) {
-                state.player1Stats.forcedErrors++
-                addPoint(false) // Punkt dla przeciwnika
-            } else {
-                state.player2Stats.forcedErrors++
-                addPoint(true) // Punkt dla przeciwnika
-            }
-            _matchState.value = state
-            checkGameAndSetStatus()
+            applyMatchCommand(state, MatchCommand.ForcedError(isPlayer1))
         }
     }
     
@@ -365,18 +280,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleUnforcedError(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
-            val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
+            val playerName = playerName(state, isPlayer1)
             saveStateBeforeAction(ActionType.UNFORCED_ERROR, str(R.string.undo_unforced_error, playerName))
-            
-            if (isPlayer1) {
-                state.player1Stats.unforcedErrors++
-                addPoint(false) // Punkt dla przeciwnika
-            } else {
-                state.player2Stats.unforcedErrors++
-                addPoint(true) // Punkt dla przeciwnika
-            }
-            _matchState.value = state
-            checkGameAndSetStatus()
+            applyMatchCommand(state, MatchCommand.UnforcedError(isPlayer1))
         }
     }
     
@@ -388,40 +294,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleBasicWin(isPlayer1: Boolean) {
         _matchState.value?.let { state ->
-            val playerName = if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
+            val playerName = playerName(state, isPlayer1)
             saveStateBeforeAction(ActionType.WINNER, str(R.string.undo_win, playerName))
-            
-            if (isPlayer1) {
-                state.player1Stats.winners++
-            } else {
-                state.player2Stats.winners++
-            }
-            
-            // Statystyki serwisu — serwis wpadł (1. lub 2.)
-            if (state.isFirstServe) {
-                // 1. serwis wpadł
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.firstServesIn++
-                    state.player1Stats.firstServesTotal++
-                } else {
-                    state.player2Stats.firstServesIn++
-                    state.player2Stats.firstServesTotal++
-                }
-            } else {
-                // 2. serwis wpadł (1. był fault — już policzony)
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.secondServesIn++
-                    state.player1Stats.secondServesTotal++
-                } else {
-                    state.player2Stats.secondServesIn++
-                    state.player2Stats.secondServesTotal++
-                }
-            }
-            
-            addPoint(isPlayer1)
-            state.isFirstServe = true
-            _matchState.value = state
-            checkGameAndSetStatus()
+            applyMatchCommand(state, MatchCommand.BasicWin(isPlayer1))
         }
     }
     
@@ -434,33 +309,40 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         _matchState.value?.let { state ->
             if (state.isFirstServe) {
                 saveStateBeforeAction(ActionType.FAULT, str(R.string.undo_fault_first))
-                // 1. serwis nieudany — policz próbę
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.firstServesTotal++
-                } else {
-                    state.player2Stats.firstServesTotal++
-                }
-                state.isFirstServe = false
-                _matchState.value = state
             } else {
                 // Podwójny błąd
-                val serverName = if (state.isDoubles) state.getCurrentServerName() else if (state.isPlayer1Serving) state.player1.getDisplayName() else state.player2.getDisplayName()
+                val serverName = serverName(state)
                 saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
-                
-                if (state.isPlayer1Serving) {
-                    state.player1Stats.doubleFaults++
-                    state.player1Stats.secondServesTotal++
-                    addPoint(false)
-                } else {
-                    state.player2Stats.doubleFaults++
-                    state.player2Stats.secondServesTotal++
-                    addPoint(true)
-                }
-                state.isFirstServe = true
-                _matchState.value = state
-                checkGameAndSetStatus()
             }
+            applyMatchCommand(state, MatchCommand.BasicFault)
         }
+    }
+
+    private fun applyMatchCommand(state: MatchState, command: MatchCommand) {
+        val result = MatchActionReducer.reduce(state, command)
+        result.pointWinner?.let { addPoint(it) }
+        _matchState.value = state
+
+        if (result.transitionToRally) {
+            _currentView.value = MatchView.RALLY
+        }
+        if (result.pointWinner != null) {
+            checkGameAndSetStatus()
+        }
+    }
+
+    private fun serverName(state: MatchState): String {
+        return if (state.isDoubles) {
+            state.getCurrentServerName()
+        } else if (state.isPlayer1Serving) {
+            state.player1.getDisplayName()
+        } else {
+            state.player2.getDisplayName()
+        }
+    }
+
+    private fun playerName(state: MatchState, isPlayer1: Boolean): String {
+        return if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
     }
     
     /**
@@ -547,97 +429,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     private fun finalizeMatchOnServer(state: MatchState) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                // 1. Upewnij się, że krótki mecz (np. sam TB) istnieje na serwerze, a potem wyślij finalny stan.
-                try {
-                    val match = state.toMatch()
-                    if (state.matchId == null) {
-                        val response = requestWithRetry("create final match") { apiService.createMatch(match) }
-                        if (response.isSuccessful && response.body() != null) {
-                            state.matchId = response.body()!!.id
-                            AppLogger.api("createFinalMatch", "OK id=${state.matchId}")
-                        }
-                    }
-
-                    state.matchId?.let { matchId ->
-                        requestWithRetry("sync final state") { apiService.updateMatch(matchId, state.toMatch()) }
-                    }
-                } catch (e: Exception) {
-                    AppLogger.error("finalizeMatch", "sync final state: ${e.message}")
-                }
-
-                if (state.matchId == null) {
-                    AppLogger.error("finalizeMatch", "match id missing after final sync")
-                }
-
-                // 2. Wyślij event match_end (POST /match-events) z pełnym sets_history
-                try {
-                    val event = MatchEvent(
-                        courtId = state.courtId,
-                        eventType = "match_end",
-                        player1 = buildSidePlayerInfo(state, isPlayer1Side = true),
-                        player2 = buildSidePlayerInfo(state, isPlayer1Side = false),
-                        score = ScoreInfo(
-                            player1Sets = state.player1Sets,
-                            player2Sets = state.player2Sets,
-                            player1Games = state.player1Games,
-                            player2Games = state.player2Games,
-                            player1Points = state.player1Points,
-                            player2Points = state.player2Points,
-                            isTiebreak = state.isTiebreak,
-                            isSuperTiebreak = state.isSuperTiebreak,
-                            matchFinished = state.isMatchFinished,
-                            setsHistory = state.setsHistory.toList(),
-                            statsMode = state.statsMode.name
-                        ),
-                        stats = LiveStatsInfo(
-                            player1Aces = state.player1Stats.aces,
-                            player1DoubleFaults = state.player1Stats.doubleFaults,
-                            player1Winners = state.player1Stats.winners,
-                            player1UnforcedErrors = state.player1Stats.unforcedErrors,
-                            player1FirstServePct = state.player1Stats.getFirstServePercentage(),
-                            player2Aces = state.player2Stats.aces,
-                            player2DoubleFaults = state.player2Stats.doubleFaults,
-                            player2Winners = state.player2Stats.winners,
-                            player2UnforcedErrors = state.player2Stats.unforcedErrors,
-                            player2FirstServePct = state.player2Stats.getFirstServePercentage()
-                        ),
-                        batteryLevel = getBatteryLevel(),
-                        isCharging = isBatteryCharging()
-                    )
-                    requestWithRetry("match_end event") { apiService.logMatchEvent(event) }
-                } catch (e: Exception) {
-                    AppLogger.error("finalizeMatch", "match_end event: ${e.message}")
-                }
-
-                // 3. Zakończ mecz na serwerze (POST /matches/{id}/finish)
-                state.matchId?.let { matchId ->
-                    try {
-                        requestWithRetry("finish match") { apiService.finishMatch(matchId) }
-                    } catch (e: Exception) {
-                        AppLogger.error("finalizeMatch", "finish: ${e.message}")
-                    }
-                }
-
-                // 4. Wyślij statystyki (POST /match-statistics)
-                val statisticsRequest = state.toMatchStatisticsRequest()
-                if (statisticsRequest != null) {
-                    try {
-                        requestWithRetry("send statistics") { apiService.sendMatchStatistics(statisticsRequest) }
-                    } catch (e: Exception) {
-                        AppLogger.error("finalizeMatch", "statistics: ${e.message}")
-                    }
-                }
-            } catch (e: Exception) {
-                AppLogger.error("finalizeMatch", "overall: ${e.message}")
-            }
-
-            // 5. Zapisz lokalnie do Room DB
-            try {
-                matchHistoryRepository.saveMatch(state)
-            } catch (e: Exception) {
-                AppLogger.error("finalizeMatch", "local save: ${e.message}")
-            }
+            matchSyncCoordinator.finalizeMatch(state)
         }
     }
 
@@ -650,87 +442,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         AppLogger.action("Match", eventType, "score=${state.player1Points}-${state.player2Points} games=${state.player1Games}-${state.player2Games} sets=${state.player1Sets}-${state.player2Sets}")
         
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val event = MatchEvent(
-                    courtId = state.courtId,
-                    eventType = eventType,
-                    player1 = buildSidePlayerInfo(state, isPlayer1Side = true),
-                    player2 = buildSidePlayerInfo(state, isPlayer1Side = false),
-                    score = ScoreInfo(
-                        player1Sets = state.player1Sets,
-                        player2Sets = state.player2Sets,
-                        player1Games = state.player1Games,
-                        player2Games = state.player2Games,
-                        player1Points = state.player1Points,
-                        player2Points = state.player2Points,
-                        isTiebreak = state.isTiebreak,
-                        isSuperTiebreak = state.isSuperTiebreak,
-                        matchFinished = state.isMatchFinished,
-                        setsHistory = state.setsHistory.toList(),
-                        statsMode = state.statsMode.name
-                    ),
-                    stats = LiveStatsInfo(
-                        player1Aces = state.player1Stats.aces,
-                        player1DoubleFaults = state.player1Stats.doubleFaults,
-                        player1Winners = state.player1Stats.winners,
-                        player1UnforcedErrors = state.player1Stats.unforcedErrors,
-                        player1FirstServePct = state.player1Stats.getFirstServePercentage(),
-                        player2Aces = state.player2Stats.aces,
-                        player2DoubleFaults = state.player2Stats.doubleFaults,
-                        player2Winners = state.player2Stats.winners,
-                        player2UnforcedErrors = state.player2Stats.unforcedErrors,
-                        player2FirstServePct = state.player2Stats.getFirstServePercentage()
-                    ),
-                    batteryLevel = getBatteryLevel(),
-                    isCharging = isBatteryCharging()
-                )
-                
-                val response = requestWithRetry("log $eventType") { apiService.logMatchEvent(event) }
-                if (!response.isSuccessful) {
-                    AppLogger.error("logMatchEvent", "HTTP ${response.code()} for $eventType")
-                }
-            } catch (e: Exception) {
-                AppLogger.error("logMatchEvent", "$eventType: ${e.message}")
-                // Nie przerywamy działania aplikacji przy błędzie logowania
-            }
-        }
-    }
-
-    private fun buildSidePlayerInfo(state: MatchState, isPlayer1Side: Boolean): PlayerInfo {
-        val player = if (isPlayer1Side) state.player1 else state.player2
-        val serving = if (isPlayer1Side) state.isPlayer1Serving else !state.isPlayer1Serving
-
-        if (!state.isDoubles) {
-            return PlayerInfo(
-                name = player.getDisplayName(),
-                fullName = player.getFullName(),
-                flag = player.flag,
-                isServing = serving
-            )
-        }
-
-        val displayName = if (isPlayer1Side) state.getTeam1DisplayName() else state.getTeam2DisplayName()
-        val fullName = if (isPlayer1Side) state.getTeam1FullName() else state.getTeam2FullName()
-
-        return PlayerInfo(
-            name = displayName,
-            fullName = fullName,
-            flag = player.flag,
-            isServing = serving
-        )
-    }
-    
-    /**
-     * Zapisuje zakończony mecz do bazy danych
-     */
-    private fun saveMatchToDatabase(state: MatchState) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                matchHistoryRepository.saveMatch(state)
-            } catch (e: Exception) {
-                AppLogger.error("saveMatchToDatabase", e)
-                // Nie przerywamy działania aplikacji przy błędzie zapisu
-            }
+            matchSyncCoordinator.logMatchEvent(state, eventType)
         }
     }
     
@@ -740,37 +452,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun syncMatchWithServer() {
         _matchState.value?.let { state ->
             viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    if (state.matchId == null) {
-                        // Pierwszy sync - utwórz mecz na serwerze
-                        val match = state.toMatch()
-                        val response = requestWithRetry("create match") { apiService.createMatch(match) }
-                        
-                        if (response.isSuccessful && response.body() != null) {
-                            val created = response.body()!!
-                            state.matchId = created.id
-                            AppLogger.api("createMatch", "OK id=${state.matchId} phase=${created.phase}")
-                            
-                            // Handle bracket warning
-                            created.bracketWarning?.let { warning ->
-                                _bracketWarning.postValue(BracketWarningEvent(warning, created.id))
-                            }
-                        } else {
-                            AppLogger.api("createMatch", "FAIL ${response.code()}")
-                        }
-                    } else {
-                        // Aktualizuj istniejący mecz
-                        val match = state.toMatch()
-                        val response = requestWithRetry("update match") { apiService.updateMatch(state.matchId!!, match) }
-                        
-                        if (!response.isSuccessful) {
-                            AppLogger.api("updateMatch", "FAIL ${response.code()}")
-                        }
-                    }
-                } catch (e: Exception) {
-                    AppLogger.error("syncMatchWithServer", e)
-                    // Nie przerywamy działania aplikacji przy błędzie synchronizacji
-                }
+                matchSyncCoordinator.syncMatch(state)
             }
         }
     }
@@ -784,17 +466,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun finishMatchOnServer() {
         _matchState.value?.let { state ->
-            state.matchId?.let { matchId ->
-                viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        val response = requestWithRetry("finish match") { apiService.finishMatch(matchId) }
-                        if (!response.isSuccessful) {
-                            AppLogger.api("finishMatch", "FAIL ${response.code()}")
-                        }
-                    } catch (e: Exception) {
-                        AppLogger.error("finishMatchOnServer", e)
-                    }
-                }
+            viewModelScope.launch(Dispatchers.IO) {
+                matchSyncCoordinator.finishMatch(state)
             }
         }
     }
@@ -804,64 +477,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun sendMatchStatistics() {
         _matchState.value?.let { state ->
-            val statisticsRequest = state.toMatchStatisticsRequest()
-            if (statisticsRequest != null) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        val response = requestWithRetry("send statistics") { apiService.sendMatchStatistics(statisticsRequest) }
-                        if (response.isSuccessful) {
-                            AppLogger.api("sendStatistics", "OK")
-                        } else {
-                            AppLogger.api("sendStatistics", "FAIL ${response.code()}")
-                        }
-                    } catch (e: Exception) {
-                        AppLogger.error("sendMatchStatistics", e)
-                    }
-                }
+            viewModelScope.launch(Dispatchers.IO) {
+                matchSyncCoordinator.sendStatistics(state)
             }
         }
-    }
-
-    private suspend fun <T> requestWithRetry(
-        operation: String,
-        maxAttempts: Int = 3,
-        call: suspend () -> Response<T>
-    ): Response<T> {
-        _syncStatus.postValue(SyncStatus.SYNCING)
-        var lastException: Exception? = null
-        var lastResponse: Response<T>? = null
-
-        repeat(maxAttempts) { attempt ->
-            try {
-                val response = call()
-                if (response.isSuccessful) {
-                    _syncStatus.postValue(SyncStatus.SYNCED)
-                    return response
-                }
-
-                lastResponse = response
-                if (!response.shouldRetry()) {
-                    _syncStatus.postValue(SyncStatus.FAILED)
-                    return response
-                }
-                AppLogger.api(operation, "retryable HTTP ${response.code()} attempt=${attempt + 1}")
-            } catch (e: Exception) {
-                lastException = e
-                AppLogger.error(operation, "attempt=${attempt + 1}: ${e.message}")
-            }
-
-            if (attempt < maxAttempts - 1) {
-                delay(500L * (attempt + 1))
-            }
-        }
-
-        _syncStatus.postValue(SyncStatus.OFFLINE)
-        lastResponse?.let { return it }
-        throw lastException ?: IllegalStateException("$operation failed")
-    }
-
-    private fun Response<*>.shouldRetry(): Boolean {
-        return code() in 500..599 || code() == 408 || code() == 429
     }
 }
 
