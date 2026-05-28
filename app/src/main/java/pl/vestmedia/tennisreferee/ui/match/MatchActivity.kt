@@ -204,22 +204,30 @@ class MatchActivity : AppCompatActivity() {
         // Wybór serwującego
         serverSelectionBinding.buttonPlayer1Serves.setOnClickListener {
             AppLogger.button("Match", "Player1Serves")
-            viewModel.setFirstServer(1)
+            viewModel.matchState.value?.let { state ->
+                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(1, state))
+            }
         }
         
         serverSelectionBinding.buttonPlayer2Serves.setOnClickListener {
             AppLogger.button("Match", "Player2Serves")
-            viewModel.setFirstServer(2)
+            viewModel.matchState.value?.let { state ->
+                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(2, state))
+            }
         }
 
         serverSelectionBinding.buttonPlayer3Serves.setOnClickListener {
             AppLogger.button("Match", "Player3Serves")
-            viewModel.setFirstServer(3)
+            viewModel.matchState.value?.let { state ->
+                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(3, state))
+            }
         }
 
         serverSelectionBinding.buttonPlayer4Serves.setOnClickListener {
             AppLogger.button("Match", "Player4Serves")
-            viewModel.setFirstServer(4)
+            viewModel.matchState.value?.let { state ->
+                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(4, state))
+            }
         }
         
         // Zamiana stron z animacją
@@ -830,7 +838,7 @@ class MatchActivity : AppCompatActivity() {
         applyServerButtonStyle(serverSelectionBinding.buttonPlayer1Serves, R.color.player_selected, state.currentServer == leftServerNumber)
         applyServerButtonStyle(serverSelectionBinding.buttonPlayer2Serves, R.color.player_selected, state.currentServer == rightServerNumber)
     }
-    
+
     private fun updateServeView(state: MatchState) {
         // Aktualizuj tylko jeśli widok SERVE jest aktywny
         if (viewModel.currentView.value != MatchView.SERVE) return

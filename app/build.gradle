@@ -23,7 +23,7 @@ android {
     def vMajor = 1
     def vMinor = 0
     def vPatch = 0
-    def vBuild = 16           // increment for each build
+    def vBuild = 19           // increment for each build
     def vQualifier = "dev"    // "dev" | "alpha" | "beta" | "" (production)
 
     signingConfigs {
