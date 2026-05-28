@@ -2,7 +2,6 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.content.res.ColorStateList
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
@@ -22,8 +21,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchBinding
@@ -35,7 +32,6 @@ import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
 import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
@@ -56,6 +52,7 @@ class MatchActivity : AppCompatActivity() {
     private lateinit var basicScoringBinding: LayoutBasicScoringBinding
     private lateinit var matchFinishedBinding: LayoutMatchFinishedBinding
     private lateinit var announcementBinding: LayoutAnnouncementBinding
+    private lateinit var serverSelectionViewBinder: ServerSelectionViewBinder
     private val viewModel: MatchViewModel by viewModels()
     
     // Śledzenie stanu serwisu do animacji przejścia na 2. serwis
@@ -85,6 +82,17 @@ class MatchActivity : AppCompatActivity() {
         basicScoringBinding = LayoutBasicScoringBinding.bind(binding.layoutBasicScoring.root)
         matchFinishedBinding = LayoutMatchFinishedBinding.bind(binding.layoutMatchFinished.root)
         announcementBinding = LayoutAnnouncementBinding.bind(binding.layoutAnnouncement.root)
+        serverSelectionViewBinder = ServerSelectionViewBinder(
+            context = this,
+            binding = serverSelectionBinding,
+            getState = { viewModel.matchState.value },
+            onServerSelected = { viewModel.setFirstServer(it) },
+            onSwapSides = {
+                animateSwapSides()
+                viewModel.swapSides()
+            },
+            onButtonLogged = { AppLogger.button("Match", it) }
+        )
         
         intent.extras?.classLoader = MatchState::class.java.classLoader
 
@@ -201,41 +209,7 @@ class MatchActivity : AppCompatActivity() {
     }
     
     private fun setupListeners() {
-        // Wybór serwującego
-        serverSelectionBinding.buttonPlayer1Serves.setOnClickListener {
-            AppLogger.button("Match", "Player1Serves")
-            viewModel.matchState.value?.let { state ->
-                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(1, state))
-            }
-        }
-        
-        serverSelectionBinding.buttonPlayer2Serves.setOnClickListener {
-            AppLogger.button("Match", "Player2Serves")
-            viewModel.matchState.value?.let { state ->
-                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(2, state))
-            }
-        }
-
-        serverSelectionBinding.buttonPlayer3Serves.setOnClickListener {
-            AppLogger.button("Match", "Player3Serves")
-            viewModel.matchState.value?.let { state ->
-                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(3, state))
-            }
-        }
-
-        serverSelectionBinding.buttonPlayer4Serves.setOnClickListener {
-            AppLogger.button("Match", "Player4Serves")
-            viewModel.matchState.value?.let { state ->
-                viewModel.setFirstServer(ServerSelectionController.resolveServerNumber(4, state))
-            }
-        }
-        
-        // Zamiana stron z animacją
-        serverSelectionBinding.buttonSwapSides.setOnClickListener {
-            AppLogger.button("Match", "SwapSides")
-            animateSwapSides()
-            viewModel.swapSides()
-        }
+        serverSelectionViewBinder.bind()
         
         // Serwis - lewa strona (Player 1)
         serveBinding.buttonAceLeft.setOnClickListener {
@@ -779,64 +753,7 @@ class MatchActivity : AppCompatActivity() {
     }
     
     private fun updateServerSelectionButtons(state: MatchState) {
-        fun playerLabel(player: Player, selected: Boolean): String {
-            val prefix = if (selected) {
-                if (state.isDoubles) "🎾 " else "• "
-            } else {
-                ""
-            }
-            val genderLabel = player.getGenderShortLabel()?.let { "$it " }.orEmpty()
-            return "$prefix$genderLabel${player.getDisplayName()}"
-        }
-
-        fun applyServerButtonStyle(
-            button: com.google.android.material.button.MaterialButton,
-            colorRes: Int,
-            selected: Boolean,
-            textColorRes: Int? = null
-        ) {
-            button.setBackgroundColor(ContextCompat.getColor(this, colorRes))
-            textColorRes?.let { button.setTextColor(ContextCompat.getColor(this, it)) }
-            button.strokeWidth = if (selected) 3 else 1
-            button.strokeColor = ColorStateList.valueOf(
-                ColorUtils.setAlphaComponent(Color.WHITE, if (selected) 224 else 104)
-            )
-            button.alpha = if (selected) 1.0f else 0.9f
-        }
-
-        if (state.isDoubles) {
-            val leftTop = if (!state.sidesSwapped) Pair(1, state.player1) else Pair(2, state.player2)
-            val leftBottom = if (!state.sidesSwapped) Pair(3, state.player3) else Pair(4, state.player4)
-            val rightTop = if (!state.sidesSwapped) Pair(2, state.player2) else Pair(1, state.player1)
-            val rightBottom = if (!state.sidesSwapped) Pair(4, state.player4) else Pair(3, state.player3)
-
-            serverSelectionBinding.buttonPlayer3Serves.visibility = View.VISIBLE
-            serverSelectionBinding.buttonPlayer4Serves.visibility = View.VISIBLE
-
-            serverSelectionBinding.buttonPlayer1Serves.text = playerLabel(leftTop.second, state.currentServer == leftTop.first)
-            serverSelectionBinding.buttonPlayer2Serves.text = playerLabel(rightTop.second, state.currentServer == rightTop.first)
-            serverSelectionBinding.buttonPlayer3Serves.text = playerLabel(leftBottom.second ?: leftTop.second, state.currentServer == leftBottom.first)
-            serverSelectionBinding.buttonPlayer4Serves.text = playerLabel(rightBottom.second ?: rightTop.second, state.currentServer == rightBottom.first)
-
-            applyServerButtonStyle(serverSelectionBinding.buttonPlayer1Serves, if (leftTop.first == 1 || leftTop.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == leftTop.first, R.color.team_button_text_color)
-            applyServerButtonStyle(serverSelectionBinding.buttonPlayer2Serves, if (rightTop.first == 1 || rightTop.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == rightTop.first, R.color.team_button_text_color)
-            applyServerButtonStyle(serverSelectionBinding.buttonPlayer3Serves, if (leftBottom.first == 1 || leftBottom.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == leftBottom.first, R.color.team_button_text_color)
-            applyServerButtonStyle(serverSelectionBinding.buttonPlayer4Serves, if (rightBottom.first == 1 || rightBottom.first == 3) R.color.team1_color else R.color.team2_color, state.currentServer == rightBottom.first, R.color.team_button_text_color)
-            return
-        }
-
-        serverSelectionBinding.buttonPlayer3Serves.visibility = View.GONE
-        serverSelectionBinding.buttonPlayer4Serves.visibility = View.GONE
-
-        val leftPlayer = if (!state.sidesSwapped) state.player1 else state.player2
-        val rightPlayer = if (!state.sidesSwapped) state.player2 else state.player1
-        val leftServerNumber = if (!state.sidesSwapped) 1 else 2
-        val rightServerNumber = if (!state.sidesSwapped) 2 else 1
-
-        serverSelectionBinding.buttonPlayer1Serves.text = playerLabel(leftPlayer, state.currentServer == leftServerNumber)
-        serverSelectionBinding.buttonPlayer2Serves.text = playerLabel(rightPlayer, state.currentServer == rightServerNumber)
-        applyServerButtonStyle(serverSelectionBinding.buttonPlayer1Serves, R.color.player_selected, state.currentServer == leftServerNumber)
-        applyServerButtonStyle(serverSelectionBinding.buttonPlayer2Serves, R.color.player_selected, state.currentServer == rightServerNumber)
+        serverSelectionViewBinder.render(state)
     }
 
     private fun updateServeView(state: MatchState) {
