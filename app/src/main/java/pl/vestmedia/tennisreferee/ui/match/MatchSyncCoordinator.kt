@@ -1,20 +1,35 @@
 package pl.vestmedia.tennisreferee.ui.match
 
-import kotlinx.coroutines.delay
+import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
 import pl.vestmedia.tennisreferee.data.api.TennisApiService
 import pl.vestmedia.tennisreferee.data.model.MatchEventFactory
 import pl.vestmedia.tennisreferee.data.model.MatchState
 import pl.vestmedia.tennisreferee.data.repository.MatchHistoryRepository
-import pl.vestmedia.tennisreferee.utils.AppLogger
 import retrofit2.Response
 
 class MatchSyncCoordinator(
-    private val apiService: TennisApiService,
-    private val matchHistoryRepository: MatchHistoryRepository,
+    private val apiClient: MatchApiClient,
+    private val matchHistorySaver: MatchHistorySaver,
     private val batteryInfoProvider: () -> MatchBatteryInfo,
     private val onSyncStatus: (SyncStatus) -> Unit,
-    private val onBracketWarning: (warning: String, matchId: Int) -> Unit
+    private val onBracketWarning: (warning: String, matchId: Int) -> Unit,
+    private val retryDelay: RetryDelay = CoroutineRetryDelay,
+    private val logger: MatchSyncLogger = AppLoggerMatchSyncLogger
 ) {
+    constructor(
+        apiService: TennisApiService,
+        matchHistoryRepository: MatchHistoryRepository,
+        batteryInfoProvider: () -> MatchBatteryInfo,
+        onSyncStatus: (SyncStatus) -> Unit,
+        onBracketWarning: (warning: String, matchId: Int) -> Unit
+    ) : this(
+        apiClient = RetrofitMatchApiClient(apiService),
+        matchHistorySaver = RoomMatchHistorySaver(matchHistoryRepository),
+        batteryInfoProvider = batteryInfoProvider,
+        onSyncStatus = onSyncStatus,
+        onBracketWarning = onBracketWarning
+    )
+
     suspend fun logMatchEvent(state: MatchState, eventType: String) {
         try {
             val batteryInfo = batteryInfoProvider()
@@ -25,42 +40,42 @@ class MatchSyncCoordinator(
                 isCharging = batteryInfo.isCharging
             )
 
-            val response = requestWithRetry("log $eventType") { apiService.logMatchEvent(event) }
+            val response = requestWithRetry("log $eventType") { apiClient.logMatchEvent(event) }
             if (!response.isSuccessful) {
-                AppLogger.error("logMatchEvent", "HTTP ${response.code()} for $eventType")
+                logger.error("logMatchEvent", "HTTP ${response.code()} for $eventType")
             }
         } catch (e: Exception) {
-            AppLogger.error("logMatchEvent", "$eventType: ${e.message}")
+            logger.error("logMatchEvent", "$eventType: ${e.message}")
         }
     }
 
     suspend fun syncMatch(state: MatchState) {
         try {
             if (state.matchId == null) {
-                val response = requestWithRetry("create match") { apiService.createMatch(state.toMatch()) }
+                val response = requestWithRetry("create match") { apiClient.createMatch(MatchApiPayloadFactory.toMatch(state)) }
 
                 if (response.isSuccessful && response.body() != null) {
                     val created = response.body()!!
                     state.matchId = created.id
-                    AppLogger.api("createMatch", "OK id=${state.matchId} phase=${created.phase}")
+                    logger.api("createMatch", "OK id=${state.matchId} phase=${created.phase}")
 
                     created.bracketWarning?.let { warning ->
                         onBracketWarning(warning, created.id)
                     }
                 } else {
-                    AppLogger.api("createMatch", "FAIL ${response.code()}")
+                    logger.api("createMatch", "FAIL ${response.code()}")
                 }
             } else {
                 val response = requestWithRetry("update match") {
-                    apiService.updateMatch(state.matchId!!, state.toMatch())
+                    apiClient.updateMatch(state.matchId!!, MatchApiPayloadFactory.toMatch(state))
                 }
 
                 if (!response.isSuccessful) {
-                    AppLogger.api("updateMatch", "FAIL ${response.code()}")
+                    logger.api("updateMatch", "FAIL ${response.code()}")
                 }
             }
         } catch (e: Exception) {
-            AppLogger.error("syncMatchWithServer", e)
+            logger.error("syncMatchWithServer", e)
         }
     }
 
@@ -68,22 +83,22 @@ class MatchSyncCoordinator(
         try {
             try {
                 if (state.matchId == null) {
-                    val response = requestWithRetry("create final match") { apiService.createMatch(state.toMatch()) }
+                    val response = requestWithRetry("create final match") { apiClient.createMatch(MatchApiPayloadFactory.toMatch(state)) }
                     if (response.isSuccessful && response.body() != null) {
                         state.matchId = response.body()!!.id
-                        AppLogger.api("createFinalMatch", "OK id=${state.matchId}")
+                        logger.api("createFinalMatch", "OK id=${state.matchId}")
                     }
                 }
 
                 state.matchId?.let { matchId ->
-                    requestWithRetry("sync final state") { apiService.updateMatch(matchId, state.toMatch()) }
+                    requestWithRetry("sync final state") { apiClient.updateMatch(matchId, MatchApiPayloadFactory.toMatch(state)) }
                 }
             } catch (e: Exception) {
-                AppLogger.error("finalizeMatch", "sync final state: ${e.message}")
+                logger.error("finalizeMatch", "sync final state: ${e.message}")
             }
 
             if (state.matchId == null) {
-                AppLogger.error("finalizeMatch", "match id missing after final sync")
+                logger.error("finalizeMatch", "match id missing after final sync")
             }
 
             try {
@@ -94,61 +109,61 @@ class MatchSyncCoordinator(
                     batteryLevel = batteryInfo.level,
                     isCharging = batteryInfo.isCharging
                 )
-                requestWithRetry("match_end event") { apiService.logMatchEvent(event) }
+                requestWithRetry("match_end event") { apiClient.logMatchEvent(event) }
             } catch (e: Exception) {
-                AppLogger.error("finalizeMatch", "match_end event: ${e.message}")
+                logger.error("finalizeMatch", "match_end event: ${e.message}")
             }
 
             state.matchId?.let { matchId ->
                 try {
-                    requestWithRetry("finish match") { apiService.finishMatch(matchId) }
+                    requestWithRetry("finish match") { apiClient.finishMatch(matchId) }
                 } catch (e: Exception) {
-                    AppLogger.error("finalizeMatch", "finish: ${e.message}")
+                    logger.error("finalizeMatch", "finish: ${e.message}")
                 }
             }
 
-            state.toMatchStatisticsRequest()?.let { statisticsRequest ->
+            MatchApiPayloadFactory.toStatisticsRequest(state)?.let { statisticsRequest ->
                 try {
-                    requestWithRetry("send statistics") { apiService.sendMatchStatistics(statisticsRequest) }
+                    requestWithRetry("send statistics") { apiClient.sendMatchStatistics(statisticsRequest) }
                 } catch (e: Exception) {
-                    AppLogger.error("finalizeMatch", "statistics: ${e.message}")
+                    logger.error("finalizeMatch", "statistics: ${e.message}")
                 }
             }
         } catch (e: Exception) {
-            AppLogger.error("finalizeMatch", "overall: ${e.message}")
+            logger.error("finalizeMatch", "overall: ${e.message}")
         }
 
         try {
-            matchHistoryRepository.saveMatch(state)
+            matchHistorySaver.saveMatch(state)
         } catch (e: Exception) {
-            AppLogger.error("finalizeMatch", "local save: ${e.message}")
+            logger.error("finalizeMatch", "local save: ${e.message}")
         }
     }
 
     suspend fun finishMatch(state: MatchState) {
         state.matchId?.let { matchId ->
             try {
-                val response = requestWithRetry("finish match") { apiService.finishMatch(matchId) }
+                val response = requestWithRetry("finish match") { apiClient.finishMatch(matchId) }
                 if (!response.isSuccessful) {
-                    AppLogger.api("finishMatch", "FAIL ${response.code()}")
+                    logger.api("finishMatch", "FAIL ${response.code()}")
                 }
             } catch (e: Exception) {
-                AppLogger.error("finishMatchOnServer", e)
+                logger.error("finishMatchOnServer", e)
             }
         }
     }
 
     suspend fun sendStatistics(state: MatchState) {
-        val statisticsRequest = state.toMatchStatisticsRequest() ?: return
+        val statisticsRequest = MatchApiPayloadFactory.toStatisticsRequest(state) ?: return
         try {
-            val response = requestWithRetry("send statistics") { apiService.sendMatchStatistics(statisticsRequest) }
+            val response = requestWithRetry("send statistics") { apiClient.sendMatchStatistics(statisticsRequest) }
             if (response.isSuccessful) {
-                AppLogger.api("sendStatistics", "OK")
+                logger.api("sendStatistics", "OK")
             } else {
-                AppLogger.api("sendStatistics", "FAIL ${response.code()}")
+                logger.api("sendStatistics", "FAIL ${response.code()}")
             }
         } catch (e: Exception) {
-            AppLogger.error("sendMatchStatistics", e)
+            logger.error("sendMatchStatistics", e)
         }
     }
 
@@ -174,14 +189,14 @@ class MatchSyncCoordinator(
                     onSyncStatus(SyncStatus.FAILED)
                     return response
                 }
-                AppLogger.api(operation, "retryable HTTP ${response.code()} attempt=${attempt + 1}")
+                logger.api(operation, "retryable HTTP ${response.code()} attempt=${attempt + 1}")
             } catch (e: Exception) {
                 lastException = e
-                AppLogger.error(operation, "attempt=${attempt + 1}: ${e.message}")
+                logger.error(operation, "attempt=${attempt + 1}: ${e.message}")
             }
 
             if (attempt < maxAttempts - 1) {
-                delay(500L * (attempt + 1))
+                retryDelay.waitBeforeNextAttempt(attempt + 1)
             }
         }
 
@@ -194,8 +209,3 @@ class MatchSyncCoordinator(
         return code() in 500..599 || code() == 408 || code() == 429
     }
 }
-
-data class MatchBatteryInfo(
-    val level: Int?,
-    val isCharging: Boolean?
-)
