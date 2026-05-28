@@ -13,6 +13,19 @@ class MatchStateTest {
     private val playerFour = Player(id = 4, name = "Wojcik", firstName = "Anna", lastName = "Wojcik")
 
     @Test
+    fun classicGameEndsOnFourthPointWithTwoPointMargin() {
+        val state = matchState().apply {
+            player1Points = 4
+            player2Points = 2
+        }
+
+        assertTrue(state.isGameWon())
+
+        state.player2Points = 3
+        assertFalse(state.isGameWon())
+    }
+
+    @Test
     fun normalGameRequiresTwoPointAdvantageAfterDeuce() {
         val state = matchState().apply {
             player1Points = 4
@@ -26,6 +39,21 @@ class MatchStateTest {
     }
 
     @Test
+    fun advantageDisplayOnlyMarksPlayerWithLeadAfterDeuce() {
+        val state = matchState().apply {
+            player1Points = 4
+            player2Points = 3
+        }
+
+        assertEquals("ADV", state.getPlayer1PointsDisplay())
+        assertEquals("40", state.getPlayer2PointsDisplay())
+
+        state.player2Points = 4
+        assertEquals("40", state.getPlayer1PointsDisplay())
+        assertEquals("40", state.getPlayer2PointsDisplay())
+    }
+
+    @Test
     fun noAdvantageGameEndsOnFourthPoint() {
         val state = matchState(noAdvantage = true).apply {
             player1Points = 4
@@ -35,6 +63,29 @@ class MatchStateTest {
         assertTrue(state.isGameWon())
         assertEquals("40", state.getPlayer1PointsDisplay())
         assertEquals("40", state.getPlayer2PointsDisplay())
+    }
+
+    @Test
+    fun standardSetRequiresTwoGameMarginBeforeTiebreak() {
+        val state = matchState(matchConfig = MatchConfig(gamesPerSet = 6)).apply {
+            player1Games = 6
+            player2Games = 5
+        }
+
+        assertFalse(state.isSetWon())
+
+        state.player1Games = 7
+        assertTrue(state.isSetWon())
+    }
+
+    @Test
+    fun shortSetEndsAtConfiguredGames() {
+        val state = matchState(matchConfig = MatchConfig(gamesPerSet = 3)).apply {
+            player1Games = 3
+            player2Games = 2
+        }
+
+        assertTrue(state.isSetWon())
     }
 
     @Test
@@ -58,6 +109,18 @@ class MatchStateTest {
     }
 
     @Test
+    fun tiebreakPointsDisplayAsRawNumbers() {
+        val state = matchState().apply {
+            isTiebreak = true
+            player1Points = 6
+            player2Points = 5
+        }
+
+        assertEquals("6", state.getPlayer1PointsDisplay())
+        assertEquals("5", state.getPlayer2PointsDisplay())
+    }
+
+    @Test
     fun tiebreakRequiresTwoPointAdvantage() {
         val state = matchState(matchConfig = MatchConfig(tiebreakPoints = 7)).apply {
             isTiebreak = true
@@ -69,6 +132,33 @@ class MatchStateTest {
 
         state.player1Points = 8
         assertTrue(state.isGameWon())
+    }
+
+    @Test
+    fun superTiebreakRequiresConfiguredPointsAndTwoPointAdvantage() {
+        val state = matchState(matchConfig = MatchConfig(superTiebreakPoints = 10)).apply {
+            isSuperTiebreak = true
+            player1Points = 10
+            player2Points = 9
+        }
+
+        assertFalse(state.isGameWon())
+
+        state.player1Points = 11
+        assertTrue(state.isGameWon())
+    }
+
+    @Test
+    fun matchEndsWhenEitherPlayerReachesSetsToWin() {
+        val state = matchState(matchConfig = MatchConfig(setsToWin = 2)).apply {
+            player1Sets = 1
+            player2Sets = 1
+        }
+
+        assertFalse(state.shouldEndMatch())
+
+        state.player2Sets = 2
+        assertTrue(state.shouldEndMatch())
     }
 
     @Test

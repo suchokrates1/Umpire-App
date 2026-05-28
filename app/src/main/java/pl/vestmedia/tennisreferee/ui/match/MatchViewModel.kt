@@ -113,7 +113,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 else -> 1
             }
             state.isPlayer1Serving = if (state.isDoubles) {
-                state.currentServer == 1 || state.currentServer == 3
+                DoublesServeRotation.isTeamOneServing(state.currentServer)
             } else {
                 state.currentServer == 1
             }
@@ -187,48 +187,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             }
             
             val lastAction = state.actionsHistory.removeAt(state.actionsHistory.size - 1)
-            
-            // Przywróć stan
-            state.player1Points = lastAction.previousPlayer1Points
-            state.player2Points = lastAction.previousPlayer2Points
-            state.player1Games = lastAction.previousPlayer1Games
-            state.player2Games = lastAction.previousPlayer2Games
-            state.player1Sets = lastAction.previousPlayer1Sets
-            state.player2Sets = lastAction.previousPlayer2Sets
-            state.isPlayer1Serving = lastAction.previousIsPlayer1Serving
-            state.isFirstServe = lastAction.previousIsFirstServe
-            state.isTiebreak = lastAction.previousIsTiebreak
-            state.isSuperTiebreak = lastAction.previousIsSuperTiebreak
-            state.sidesSwapped = lastAction.previousSidesSwapped
-            state.totalGamesPlayed = lastAction.previousTotalGamesPlayed
-            state.currentServer = lastAction.previousCurrentServer
-            state.isMatchFinished = lastAction.previousIsMatchFinished
-            
-            // Przywróć historię setów
-            while (state.setsHistory.size > lastAction.previousSetsHistorySize) {
-                state.setsHistory.removeAt(state.setsHistory.size - 1)
-            }
-            
-            // Przywróć statystyki
-            state.player1Stats.aces = lastAction.previousPlayer1Stats.aces
-            state.player1Stats.doubleFaults = lastAction.previousPlayer1Stats.doubleFaults
-            state.player1Stats.winners = lastAction.previousPlayer1Stats.winners
-            state.player1Stats.forcedErrors = lastAction.previousPlayer1Stats.forcedErrors
-            state.player1Stats.unforcedErrors = lastAction.previousPlayer1Stats.unforcedErrors
-            state.player1Stats.firstServesIn = lastAction.previousPlayer1Stats.firstServesIn
-            state.player1Stats.firstServesTotal = lastAction.previousPlayer1Stats.firstServesTotal
-            state.player1Stats.secondServesIn = lastAction.previousPlayer1Stats.secondServesIn
-            state.player1Stats.secondServesTotal = lastAction.previousPlayer1Stats.secondServesTotal
-            
-            state.player2Stats.aces = lastAction.previousPlayer2Stats.aces
-            state.player2Stats.doubleFaults = lastAction.previousPlayer2Stats.doubleFaults
-            state.player2Stats.winners = lastAction.previousPlayer2Stats.winners
-            state.player2Stats.forcedErrors = lastAction.previousPlayer2Stats.forcedErrors
-            state.player2Stats.unforcedErrors = lastAction.previousPlayer2Stats.unforcedErrors
-            state.player2Stats.firstServesIn = lastAction.previousPlayer2Stats.firstServesIn
-            state.player2Stats.firstServesTotal = lastAction.previousPlayer2Stats.firstServesTotal
-            state.player2Stats.secondServesIn = lastAction.previousPlayer2Stats.secondServesIn
-            state.player2Stats.secondServesTotal = lastAction.previousPlayer2Stats.secondServesTotal
+            MatchUndoRestorer.restore(state, lastAction)
             
             _canUndo.value = state.actionsHistory.isNotEmpty()
             _undoMessage.value = getApplication<Application>().getString(R.string.undo_action_format, lastAction.description)
@@ -513,24 +472,6 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     }
     
     /**
-     * Rotuje serwującego w deblu (1 -> 2 -> 3 -> 4 -> 1)
-     */
-    private fun rotateDoublesServer(state: MatchState) {
-        state.currentServer = when (state.currentServer) {
-            1 -> 2  // Gracz 1 (Zespół A) -> Gracz 2 (Zespół B)
-            2 -> 3  // Gracz 2 (Zespół B) -> Gracz 3 (Partner 1, Zespół A)
-            3 -> 4  // Gracz 3 (Zespół A) -> Gracz 4 (Zespół B)
-            4 -> 1  // Gracz 4 (Zespół B) -> Gracz 1 (Zespół A)
-            else -> 1
-        }
-        
-        // Ustaw isPlayer1Serving na podstawie currentServer
-        // 1,3 = Zespół A (player1Serving = true)
-        // 2,4 = Zespół B (player1Serving = false)
-        state.isPlayer1Serving = (state.currentServer == 1 || state.currentServer == 3)
-    }
-    
-    /**
      * Dodaje punkt dla gracza
      */
     private fun addPoint(isPlayer1: Boolean) {
@@ -552,7 +493,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 if (totalPoints % 2 == 1) {
                     if (state.isDoubles) {
                         // W deblu rotuj serwującego zgodnie z kolejnością
-                        rotateDoublesServer(state)
+                        DoublesServeRotation.rotate(state)
                     } else {
                         // W singlu zwykła zmiana
                         state.isPlayer1Serving = !state.isPlayer1Serving
@@ -673,7 +614,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 // Zmiana serwującego po gemie
                 if (state.isDoubles) {
                     // W deblu rotacja serwisów: 1 -> 2 -> 3 -> 4 -> 1
-                    rotateDoublesServer(state)
+                    DoublesServeRotation.rotate(state)
                 } else {
                     // W singlu zwykła zmiana
                     state.isPlayer1Serving = !state.isPlayer1Serving
