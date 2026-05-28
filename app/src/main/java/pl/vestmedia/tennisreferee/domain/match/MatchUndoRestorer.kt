@@ -1,4 +1,4 @@
-package pl.vestmedia.tennisreferee.ui.match
+package pl.vestmedia.tennisreferee.domain.match
 
 import pl.vestmedia.tennisreferee.data.model.MatchAction
 import pl.vestmedia.tennisreferee.data.model.MatchState
