@@ -1,5 +1,6 @@
 package pl.vestmedia.tennisreferee.ui.tournamentselection
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -23,6 +24,17 @@ class TournamentSelectionActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_FORCE_SELECTION = "force_selection"
+        private const val EXTRA_SELECTED_TOURNAMENT_ID = "selected_tournament_id"
+        private const val EXTRA_SELECTED_TOURNAMENT_NAME = "selected_tournament_name"
+
+        fun selectedTournamentId(data: Intent?): Int? {
+            val id = data?.getIntExtra(EXTRA_SELECTED_TOURNAMENT_ID, -1) ?: -1
+            return id.takeIf { it > 0 }
+        }
+
+        fun selectedTournamentName(data: Intent?): String? {
+            return data?.getStringExtra(EXTRA_SELECTED_TOURNAMENT_NAME)
+        }
     }
 
     private lateinit var binding: ActivityTournamentSelectionBinding
@@ -115,6 +127,16 @@ class TournamentSelectionActivity : AppCompatActivity() {
     private fun onTournamentSelected(tournament: TournamentOption) {
         AppLogger.button("TournamentSelection", "TournamentTap", "id=${tournament.id} name=${tournament.name}")
         TournamentSelectionStore.saveSelection(this, tournament)
+        if (intent.getBooleanExtra(EXTRA_FORCE_SELECTION, false)) {
+            setResult(
+                Activity.RESULT_OK,
+                Intent()
+                    .putExtra(EXTRA_SELECTED_TOURNAMENT_ID, tournament.id)
+                    .putExtra(EXTRA_SELECTED_TOURNAMENT_NAME, tournament.name)
+            )
+            finish()
+            return
+        }
         navigateToCourts()
     }
 

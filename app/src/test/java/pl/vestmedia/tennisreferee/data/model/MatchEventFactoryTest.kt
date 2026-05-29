@@ -4,6 +4,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 class MatchEventFactoryTest {
     private val playerOne = Player(id = 1, name = "Kowalski", firstName = "Jan", lastName = "Kowalski", flag = "PL")
@@ -14,6 +16,7 @@ class MatchEventFactoryTest {
     @Test
     fun createsSinglesEventWithScoreStatsBatteryAndTimestamp() {
         val state = singlesState().apply {
+            matchId = 42
             isPlayer1Serving = true
             player1Sets = 1
             player2Sets = 0
@@ -38,6 +41,8 @@ class MatchEventFactoryTest {
         )
 
         assertEquals("1", event.courtId)
+        assertEquals(42, event.matchId)
+        assertEquals(state.clientMatchUuid, event.clientMatchUuid)
         assertEquals("point", event.eventType)
         assertEquals("Kowalski", event.player1.name)
         assertEquals("Jan Kowalski", event.player1.fullName)

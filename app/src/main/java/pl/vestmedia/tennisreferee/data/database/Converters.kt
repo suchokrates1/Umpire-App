@@ -4,7 +4,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.data.model.SetScore
+import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 /**
  * Konwertery typów dla Room Database

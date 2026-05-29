@@ -3,10 +3,11 @@ package pl.vestmedia.tennisreferee.data.api
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.MatchStatus
+import pl.vestmedia.tennisreferee.data.api.dto.MatchStatusDto
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchFinishReason
 import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.data.model.SetScore
+import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 class MatchApiPayloadFactoryTest {
     private val playerOne = Player(id = 1, name = "Kowalski", firstName = "Jan", lastName = "Kowalski", flag = "PL")
@@ -16,7 +17,7 @@ class MatchApiPayloadFactoryTest {
 
     @Test
     fun createsMatchPayloadForSinglesState() {
-        val state = singlesState().apply {
+        val state = singlesState(scheduleId = 44).apply {
             matchId = 9
             matchStartTime = 100L
             player1Sets = 1
@@ -34,7 +35,9 @@ class MatchApiPayloadFactoryTest {
         assertEquals("1", payload.courtId)
         assertEquals("Jan Kowalski", payload.player1Name)
         assertEquals("Adam Nowak", payload.player2Name)
-        assertEquals(MatchStatus.IN_PROGRESS, payload.status)
+        assertEquals(MatchStatusDto.IN_PROGRESS, payload.status)
+        assertEquals(state.clientMatchUuid, payload.clientMatchUuid)
+        assertEquals(44, payload.scheduleId)
         assertEquals(1, payload.score.player1Sets)
         assertEquals(4, payload.score.player1Games)
         assertEquals(2, payload.score.player1Points)
@@ -49,7 +52,7 @@ class MatchApiPayloadFactoryTest {
 
         assertEquals("Team A", payload.player1Name)
         assertEquals("Team B", payload.player2Name)
-        assertEquals(MatchStatus.NOT_STARTED, payload.status)
+        assertEquals(MatchStatusDto.NOT_STARTED, payload.status)
     }
 
     @Test
@@ -81,12 +84,31 @@ class MatchApiPayloadFactoryTest {
         assertNull(MatchApiPayloadFactory.toStatisticsRequest(singlesState().apply { isMatchFinished = true }))
     }
 
-    private fun singlesState(): MatchState {
+    @Test
+    fun createsFinishRequestFromStateAndSkipsTestStatistics() {
+        val state = singlesState().apply {
+            matchId = 12
+            isMatchFinished = true
+            finishReason = MatchFinishReason.TEST
+            finishWinnerName = "Jan Kowalski"
+            resultNote = "Mecz testowy"
+        }
+
+        val request = MatchApiPayloadFactory.toFinishRequest(state)
+
+        assertEquals(MatchFinishReason.TEST, request.finishReason)
+        assertEquals("Jan Kowalski", request.winnerName)
+        assertEquals("Mecz testowy", request.resultNote)
+        assertNull(MatchApiPayloadFactory.toStatisticsRequest(state))
+    }
+
+    private fun singlesState(scheduleId: Int? = null): MatchState {
         return MatchState(
             player1 = playerOne,
             player2 = playerTwo,
             courtId = "1",
-            courtName = "Court 1"
+            courtName = "Court 1",
+            scheduleId = scheduleId
         )
     }
 

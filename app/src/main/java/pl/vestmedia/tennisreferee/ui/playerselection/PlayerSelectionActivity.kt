@@ -1,6 +1,7 @@
 package pl.vestmedia.tennisreferee.ui.playerselection
 
 import android.app.DatePickerDialog
+import android.app.Activity
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -21,12 +23,15 @@ import com.google.android.material.textfield.TextInputEditText
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityPlayerSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.MatchConfig
-import pl.vestmedia.tennisreferee.data.model.StatsMode
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
+import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
+import pl.vestmedia.tennisreferee.domain.match.model.StatsMode
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.ui.match.ActiveMatchStore
 import pl.vestmedia.tennisreferee.ui.match.MatchActivity
+import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -52,13 +57,23 @@ class PlayerSelectionActivity : AppCompatActivity() {
     private var courtId: String = ""
     private var courtName: String = ""
     private var courtPin: String = ""
+    private var selectedTournamentId: Int? = null
+    private var currentSuggestion: ScheduleSuggestion? = null
+    private var selectedScheduleId: Int? = null
     private var savedMatchConfig: MatchConfig? = null
+    private var lastStartedMatchConfig: MatchConfig? = null
+    private lateinit var activeMatchStore: ActiveMatchStore
     private val dateTimeFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+
+    private val matchLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        handleMatchResult(result.resultCode, result.data)
+    }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        activeMatchStore = ActiveMatchStore(this)
 
         // Podnieś przyciski nad pasek nawigacyjny
         val rootPaddingBottom = binding.root.paddingBottom
@@ -75,6 +90,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         courtId = intent.getStringExtra(EXTRA_COURT_ID) ?: ""
         courtName = intent.getStringExtra(EXTRA_COURT_NAME) ?: ""
         courtPin = intent.getStringExtra(EXTRA_COURT_PIN) ?: ""
+        selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this)
         
         // Sprawdź czy przekazano konfigurację z poprzedniego meczu
         @Suppress("DEPRECATION")
@@ -93,6 +109,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         // Załaduj zawodników
         viewModel.loadPlayers(courtId)
+        viewModel.loadSuggestedMatch(courtId, selectedTournamentId)
     }
     
     private fun setupUI() {
@@ -102,6 +119,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         adapter = PlayerAdapter(
             onPlayerClick = { player ->
+                selectedScheduleId = null
                 viewModel.togglePlayerSelection(player)
             },
             isPlayerSelected = { player ->
@@ -157,6 +175,11 @@ class PlayerSelectionActivity : AppCompatActivity() {
             binding.checkboxDoubles.isChecked = isDoubles
             updateRequiredPlayersText(isDoubles)
         }
+
+        viewModel.suggestedMatch.observe(this) { suggestion ->
+            currentSuggestion = suggestion
+            updateSuggestedMatchCard(suggestion)
+        }
         
         viewModel.isLoading.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -210,17 +233,38 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         binding.checkboxDoubles.setOnCheckedChangeListener { _, isChecked ->
             AppLogger.button("PlayerSelection", "Doubles", isChecked.toString())
+            selectedScheduleId = null
             viewModel.setDoubles(isChecked)
+        }
+
+        binding.buttonUseSuggestedMatch.setOnClickListener {
+            val suggestion = currentSuggestion ?: return@setOnClickListener
+            selectedScheduleId = suggestion.id
+            if (viewModel.applySuggestedMatch(suggestion)) {
+                AppLogger.button("PlayerSelection", "UseSuggestedMatch", "schedule=${suggestion.id}")
+                binding.cardSuggestedMatch.visibility = View.GONE
+                Toast.makeText(this, getString(R.string.suggested_match_applied), Toast.LENGTH_SHORT).show()
+            } else {
+                selectedScheduleId = null
+            }
+        }
+
+        binding.buttonManualPlayers.setOnClickListener {
+            AppLogger.button("PlayerSelection", "ManualPlayersDespiteSuggestion")
+            selectedScheduleId = null
+            binding.cardSuggestedMatch.visibility = View.GONE
         }
         
         // Przycisk "+" obok pola wyszukiwania
         binding.buttonAddPlayerTop.setOnClickListener {
             AppLogger.button("PlayerSelection", "AddPlayer")
+            selectedScheduleId = null
             showAddPlayerDialog()
         }
         
         // Przycisk dodawania przy braku wyników (zachowany dla kompatybilności)
         binding.buttonAddPlayer.setOnClickListener {
+            selectedScheduleId = null
             showAddPlayerDialog()
         }
         
@@ -233,6 +277,30 @@ class PlayerSelectionActivity : AppCompatActivity() {
             AppLogger.button("PlayerSelection", "Back")
             finish()
         }
+    }
+
+    private fun handleMatchResult(resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        when (MatchActivity.resultAction(data)) {
+            MatchActivity.RESULT_NEXT_MATCH_SAME_SETUP -> prepareForNextMatch(reuseSetup = true)
+            MatchActivity.RESULT_NEXT_MATCH_NEW_SETUP -> prepareForNextMatch(reuseSetup = false)
+        }
+    }
+
+    private fun prepareForNextMatch(reuseSetup: Boolean) {
+        selectedScheduleId = null
+        currentSuggestion = null
+        if (reuseSetup) {
+            savedMatchConfig = lastStartedMatchConfig
+        } else {
+            savedMatchConfig = null
+        }
+        viewModel.clearSelection()
+        binding.cardSuggestedMatch.visibility = View.GONE
+        viewModel.loadSuggestedMatch(courtId, selectedTournamentId)
     }
     
     private fun updateSelectedPlayersInfo(selectedPlayers: List<Player>) {
@@ -267,6 +335,22 @@ class PlayerSelectionActivity : AppCompatActivity() {
         } else {
             getString(R.string.game_type_singles)
         }
+    }
+
+    private fun updateSuggestedMatchCard(suggestion: ScheduleSuggestion?) {
+        if (suggestion == null) {
+            binding.cardSuggestedMatch.visibility = View.GONE
+            return
+        }
+
+        binding.textSuggestedMatchPlayers.text = "${suggestion.player1Name} vs ${suggestion.player2Name}"
+        binding.textSuggestedMatchMeta.text = listOf(
+            suggestion.scheduledTime,
+            suggestion.categoryName,
+            suggestion.phase
+        ).mapNotNull { value -> value?.takeIf { it.isNotBlank() } }
+            .joinToString(" • ")
+        binding.cardSuggestedMatch.visibility = View.VISIBLE
     }
     
     private fun proceedToNextScreen() {
@@ -491,10 +575,11 @@ class PlayerSelectionActivity : AppCompatActivity() {
         val isDoublesMatch = viewModel.isDoubles.value ?: false
         val isMixedDoubles = isDoublesMatch && isMixedDoublesSelection(selectedPlayers)
         val playerNames = selectedPlayers.joinToString(", ") { it.getDisplayName() }
+        lastStartedMatchConfig = config
         AppLogger.navigate(
             "PlayerSelection",
             "Match",
-            "players=[$playerNames] doubles=$isDoublesMatch mixed=$isMixedDoubles umpire=${umpireName.ifBlank { "-" }} config=$config"
+            "players=[$playerNames] doubles=$isDoublesMatch mixed=$isMixedDoubles schedule=${selectedScheduleId ?: "-"} umpire=${umpireName.ifBlank { "-" }} config=$config"
         )
         
         // Utwórz stan meczu
@@ -507,6 +592,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 player4 = selectedPlayers[3],
                 courtId = courtId,
                 courtName = courtName,
+                scheduleId = selectedScheduleId,
                 isDoubles = true,
                 isMixedDoubles = isMixedDoubles,
                 umpireName = umpireName.ifBlank { null },
@@ -523,6 +609,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 player2 = selectedPlayers[1],
                 courtId = courtId,
                 courtName = courtName,
+                scheduleId = selectedScheduleId,
                 isDoubles = false,
                 umpireName = umpireName.ifBlank { null },
                 manualStartTime = manualStartTime,
@@ -537,18 +624,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
             matchState.isSuperTiebreak = true
         }
         
-        // Przejdź do ekranu meczu
-        val intent = Intent(this, MatchActivity::class.java).apply {
-            putExtra(MatchActivity.EXTRA_MATCH_STATE, matchState)
-            
-            // Przekaż informację o deblu
-            if (isDoublesMatch) {
-                putExtra(MatchActivity.EXTRA_IS_DOUBLES, true)
-                putExtra(MatchActivity.EXTRA_TEAM1_COLOR, R.color.team1_color)
-                putExtra(MatchActivity.EXTRA_TEAM2_COLOR, R.color.team2_color)
-            }
-        }
-        startActivity(intent)
+        activeMatchStore.save(matchState)
+        matchLauncher.launch(MatchActivity.createIntent(this, matchState.clientMatchUuid, isDoublesMatch))
     }
 
     private fun isMixedDoublesSelection(selectedPlayers: List<Player>): Boolean {

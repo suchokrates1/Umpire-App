@@ -25,6 +25,10 @@
     
     <!-- Player Selection -->
     <string name="select_players">Seleccionar jugadores</string>
+    <string name="suggested_match_title">Partido sugerido del calendario</string>
+    <string name="suggested_match_use">Usar partido</string>
+    <string name="suggested_match_manual">Elegir manualmente</string>
+    <string name="suggested_match_applied">Partido sugerido seleccionado</string>
     <string name="court_label">Cancha: %1$s</string>
     <string name="doubles_checkbox">Dobles</string>
     <string name="game_type_singles">Individual (2 jugadores)</string>
@@ -74,6 +78,13 @@
     <string name="winner_label">Ganador: %1$s</string>
     <string name="finish">Finalizar</string>
     <string name="finish_match">Finalizar partido</string>
+    <string name="finish_reason_prompt">¿Por qué estás finalizando este partido?</string>
+    <string name="finish_reason_normal">Finalización normal</string>
+    <string name="finish_reason_test">Entrada de prueba</string>
+    <string name="finish_reason_retirement">Retirada</string>
+    <string name="finish_reason_walkover">Walkover</string>
+    <string name="finish_retirement_prompt">¿Qué jugador se retira lesionado?</string>
+    <string name="finish_walkover_prompt">¿Qué jugador gana por walkover?</string>
     <string name="new_match">Nuevo partido</string>
     <string name="next_match_same_setup">▶ Siguiente partido (misma configuración)</string>
     <string name="next_match_new_setup">⚙ Nuevo partido (otra configuración)</string>
@@ -153,6 +164,7 @@
     <string name="sync_status_synced">Sincronizado</string>
     <string name="sync_status_failed">Error de sincronización</string>
     <string name="sync_status_offline">Sin conexión - se reintentará</string>
+    <string name="sync_status_idle">Aún no sincronizado</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Error al cargar las canchas</string>
@@ -218,6 +230,19 @@
     <string name="app_description">Aplicación profesional de árbitro de tenis para puntuación de partidos en tiempo real</string>
     <string name="version_format">Versión %1$s</string>
     <string name="version_unknown">Versión desconocida</string>
+    <string name="diagnostics">Diagnóstico</string>
+    <string name="diagnostics_app_version">Versión de la aplicación</string>
+    <string name="diagnostics_backend">Backend</string>
+    <string name="diagnostics_device">Dispositivo</string>
+    <string name="diagnostics_locale">Idioma</string>
+    <string name="diagnostics_timezone">Zona horaria</string>
+    <string name="diagnostics_sync_status">Último estado de sincronización</string>
+    <string name="diagnostics_last_update">Última actualización de sincronización</string>
+    <string name="diagnostics_last_error">Último error de sincronización</string>
+    <string name="diagnostics_no_error">Sin errores</string>
+    <string name="diagnostics_never">Nunca</string>
+    <string name="diagnostics_copy">Copiar diagnóstico</string>
+    <string name="diagnostics_copied">Diagnóstico copiado</string>
 
     <!-- Bracket warnings -->
     <string name="bracket_warning_title">Aviso del partido</string>

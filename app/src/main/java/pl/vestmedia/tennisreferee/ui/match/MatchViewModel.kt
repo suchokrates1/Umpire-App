@@ -11,14 +11,15 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.*
+import pl.vestmedia.tennisreferee.domain.match.model.*
 import pl.vestmedia.tennisreferee.domain.match.MatchActionReducer
+import pl.vestmedia.tennisreferee.domain.match.MatchActionResult
 import pl.vestmedia.tennisreferee.domain.match.MatchCommand
+import pl.vestmedia.tennisreferee.domain.match.MatchFinishOutcomeApplier
 import pl.vestmedia.tennisreferee.domain.match.MatchPointEvent
-import pl.vestmedia.tennisreferee.domain.match.MatchPointReducer
 import pl.vestmedia.tennisreferee.domain.match.MatchProgressEvent
 import pl.vestmedia.tennisreferee.domain.match.MatchProgressReducer
 import pl.vestmedia.tennisreferee.domain.match.MatchProgressScreen
-import pl.vestmedia.tennisreferee.domain.match.MatchStartReducer
 import pl.vestmedia.tennisreferee.domain.match.MatchUndoManager
 import pl.vestmedia.tennisreferee.domain.match.MatchUndoResult
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -46,6 +47,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     val syncStatus: LiveData<SyncStatus> = _syncStatus
 
     private val batteryInfoProvider = DeviceBatteryInfoProvider(application)
+    private val syncDiagnosticsStore = SyncDiagnosticsStore(application)
     
     /** Helper: get localized string from resources */
     private fun str(resId: Int, vararg args: Any): String =
@@ -70,8 +72,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun skipSideChange() {
         _matchState.value?.let { state ->
-            state.sidesSwapped = !state.sidesSwapped
-            _matchState.value = state
+            applyMatchCommand(state, MatchCommand.ToggleSides)
         }
         AppLogger.action("Match", "SideChangeSkipped")
         continueFromAnnouncement()
@@ -82,7 +83,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         matchHistoryRepository = (application as TennisRefereeApp).matchHistoryRepository,
         batteryInfoProvider = { batteryInfoProvider.current() },
         onSyncStatus = { status -> _syncStatus.postValue(status) },
-        onBracketWarning = { warning, matchId -> _bracketWarning.postValue(BracketWarningEvent(warning, matchId)) }
+        onBracketWarning = { warning, matchId -> _bracketWarning.postValue(BracketWarningEvent(warning, matchId)) },
+        onSyncDiagnostics = { status, error -> syncDiagnosticsStore.record(status, error) }
     )
     
     /**
@@ -97,9 +99,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun setFirstServer(serverNumber: Int) {
         _matchState.value?.let { state ->
-            MatchStartReducer.start(state, serverNumber, System.currentTimeMillis())
-            _matchState.value = state
-            
+            applyMatchCommand(state, MatchCommand.StartMatch(serverNumber, System.currentTimeMillis()))
             _currentView.value = scoringViewFor(state)
             
             // Log match start event
@@ -112,8 +112,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun swapSides() {
         _matchState.value?.let { state ->
-            state.sidesSwapped = !state.sidesSwapped
-            _matchState.value = state
+            applyMatchCommand(state, MatchCommand.ToggleSides)
         }
     }
     
@@ -273,14 +272,35 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun applyMatchCommand(state: MatchState, command: MatchCommand) {
         val result = MatchActionReducer.reduce(state, command)
-        result.pointWinner?.let { addPoint(it) }
+
+        result.pointWinner?.let { pointWinner ->
+            val pointResult = MatchActionReducer.reduce(state, MatchCommand.PointWon(pointWinner))
+            handlePointResult(state, pointResult)
+        }
+        handlePointResult(state, result)
         _matchState.value = state
 
         if (result.transitionToRally) {
             _currentView.value = MatchView.RALLY
         }
-        if (result.pointWinner != null) {
+        if (result.pointWinner != null || result.pointScored) {
             checkGameAndSetStatus()
+        }
+    }
+
+    private fun handlePointResult(state: MatchState, result: MatchActionResult) {
+        result.pointEvents.forEach { event ->
+            when (event) {
+                MatchPointEvent.Point -> logMatchEvent("point")
+                MatchPointEvent.ServeChange -> logMatchEvent("serve_change")
+                MatchPointEvent.SideChange -> logMatchEvent("side_change")
+            }
+        }
+
+        result.announcementType?.let { pendingAnnouncementType = it }
+        if (result.showAnnouncementImmediately) {
+            _matchState.value = state
+            _currentView.value = MatchView.ANNOUNCEMENT
         }
     }
 
@@ -296,29 +316,6 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun playerName(state: MatchState, isPlayer1: Boolean): String {
         return if (isPlayer1) state.player1.getDisplayName() else state.player2.getDisplayName()
-    }
-    
-    /**
-     * Dodaje punkt dla gracza
-     */
-    private fun addPoint(isPlayer1: Boolean) {
-        _matchState.value?.let { state ->
-            val result = MatchPointReducer.addPoint(state, isPlayer1)
-
-            result.events.forEach { event ->
-                when (event) {
-                    MatchPointEvent.Point -> logMatchEvent("point")
-                    MatchPointEvent.ServeChange -> logMatchEvent("serve_change")
-                    MatchPointEvent.SideChange -> logMatchEvent("side_change")
-                }
-            }
-
-            result.announcementType?.let { pendingAnnouncementType = it }
-            if (result.showAnnouncementImmediately) {
-                _matchState.value = state
-                _currentView.value = MatchView.ANNOUNCEMENT
-            }
-        }
     }
     
     /**
@@ -383,6 +380,17 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private fun finalizeMatchOnServer(state: MatchState) {
         viewModelScope.launch(Dispatchers.IO) {
             matchSyncCoordinator.finalizeMatch(state)
+        }
+    }
+
+    fun finishMatchWithOutcome(request: FinishMatchRequest) {
+        _matchState.value?.let { state ->
+            MatchFinishOutcomeApplier.apply(state, request, System.currentTimeMillis())
+            _matchState.value = state
+            _currentView.value = MatchView.MATCH_FINISHED
+            viewModelScope.launch(Dispatchers.IO) {
+                matchSyncCoordinator.finalizeMatch(state, request)
+            }
         }
     }
 

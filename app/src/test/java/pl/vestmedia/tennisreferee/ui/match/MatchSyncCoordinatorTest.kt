@@ -10,11 +10,13 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
-import pl.vestmedia.tennisreferee.data.model.Match
-import pl.vestmedia.tennisreferee.data.model.MatchEvent
-import pl.vestmedia.tennisreferee.data.model.MatchEventResponse
-import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.MatchStatisticsRequest
+import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
+import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
+import pl.vestmedia.tennisreferee.data.api.dto.MatchEventResponseDto
+import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
+import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
+import pl.vestmedia.tennisreferee.domain.match.model.MatchFinishReason
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.data.model.Player
 import retrofit2.Response
 
@@ -50,7 +52,8 @@ class MatchSyncCoordinatorTest {
         }
         val retryDelay = RecordingRetryDelay()
         val statuses = mutableListOf<SyncStatus>()
-        val coordinator = coordinator(apiClient, statuses, retryDelay = retryDelay)
+        val diagnostics = mutableListOf<Pair<SyncStatus, String?>>()
+        val coordinator = coordinator(apiClient, statuses, retryDelay = retryDelay, diagnostics = diagnostics)
         val state = matchState()
 
         coordinator.syncMatch(state)
@@ -59,6 +62,10 @@ class MatchSyncCoordinatorTest {
         assertEquals(1, apiClient.createCalls)
         assertTrue(retryDelay.attemptNumbers.isEmpty())
         assertEquals(listOf(SyncStatus.SYNCING, SyncStatus.FAILED), statuses)
+        assertEquals(
+            listOf(SyncStatus.SYNCING to null, SyncStatus.FAILED to "create match: HTTP 400"),
+            diagnostics
+        )
     }
 
     @Test
@@ -70,7 +77,8 @@ class MatchSyncCoordinatorTest {
         }
         val retryDelay = RecordingRetryDelay()
         val statuses = mutableListOf<SyncStatus>()
-        val coordinator = coordinator(apiClient, statuses, retryDelay = retryDelay)
+        val diagnostics = mutableListOf<Pair<SyncStatus, String?>>()
+        val coordinator = coordinator(apiClient, statuses, retryDelay = retryDelay, diagnostics = diagnostics)
         val state = matchState()
 
         coordinator.syncMatch(state)
@@ -79,6 +87,7 @@ class MatchSyncCoordinatorTest {
         assertEquals(3, apiClient.createCalls)
         assertEquals(listOf(1, 2), retryDelay.attemptNumbers)
         assertEquals(listOf(SyncStatus.SYNCING, SyncStatus.OFFLINE), statuses)
+        assertEquals(SyncStatus.OFFLINE to "create match: HTTP 503", diagnostics.last())
     }
 
     @Test
@@ -104,7 +113,7 @@ class MatchSyncCoordinatorTest {
         val apiClient = FakeMatchApiClient().apply {
             createResults += queuedResponse(Response.success(apiMatch(id = 77)))
             updateResults += queuedResponse(Response.success(apiMatch(id = 77)))
-            eventResults += queuedResponse(Response.success(MatchEventResponse(success = true, message = null)))
+            eventResults += queuedResponse(Response.success(MatchEventResponseDto(success = true, message = null)))
             finishResults += queuedResponse(Response.success(apiMatch(id = 77)))
             statisticsResults += queuedResponse(Response.success(Unit))
         }
@@ -121,6 +130,7 @@ class MatchSyncCoordinatorTest {
 
         assertEquals(77, state.matchId)
         assertEquals(listOf("create", "update:77", "event:match_end", "finish:77", "statistics"), apiClient.operations)
+        assertEquals(MatchFinishReason.NORMAL, apiClient.finishRequests.single().finishReason)
         assertEquals(1, apiClient.loggedEvents.size)
         assertEquals(65, apiClient.loggedEvents.single().batteryLevel)
         assertEquals(true, apiClient.loggedEvents.single().isCharging)
@@ -128,12 +138,36 @@ class MatchSyncCoordinatorTest {
         assertSame(state, historySaver.savedStates.single())
     }
 
+    @Test
+    fun finalizeTestMatchSkipsStatisticsAndLocalHistory() = runBlocking {
+        val apiClient = FakeMatchApiClient().apply {
+            createResults += queuedResponse(Response.success(apiMatch(id = 88)))
+            updateResults += queuedResponse(Response.success(apiMatch(id = 88)))
+            eventResults += queuedResponse(Response.success(MatchEventResponseDto(success = true, message = null)))
+            finishResults += queuedResponse(Response.success(apiMatch(id = 88)))
+        }
+        val historySaver = RecordingHistorySaver()
+        val coordinator = coordinator(apiClient, historySaver = historySaver)
+        val state = matchState().apply {
+            isMatchFinished = true
+            finishReason = MatchFinishReason.TEST
+        }
+
+        coordinator.finalizeMatch(state)
+
+        assertEquals(listOf("create", "update:88", "event:match_end", "finish:88"), apiClient.operations)
+        assertEquals(MatchFinishReason.TEST, apiClient.finishRequests.single().finishReason)
+        assertTrue(apiClient.statisticsRequests.isEmpty())
+        assertTrue(historySaver.savedStates.isEmpty())
+    }
+
     private fun coordinator(
         apiClient: FakeMatchApiClient,
         statuses: MutableList<SyncStatus> = mutableListOf(),
         warnings: MutableList<Pair<String, Int>> = mutableListOf(),
         historySaver: MatchHistorySaver = RecordingHistorySaver(),
-        retryDelay: RetryDelay = RecordingRetryDelay()
+        retryDelay: RetryDelay = RecordingRetryDelay(),
+        diagnostics: MutableList<Pair<SyncStatus, String?>> = mutableListOf()
     ): MatchSyncCoordinator {
         return MatchSyncCoordinator(
             apiClient = apiClient,
@@ -142,7 +176,8 @@ class MatchSyncCoordinatorTest {
             onSyncStatus = { statuses += it },
             onBracketWarning = { warning, matchId -> warnings += warning to matchId },
             retryDelay = retryDelay,
-            logger = NoOpMatchSyncLogger
+            logger = NoOpMatchSyncLogger,
+            onSyncDiagnostics = { status, error -> diagnostics += status to error }
         )
     }
 
@@ -155,7 +190,7 @@ class MatchSyncCoordinatorTest {
         )
     }
 
-    private fun apiMatch(id: Int, bracketWarning: String? = null): Match {
+    private fun apiMatch(id: Int, bracketWarning: String? = null): MatchDto {
         return MatchApiPayloadFactory.toMatch(matchState()).copy(
             id = id,
             bracketWarning = bracketWarning
@@ -164,39 +199,41 @@ class MatchSyncCoordinatorTest {
 }
 
 private class FakeMatchApiClient : MatchApiClient {
-    val createResults = mutableListOf<QueuedResponse<Match>>()
-    val updateResults = mutableListOf<QueuedResponse<Match>>()
-    val finishResults = mutableListOf<QueuedResponse<Match>>()
-    val eventResults = mutableListOf<QueuedResponse<MatchEventResponse>>()
+    val createResults = mutableListOf<QueuedResponse<MatchDto>>()
+    val updateResults = mutableListOf<QueuedResponse<MatchDto>>()
+    val finishResults = mutableListOf<QueuedResponse<MatchDto>>()
+    val eventResults = mutableListOf<QueuedResponse<MatchEventResponseDto>>()
     val statisticsResults = mutableListOf<QueuedResponse<Unit>>()
     val operations = mutableListOf<String>()
-    val loggedEvents = mutableListOf<MatchEvent>()
-    val statisticsRequests = mutableListOf<MatchStatisticsRequest>()
+    val loggedEvents = mutableListOf<MatchEventDto>()
+    val finishRequests = mutableListOf<FinishMatchRequest>()
+    val statisticsRequests = mutableListOf<MatchStatisticsRequestDto>()
     var createCalls = 0
 
-    override suspend fun createMatch(match: Match): Response<Match> {
+    override suspend fun createMatch(match: MatchDto): Response<MatchDto> {
         createCalls++
         operations += "create"
         return createResults.next()
     }
 
-    override suspend fun updateMatch(matchId: Int, match: Match): Response<Match> {
+    override suspend fun updateMatch(matchId: Int, match: MatchDto): Response<MatchDto> {
         operations += "update:$matchId"
         return updateResults.next()
     }
 
-    override suspend fun finishMatch(matchId: Int): Response<Match> {
+    override suspend fun finishMatch(matchId: Int, request: FinishMatchRequest): Response<MatchDto> {
         operations += "finish:$matchId"
+        finishRequests += request
         return finishResults.next()
     }
 
-    override suspend fun logMatchEvent(event: MatchEvent): Response<MatchEventResponse> {
+    override suspend fun logMatchEvent(event: MatchEventDto): Response<MatchEventResponseDto> {
         operations += "event:${event.eventType}"
         loggedEvents += event
         return eventResults.next()
     }
 
-    override suspend fun sendMatchStatistics(statistics: MatchStatisticsRequest): Response<Unit> {
+    override suspend fun sendMatchStatistics(statistics: MatchStatisticsRequestDto): Response<Unit> {
         operations += "statistics"
         statisticsRequests += statistics
         return statisticsResults.next()

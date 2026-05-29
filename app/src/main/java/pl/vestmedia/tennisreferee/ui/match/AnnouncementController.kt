@@ -3,7 +3,7 @@ package pl.vestmedia.tennisreferee.ui.match
 import android.content.Context
 import android.view.View
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
 
 class AnnouncementController(

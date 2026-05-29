@@ -1,8 +1,10 @@
-package pl.vestmedia.tennisreferee.data.model
+package pl.vestmedia.tennisreferee.domain.match.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
+import pl.vestmedia.tennisreferee.data.model.Player
+import java.util.UUID
 
 /**
  * Model stanu meczu podczas rozgrywki
@@ -11,6 +13,9 @@ import kotlinx.parcelize.RawValue
 data class MatchState(
     // Identyfikator meczu na serwerze
     var matchId: Int? = null,
+
+    // Stabilny identyfikator klienta do idempotentnego tworzenia meczu
+    val clientMatchUuid: String = UUID.randomUUID().toString(),
     
     // Wybrani gracze
     val player1: Player,
@@ -19,6 +24,7 @@ data class MatchState(
     val player4: Player? = null,  // Dla debla - partner gracza 2
     val courtId: String,
     val courtName: String,
+    val scheduleId: Int? = null,
     
     // Debel
     val isDoubles: Boolean = false,
@@ -67,7 +73,13 @@ data class MatchState(
     var statsMode: StatsMode = StatsMode.ADVANCED,
     
     // Historia akcji (do cofania)
-    val actionsHistory: @RawValue MutableList<MatchAction> = mutableListOf()
+    val actionsHistory: @RawValue MutableList<MatchAction> = mutableListOf(),
+
+    // Wynik specjalny przy ręcznym zakończeniu meczu
+    var finishReason: MatchFinishReason = MatchFinishReason.NORMAL,
+    var finishWinnerName: String? = null,
+    var injuredPlayerName: String? = null,
+    var resultNote: String? = null
 ) : Parcelable {
     
     /**

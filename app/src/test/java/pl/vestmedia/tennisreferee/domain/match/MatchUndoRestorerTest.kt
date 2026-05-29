@@ -4,12 +4,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import pl.vestmedia.tennisreferee.data.model.ActionType
-import pl.vestmedia.tennisreferee.data.model.MatchAction
-import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.MatchStatistics
+import pl.vestmedia.tennisreferee.domain.match.model.ActionType
+import pl.vestmedia.tennisreferee.domain.match.model.MatchAction
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchStatistics
 import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.data.model.SetScore
+import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 class MatchUndoRestorerTest {
     private val playerOne = Player(id = 1, name = "Kowalski", firstName = "Jan", lastName = "Kowalski")

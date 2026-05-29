@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.data.model.Player
+import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 
 /**
@@ -33,6 +34,9 @@ class PlayerSelectionViewModel : ViewModel() {
     
     private val _canProceed = MutableLiveData<Boolean>(false)
     val canProceed: LiveData<Boolean> = _canProceed
+
+    private val _suggestedMatch = MutableLiveData<ScheduleSuggestion?>()
+    val suggestedMatch: LiveData<ScheduleSuggestion?> = _suggestedMatch
     
     // Nowo dodany gracz do automatycznego zaznaczenia
     private val _newlyAddedPlayer = MutableLiveData<Player?>()
@@ -55,6 +59,13 @@ class PlayerSelectionViewModel : ViewModel() {
                 _error.value = exception.message ?: "Unknown error"
                 _isLoading.value = false
             }
+        }
+    }
+
+    fun loadSuggestedMatch(courtId: String, tournamentId: Int?) {
+        viewModelScope.launch {
+            repository.getSuggestedMatch(courtId, tournamentId)
+                .onSuccess { suggestion -> _suggestedMatch.value = suggestion }
         }
     }
     
@@ -88,6 +99,19 @@ class PlayerSelectionViewModel : ViewModel() {
         _selectedPlayers.value = currentSelected
         updateCanProceed()
     }
+
+    fun applySuggestedMatch(suggestion: ScheduleSuggestion): Boolean {
+        val selectedPlayers = ScheduleSuggestionSelector.selectPlayers(_players.value.orEmpty(), suggestion)
+        if (selectedPlayers == null) {
+            _error.value = "Suggested players are not available in the player list"
+            return false
+        }
+
+        _isDoubles.value = false
+        _selectedPlayers.value = selectedPlayers.toMutableList()
+        updateCanProceed()
+        return true
+    }
     
     /**
      * Sprawdza czy wybrano odpowiednią liczbę graczy
@@ -117,6 +141,11 @@ class PlayerSelectionViewModel : ViewModel() {
      */
     fun getSelectedPlayersList(): List<Player> {
         return _selectedPlayers.value ?: emptyList()
+    }
+
+    fun clearSelection() {
+        _selectedPlayers.value = mutableListOf()
+        updateCanProceed()
     }
     
     /**

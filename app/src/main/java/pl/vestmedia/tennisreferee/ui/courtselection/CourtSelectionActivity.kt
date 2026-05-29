@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -46,6 +47,17 @@ class CourtSelectionActivity : AppCompatActivity() {
     private val repository = TennisRepository()
     private var selectedTournamentId: Int? = null
     private var selectedTournamentName: String? = null
+
+    private val tournamentSelectionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            selectedTournamentId = TournamentSelectionActivity.selectedTournamentId(result.data)
+                ?: TournamentSelectionStore.getSelectedTournamentIdForToday(this)
+            selectedTournamentName = TournamentSelectionActivity.selectedTournamentName(result.data)
+                ?: TournamentSelectionStore.getSelectedTournamentNameForToday(this)
+            supportActionBar?.subtitle = selectedTournamentName
+            viewModel.loadCourts(selectedTournamentId)
+        }
+    }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -304,12 +316,11 @@ class CourtSelectionActivity : AppCompatActivity() {
             }
             R.id.action_change_tournament -> {
                 AppLogger.button("CourtSelection", "Menu:ChangeTournament")
-                startActivity(
+                tournamentSelectionLauncher.launch(
                     Intent(this, TournamentSelectionActivity::class.java).apply {
                         putExtra(TournamentSelectionActivity.EXTRA_FORCE_SELECTION, true)
                     }
                 )
-                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)

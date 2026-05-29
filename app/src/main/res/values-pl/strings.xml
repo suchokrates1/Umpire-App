@@ -62,6 +62,10 @@
     
     <!-- Player Selection -->
     <string name="select_players">Wybierz zawodników</string>
+    <string name="suggested_match_title">Sugerowany mecz z planu</string>
+    <string name="suggested_match_use">Użyj meczu</string>
+    <string name="suggested_match_manual">Wybiorę ręcznie</string>
+    <string name="suggested_match_applied">Wybrano sugerowany mecz</string>
     <string name="court_label">Kort: %1$s</string>
     <string name="doubles_checkbox">Debel</string>
     <string name="game_type_singles">Singiel (2 graczy)</string>
@@ -111,6 +115,13 @@
     <string name="winner_label">Zwycięzca: %1$s</string>
     <string name="finish">Zakończ</string>
     <string name="finish_match">Zakończ mecz</string>
+    <string name="finish_reason_prompt">Dlaczego kończysz ten mecz?</string>
+    <string name="finish_reason_normal">Normalne zakończenie</string>
+    <string name="finish_reason_test">Wpis testowy</string>
+    <string name="finish_reason_retirement">Krecz</string>
+    <string name="finish_reason_walkover">Walkower</string>
+    <string name="finish_retirement_prompt">Który zawodnik ma kontuzję?</string>
+    <string name="finish_walkover_prompt">Który zawodnik wygrywa walkowerem?</string>
     <string name="new_match">Nowy mecz</string>
     
     <!-- Scoreboard -->
@@ -148,6 +159,7 @@
     <string name="sync_status_synced">Zsynchronizowano</string>
     <string name="sync_status_failed">Błąd synchronizacji</string>
     <string name="sync_status_offline">Offline - ponowimy próbę</string>
+    <string name="sync_status_idle">Jeszcze nie synchronizowano</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Błąd wczytywania kortów</string>
@@ -211,6 +223,19 @@
     <string name="app_description">Profesjonalna aplikacja dla sędziów tenisowych do prowadzenia wyników w czasie rzeczywistym</string>
     <string name="version_format">Wersja %1$s</string>
     <string name="version_unknown">Wersja nieznana</string>
+    <string name="diagnostics">Diagnostyka</string>
+    <string name="diagnostics_app_version">Wersja aplikacji</string>
+    <string name="diagnostics_backend">Backend</string>
+    <string name="diagnostics_device">Urządzenie</string>
+    <string name="diagnostics_locale">Język</string>
+    <string name="diagnostics_timezone">Strefa czasowa</string>
+    <string name="diagnostics_sync_status">Ostatni status synchronizacji</string>
+    <string name="diagnostics_last_update">Ostatnia aktualizacja synchronizacji</string>
+    <string name="diagnostics_last_error">Ostatni błąd synchronizacji</string>
+    <string name="diagnostics_no_error">Brak błędu</string>
+    <string name="diagnostics_never">Nigdy</string>
+    <string name="diagnostics_copy">Kopiuj diagnostykę</string>
+    <string name="diagnostics_copied">Skopiowano diagnostykę</string>
 
     <!-- Statistics Labels -->
     <string name="winners_stat">Zagrania wygrywające</string>

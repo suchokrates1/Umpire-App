@@ -1,49 +1,48 @@
 package pl.vestmedia.tennisreferee.data.model
 
-import com.google.gson.annotations.SerializedName
+import pl.vestmedia.tennisreferee.domain.match.model.MatchFinishReason
 
 /**
  * Model reprezentujący mecz tenisowy
  */
 data class Match(
-    @SerializedName("id")
     val id: Int,
     
-    @SerializedName("court_id")
     val courtId: String,
     
-    @SerializedName("player1_name")
     val player1Name: String,
     
-    @SerializedName("player2_name")
     val player2Name: String,
     
-    @SerializedName("score")
     val score: Score,
     
-    @SerializedName("status")
     val status: MatchStatus,
     
-    @SerializedName("created_at")
     val createdAt: String?,
     
-    @SerializedName("updated_at")
     val updatedAt: String?,
     
-    @SerializedName("bracket_warning")
     val bracketWarning: String? = null,
     
-    @SerializedName("phase")
-    val phase: String? = null
+    val phase: String? = null,
+
+    val scheduleId: Int? = null,
+
+    val clientMatchUuid: String? = null,
+
+    val finishReason: MatchFinishReason? = null,
+
+    val winnerName: String? = null,
+
+    val injuredPlayerName: String? = null,
+
+    val resultNote: String? = null
 )
 
 enum class MatchStatus {
-    @SerializedName("not_started")
     NOT_STARTED,
     
-    @SerializedName("in_progress")
     IN_PROGRESS,
     
-    @SerializedName("finished")
     FINISHED
 }

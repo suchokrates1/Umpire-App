@@ -25,6 +25,10 @@
     
     <!-- Player Selection -->
     <string name="select_players">Spieler auswählen</string>
+    <string name="suggested_match_title">Vorgeschlagenes Spiel aus dem Zeitplan</string>
+    <string name="suggested_match_use">Spiel verwenden</string>
+    <string name="suggested_match_manual">Manuell wählen</string>
+    <string name="suggested_match_applied">Vorgeschlagenes Spiel ausgewählt</string>
     <string name="court_label">Platz: %1$s</string>
     <string name="doubles_checkbox">Doppel</string>
     <string name="game_type_singles">Einzel (2 Spieler)</string>
@@ -74,6 +78,13 @@
     <string name="winner_label">Gewinner: %1$s</string>
     <string name="finish">Beenden</string>
     <string name="finish_match">Spiel beenden</string>
+    <string name="finish_reason_prompt">Warum wird dieses Match beendet?</string>
+    <string name="finish_reason_normal">Reguläres Ende</string>
+    <string name="finish_reason_test">Testeintrag</string>
+    <string name="finish_reason_retirement">Aufgabe wegen Verletzung</string>
+    <string name="finish_reason_walkover">Walkover</string>
+    <string name="finish_retirement_prompt">Welcher Spieler gibt verletzt auf?</string>
+    <string name="finish_walkover_prompt">Welcher Spieler gewinnt per Walkover?</string>
     <string name="new_match">Neues Spiel</string>
     <string name="next_match_same_setup">▶ Nächstes Spiel (gleiche Einstellungen)</string>
     <string name="next_match_new_setup">⚙ Neues Spiel (andere Einstellungen)</string>
@@ -132,6 +143,7 @@
     <string name="sync_status_synced">Synchronisiert</string>
     <string name="sync_status_failed">Synchronisierung fehlgeschlagen</string>
     <string name="sync_status_offline">Offline - erneuter Versuch folgt</string>
+    <string name="sync_status_idle">Noch nicht synchronisiert</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Fehler beim Laden der Plätze</string>
@@ -210,6 +222,19 @@
     <string name="app_description">Professionelle Tennis-Schiedsrichter-App für Echtzeit-Spielstanderfassung</string>
     <string name="version_format">Version %1$s</string>
     <string name="version_unknown">Version unbekannt</string>
+    <string name="diagnostics">Diagnose</string>
+    <string name="diagnostics_app_version">App-Version</string>
+    <string name="diagnostics_backend">Backend</string>
+    <string name="diagnostics_device">Gerät</string>
+    <string name="diagnostics_locale">Sprache</string>
+    <string name="diagnostics_timezone">Zeitzone</string>
+    <string name="diagnostics_sync_status">Letzter Synchronisierungsstatus</string>
+    <string name="diagnostics_last_update">Letzte Synchronisierungsaktualisierung</string>
+    <string name="diagnostics_last_error">Letzter Synchronisierungsfehler</string>
+    <string name="diagnostics_no_error">Kein Fehler</string>
+    <string name="diagnostics_never">Nie</string>
+    <string name="diagnostics_copy">Diagnose kopieren</string>
+    <string name="diagnostics_copied">Diagnose kopiert</string>
 
     <!-- Statistics Labels -->
     <string name="winners_stat">Gewinner-Schläge</string>
