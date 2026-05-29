@@ -119,6 +119,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="?attr/colorSurface">
@@ -155,6 +156,184 @@
                         android:textSize="14sp"
                         android:textColor="?attr/colorOnSurface"
                         android:alpha="0.7"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Diagnostics Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/diagnostics"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_app_version"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsAppVersion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="1.0.0 (100)"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_backend"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsBackend"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="https://score.vestmedia.pl/"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_device"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsDevice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="Samsung SM-X200"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_locale"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsLocale"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="pl-PL"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_timezone"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsTimezone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="Europe/Warsaw"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_sync_status"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsSyncStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="Synced"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_last_update"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsLastUpdate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="29.05.2026, 14:30"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_last_error"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.7"/>
+
+                    <TextView
+                        android:id="@+id/textDiagnosticsLastError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="No error"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonCopyDiagnostics"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/diagnostics_copy"/>
 
                 </LinearLayout>
 

@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import com.google.android.material.button.MaterialButton
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutServerSelectionBinding
 
 class ServerSelectionViewBinder(

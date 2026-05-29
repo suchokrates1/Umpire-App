@@ -1,8 +1,8 @@
 package pl.vestmedia.tennisreferee.domain.match
 
-import pl.vestmedia.tennisreferee.data.model.MatchAction
-import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.MatchStatistics
+import pl.vestmedia.tennisreferee.domain.match.model.MatchAction
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchStatistics
 
 object MatchUndoRestorer {
     fun restore(state: MatchState, action: MatchAction) {

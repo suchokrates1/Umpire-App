@@ -1,7 +1,7 @@
 package pl.vestmedia.tennisreferee.domain.match
 
-import pl.vestmedia.tennisreferee.data.model.MatchState
-import pl.vestmedia.tennisreferee.data.model.SetScore
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 object MatchProgressReducer {
     const val ANNOUNCEMENT_SIDE_CHANGE = "side_change"

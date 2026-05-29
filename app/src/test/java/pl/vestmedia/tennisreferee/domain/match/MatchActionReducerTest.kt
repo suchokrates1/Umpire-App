@@ -5,12 +5,23 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.data.model.Player
 
 class MatchActionReducerTest {
     private val playerOne = Player(id = 1, name = "Kowalski", firstName = "Jan", lastName = "Kowalski")
     private val playerTwo = Player(id = 2, name = "Nowak", firstName = "Adam", lastName = "Nowak")
+
+    @Test
+    fun startMatchCommandUsesStartReducer() {
+        val state = matchState()
+
+        MatchActionReducer.reduce(state, MatchCommand.StartMatch(serverNumber = 2, nowMs = 10_000L))
+
+        assertEquals(2, state.currentServer)
+        assertFalse(state.isPlayer1Serving)
+        assertEquals(10_000L, state.matchStartTime)
+    }
 
     @Test
     fun aceRecordsFirstServeStatsAndAwardsPointToServer() {
@@ -88,6 +99,17 @@ class MatchActionReducerTest {
     }
 
     @Test
+    fun pointWonCommandAddsPointAndReportsPointEvent() {
+        val state = matchState()
+
+        val result = MatchActionReducer.reduce(state, MatchCommand.PointWon(isPlayer1 = true))
+
+        assertEquals(1, state.player1Points)
+        assertTrue(result.pointScored)
+        assertEquals(listOf(MatchPointEvent.Point), result.pointEvents)
+    }
+
+    @Test
     fun winnerAwardsPointToWinner() {
         val state = matchState()
 
@@ -139,6 +161,19 @@ class MatchActionReducerTest {
         assertEquals(1, state.player1Stats.firstServesTotal)
         assertFalse(state.isFirstServe)
         assertNull(result.pointWinner)
+    }
+
+    @Test
+    fun toggleSidesCommandFlipsSidesWithoutUiMutation() {
+        val state = matchState().apply { sidesSwapped = false }
+
+        MatchActionReducer.reduce(state, MatchCommand.ToggleSides)
+
+        assertTrue(state.sidesSwapped)
+
+        MatchActionReducer.reduce(state, MatchCommand.ToggleSides)
+
+        assertFalse(state.sidesSwapped)
     }
 
     private fun matchState(): MatchState {

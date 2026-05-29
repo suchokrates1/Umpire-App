@@ -35,10 +35,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
-import pl.vestmedia.tennisreferee.data.model.MatchConfig
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.data.model.StatsMode
+import pl.vestmedia.tennisreferee.domain.match.model.StatsMode
 import pl.vestmedia.tennisreferee.ui.match.MatchActivity
 import java.io.ByteArrayOutputStream
 import java.net.URLEncoder

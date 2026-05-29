@@ -1,4 +1,4 @@
-package pl.vestmedia.tennisreferee.data.model
+package pl.vestmedia.tennisreferee.domain.match.model
 
 /**
  * Tryb zbierania statystyk meczu

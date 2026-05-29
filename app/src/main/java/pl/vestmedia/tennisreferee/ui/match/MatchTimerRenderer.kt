@@ -3,7 +3,7 @@ package pl.vestmedia.tennisreferee.ui.match
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutScoreboardBinding
 import java.util.Locale
 

@@ -3,7 +3,7 @@ package pl.vestmedia.tennisreferee.data.repository
 import kotlinx.coroutines.flow.Flow
 import pl.vestmedia.tennisreferee.data.database.MatchDao
 import pl.vestmedia.tennisreferee.data.database.MatchEntity
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 
 /**
  * Repository do zarządzania zapisanymi meczami

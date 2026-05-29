@@ -26,6 +26,10 @@
     
     <!-- Player Selection -->
     <string name="select_players">Select Players</string>
+    <string name="suggested_match_title">Suggested match from schedule</string>
+    <string name="suggested_match_use">Use match</string>
+    <string name="suggested_match_manual">Choose manually</string>
+    <string name="suggested_match_applied">Suggested match selected</string>
     <string name="court_label">Court: %1$s</string>
     <string name="doubles_checkbox">Doubles</string>
     <string name="game_type_singles">Singles (2 players)</string>
@@ -75,6 +79,13 @@
     <string name="winner_label">Winner: %1$s</string>
     <string name="finish">Finish</string>
     <string name="finish_match">Finish Match</string>
+    <string name="finish_reason_prompt">Why are you ending this match?</string>
+    <string name="finish_reason_normal">Normal finish</string>
+    <string name="finish_reason_test">Test entry</string>
+    <string name="finish_reason_retirement">Retirement</string>
+    <string name="finish_reason_walkover">Walkover</string>
+    <string name="finish_retirement_prompt">Which player retired injured?</string>
+    <string name="finish_walkover_prompt">Which player wins by walkover?</string>
     <string name="new_match">New Match</string>
     <string name="next_match_same_setup">▶ Next Match (same setup)</string>
     <string name="next_match_new_setup">⚙ New Match (different setup)</string>
@@ -158,6 +169,7 @@
     <string name="sync_status_synced">Synced</string>
     <string name="sync_status_failed">Sync failed</string>
     <string name="sync_status_offline">Offline - will retry</string>
+    <string name="sync_status_idle">Not synced yet</string>
     
     <!-- Errors -->
     <string name="error_loading_courts">Error loading courts</string>
@@ -226,6 +238,19 @@
     <string name="app_description">Professional tennis referee application for real-time match scoring</string>
     <string name="version_format">Version %1$s</string>
     <string name="version_unknown">Version unknown</string>
+    <string name="diagnostics">Diagnostics</string>
+    <string name="diagnostics_app_version">App version</string>
+    <string name="diagnostics_backend">Backend</string>
+    <string name="diagnostics_device">Device</string>
+    <string name="diagnostics_locale">Locale</string>
+    <string name="diagnostics_timezone">Timezone</string>
+    <string name="diagnostics_sync_status">Last sync status</string>
+    <string name="diagnostics_last_update">Last sync update</string>
+    <string name="diagnostics_last_error">Last sync error</string>
+    <string name="diagnostics_no_error">No error</string>
+    <string name="diagnostics_never">Never</string>
+    <string name="diagnostics_copy">Copy diagnostics</string>
+    <string name="diagnostics_copied">Diagnostics copied</string>
     <string name="tournament_dates" translatable="false">%1$s - %2$s</string>
 
     <!-- Bracket warnings -->

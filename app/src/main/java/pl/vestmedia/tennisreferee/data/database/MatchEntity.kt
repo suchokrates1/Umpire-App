@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.data.model.SetScore
+import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 /**
  * Encja reprezentująca mecz w bazie danych

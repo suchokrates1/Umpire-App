@@ -2,13 +2,20 @@ package pl.vestmedia.tennisreferee.data.repository
 
 import kotlinx.coroutines.delay
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.data.api.dto.CourtPinRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.toDto
+import pl.vestmedia.tennisreferee.data.api.dto.toModel
 import pl.vestmedia.tennisreferee.data.model.Court
-import pl.vestmedia.tennisreferee.data.model.Match
+import pl.vestmedia.tennisreferee.domain.match.model.Match
 import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.data.model.CourtPinRequest
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
+import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
+import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.data.model.TournamentOption
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -24,7 +31,7 @@ class TennisRepository {
      */
     suspend fun getCourts(tournamentId: Int? = null): Result<List<Court>> {
         return request { apiService.getCourts(tournamentId) }
-            .map { it.courts }
+            .map { response -> response.courts.map { it.toModel() } }
     }
 
     /**
@@ -32,6 +39,7 @@ class TennisRepository {
      */
     suspend fun getActiveTournaments(): Result<List<TournamentOption>> {
         return request { apiService.getActiveTournaments() }
+            .map { tournaments -> tournaments.map { it.toModel() } }
     }
     
     /**
@@ -43,15 +51,25 @@ class TennisRepository {
         }
 
         return request { apiService.getPlayers(courtId) }
-            .map { it.players }
+            .map { response -> response.players.map { it.toModel() } }
             .onSuccess { playersCache[cacheKey(courtId)] = it }
+    }
+
+    suspend fun getSuggestedMatch(
+        courtId: String,
+        tournamentId: Int? = null,
+        at: String = currentScheduleTimeIso()
+    ): Result<ScheduleSuggestion?> {
+        return request { apiService.getSuggestedMatch(courtId, tournamentId, at) }
+            .map { it.suggestion?.toModel() }
     }
     
     /**
      * Weryfikuje PIN dla kortu
      */
     suspend fun verifyCourtPin(courtId: String, pin: String): Result<CourtAuthResponse> {
-        return request { apiService.verifyCourtPin(courtId, CourtPinRequest(pin)) }
+        return request { apiService.verifyCourtPin(courtId, CourtPinRequestDto(pin)) }
+            .map { it.toModel() }
             .fold(
                 onSuccess = { authResponse ->
                 if (authResponse.authorized) {
@@ -69,27 +87,31 @@ class TennisRepository {
      */
     suspend fun getMatch(matchId: Int): Result<Match> {
         return request { apiService.getMatch(matchId) }
+            .map { it.toModel() }
     }
     
     /**
      * Tworzy nowy mecz
      */
     suspend fun createMatch(match: Match): Result<Match> {
-        return request { apiService.createMatch(match) }
+        return request { apiService.createMatch(match.toDto()) }
+            .map { it.toModel() }
     }
     
     /**
      * Aktualizuje wynik meczu
      */
     suspend fun updateMatch(matchId: Int, match: Match): Result<Match> {
-        return request { apiService.updateMatch(matchId, match) }
+        return request { apiService.updateMatch(matchId, match.toDto()) }
+            .map { it.toModel() }
     }
     
     /**
      * Kończy mecz
      */
     suspend fun finishMatch(matchId: Int): Result<Match> {
-        return request { apiService.finishMatch(matchId) }
+        return request { apiService.finishMatch(matchId, FinishMatchRequest().toDto()) }
+            .map { it.toModel() }
     }
     
     /**
@@ -112,7 +134,9 @@ class TennisRepository {
                 playerRequest["pin"] = courtPin
             }
             
-            request { apiService.addPlayer(playerRequest) }.fold(
+            request { apiService.addPlayer(playerRequest) }
+                .map { it.toModel() }
+                .fold(
                 onSuccess = { addPlayerResponse ->
                     if (addPlayerResponse.ok && addPlayerResponse.player != null) {
                         playersCache.clear()
@@ -171,4 +195,8 @@ class TennisRepository {
     }
 
     private fun cacheKey(courtId: String?): String = courtId ?: "__all__"
+
+    private fun currentScheduleTimeIso(): String {
+        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(Date())
+    }
 }

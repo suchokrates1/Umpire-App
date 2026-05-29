@@ -1,8 +1,8 @@
 package pl.vestmedia.tennisreferee.domain.match
 
-import pl.vestmedia.tennisreferee.data.model.ActionType
-import pl.vestmedia.tennisreferee.data.model.MatchAction
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.ActionType
+import pl.vestmedia.tennisreferee.domain.match.model.MatchAction
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 
 object MatchUndoManager {
     private const val DEFAULT_MAX_HISTORY = 100

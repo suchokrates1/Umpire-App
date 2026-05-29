@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.view.View
 import android.widget.TextView
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutScoreboardBinding
 import java.text.SimpleDateFormat
 import java.util.Date

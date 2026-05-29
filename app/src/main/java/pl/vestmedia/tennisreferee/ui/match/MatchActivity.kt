@@ -1,5 +1,7 @@
 package pl.vestmedia.tennisreferee.ui.match
 
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -16,7 +18,7 @@ import pl.vestmedia.tennisreferee.databinding.LayoutRallyBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
@@ -44,19 +46,45 @@ class MatchActivity : AppCompatActivity() {
     private lateinit var matchTimerRenderer: MatchTimerRenderer
     private lateinit var matchToolbarRenderer: MatchToolbarRenderer
     private lateinit var matchViewSwitcher: MatchViewSwitcher
+    private lateinit var activeMatchStore: ActiveMatchStore
+    private var activeMatchUuid: String? = null
     private val viewModel: MatchViewModel by viewModels()
     
     companion object {
+        private const val EXTRA_MATCH_UUID = "match_uuid"
         const val EXTRA_MATCH_STATE = "match_state"
         const val EXTRA_IS_DOUBLES = "is_doubles"
         const val EXTRA_TEAM1_COLOR = "team1_color"
         const val EXTRA_TEAM2_COLOR = "team2_color"
+        private const val EXTRA_MATCH_RESULT_ACTION = "match_result_action"
+        const val RESULT_NEXT_MATCH_SAME_SETUP = "next_match_same_setup"
+        const val RESULT_NEXT_MATCH_NEW_SETUP = "next_match_new_setup"
+
+        fun createIntent(context: Context, matchUuid: String, isDoubles: Boolean): Intent {
+            return Intent(context, MatchActivity::class.java).apply {
+                putExtra(EXTRA_MATCH_UUID, matchUuid)
+                if (isDoubles) {
+                    putExtra(EXTRA_IS_DOUBLES, true)
+                    putExtra(EXTRA_TEAM1_COLOR, R.color.team1_color)
+                    putExtra(EXTRA_TEAM2_COLOR, R.color.team2_color)
+                }
+            }
+        }
+
+        fun resultIntent(action: String): Intent {
+            return Intent().putExtra(EXTRA_MATCH_RESULT_ACTION, action)
+        }
+
+        fun resultAction(data: Intent?): String? {
+            return data?.getStringExtra(EXTRA_MATCH_RESULT_ACTION)
+        }
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMatchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        activeMatchStore = ActiveMatchStore(this)
         
         // Inicjalizuj bindingi dla included layoutów
         scoreboardBinding = LayoutScoreboardBinding.bind(binding.layoutScoreboard.root)
@@ -73,7 +101,8 @@ class MatchActivity : AppCompatActivity() {
         matchDialogsController = MatchDialogsController(
             activity = this,
             onUndoConfirmed = { viewModel.undoLastAction() },
-            onFinishConfirmed = { finish() },
+            getMatchState = { viewModel.matchState.value },
+            onFinishConfirmed = { request -> viewModel.finishMatchWithOutcome(request) },
             onExitConfirmed = { finish() },
             onBracketWarningCleared = { viewModel.clearBracketWarning() }
         )
@@ -84,7 +113,11 @@ class MatchActivity : AppCompatActivity() {
             rallyBinding = rallyBinding,
             basicScoringBinding = basicScoringBinding
         )
-        matchFinishController = MatchFinishController(this, matchFinishedBinding)
+        matchFinishController = MatchFinishController(
+            activity = this,
+            binding = matchFinishedBinding,
+            onNextMatch = { action -> finishWithResult(action) }
+        )
         scoringButtonsController = ScoringButtonsController(
             context = this,
             serveBinding = serveBinding,
@@ -136,22 +169,17 @@ class MatchActivity : AppCompatActivity() {
             }
         )
         
-        intent.extras?.classLoader = MatchState::class.java.classLoader
-
-        // Pobierz stan meczu z Intent
-        val matchState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_MATCH_STATE, MatchState::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_MATCH_STATE)
-        }
+        val matchState = loadInitialMatchState()
         
         if (matchState == null) {
             finish()
             return
         }
         
-        viewModel.initializeMatch(matchState)
+        activeMatchUuid = matchState.clientMatchUuid
+        if (viewModel.matchState.value == null) {
+            viewModel.initializeMatch(matchState)
+        }
         AppLogger.screen("Match", "court=${matchState.courtId} p1=${matchState.player1.getDisplayName()} p2=${matchState.player2.getDisplayName()}")
         (application as TennisRefereeApp).healthCheckManager.currentScreen = "Match"
         
@@ -176,6 +204,7 @@ class MatchActivity : AppCompatActivity() {
     
     private fun setupObservers() {
         viewModel.matchState.observe(this) { state ->
+            activeMatchStore.save(state)
             scoreboardRenderer.render(state)
             courtSideNamesRenderer.render(state)
             serverSelectionViewBinder.render(state)
@@ -216,6 +245,26 @@ class MatchActivity : AppCompatActivity() {
         
         // Match announcements — now handled as inline ANNOUNCEMENT view
         // (no more AlertDialog popups)
+    }
+
+    private fun loadInitialMatchState(): MatchState? {
+        intent.getStringExtra(EXTRA_MATCH_UUID)?.let { matchUuid ->
+            activeMatchStore.get(matchUuid)?.let { return it }
+        }
+
+        intent.extras?.classLoader = MatchState::class.java.classLoader
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(EXTRA_MATCH_STATE, MatchState::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_MATCH_STATE)
+        }?.also { activeMatchStore.save(it) }
+    }
+
+    private fun finishWithResult(action: String) {
+        activeMatchUuid?.let { activeMatchStore.clear(it) }
+        setResult(RESULT_OK, resultIntent(action))
+        finish()
     }
     
     private fun setupListeners() {

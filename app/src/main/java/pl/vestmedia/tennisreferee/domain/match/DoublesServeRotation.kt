@@ -1,6 +1,6 @@
 package pl.vestmedia.tennisreferee.domain.match
 
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 
 object DoublesServeRotation {
     fun nextServer(currentServer: Int): Int {

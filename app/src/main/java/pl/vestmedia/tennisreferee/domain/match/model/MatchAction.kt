@@ -1,4 +1,4 @@
-package pl.vestmedia.tennisreferee.data.model
+package pl.vestmedia.tennisreferee.domain.match.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -1,16 +1,15 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import android.app.Activity
-import android.content.Intent
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
-import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 class MatchFinishController(
     private val activity: Activity,
-    private val binding: LayoutMatchFinishedBinding
+    private val binding: LayoutMatchFinishedBinding,
+    private val onNextMatch: (String) -> Unit
 ) {
     fun render(state: MatchState) {
         val winner = if (state.player1Sets > state.player2Sets) {
@@ -48,26 +47,13 @@ class MatchFinishController(
         binding.buttonNextMatchSameSetup.setOnClickListener {
             AppLogger.button("Match", "NextMatchSameSetup", "court=${state.courtId}")
             AppLogger.navigate("Match", "PlayerSelection", "sameSetup=true")
-            val intent = Intent(activity, PlayerSelectionActivity::class.java).apply {
-                putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, state.courtId)
-                putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, state.courtName)
-                putExtra(PlayerSelectionActivity.EXTRA_MATCH_CONFIG, state.matchConfig)
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            activity.startActivity(intent)
-            activity.finish()
+            onNextMatch(MatchActivity.RESULT_NEXT_MATCH_SAME_SETUP)
         }
 
         binding.buttonNextMatchNewSetup.setOnClickListener {
             AppLogger.button("Match", "NextMatchNewSetup", "court=${state.courtId}")
             AppLogger.navigate("Match", "PlayerSelection", "sameSetup=false")
-            val intent = Intent(activity, PlayerSelectionActivity::class.java).apply {
-                putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, state.courtId)
-                putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, state.courtName)
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            activity.startActivity(intent)
-            activity.finish()
+            onNextMatch(MatchActivity.RESULT_NEXT_MATCH_NEW_SETUP)
         }
     }
 

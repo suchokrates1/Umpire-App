@@ -1,6 +1,6 @@
 package pl.vestmedia.tennisreferee.domain.match
 
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 
 object MatchStartReducer {
     fun start(state: MatchState, serverNumber: Int, nowMs: Long) {

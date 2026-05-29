@@ -2,7 +2,7 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import android.view.View
 import androidx.core.view.isVisible
-import pl.vestmedia.tennisreferee.data.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchBinding
 
 class MatchViewSwitcher(
