@@ -166,12 +166,12 @@ class PlayerSelectionViewModel : ViewModel() {
      * Dodaje nowego zawodnika do API
      * Po dodaniu automatycznie zaznacza go do meczu
      */
-    fun addPlayer(firstName: String, lastName: String, flagCode: String, category: String = "B1", courtId: String = "", courtPin: String = "") {
+    fun addPlayer(firstName: String, lastName: String, flagCode: String, category: String = "B1", courtId: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             
-            val result = repository.addPlayer(firstName, lastName, flagCode, category, courtId, courtPin)
+            val result = repository.addPlayer(firstName, lastName, flagCode, category, courtId)
             result.onSuccess { newPlayer ->
                 // Odśwież listę zawodników
                 val playersResult = repository.getPlayers(currentCourtId, forceRefresh = true)

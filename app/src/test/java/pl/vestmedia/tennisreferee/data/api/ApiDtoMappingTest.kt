@@ -1,5 +1,6 @@
 package pl.vestmedia.tennisreferee.data.api
 
+import com.google.gson.Gson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -115,11 +116,32 @@ class ApiDtoMappingTest {
             ok = true,
             authorized = true,
             courtId = "1",
+            token = "court-token",
+            expiresAt = "2026-07-11T16:30:00Z",
             error = null
         ).toModel()
 
         assertEquals(true, model.ok)
         assertEquals(true, model.authorized)
         assertEquals("1", model.courtId)
+        assertEquals("court-token", model.token)
+        assertEquals("2026-07-11T16:30:00Z", model.expiresAt)
+    }
+
+    @Test
+    fun courtAuthResponseAcceptsCourtIdAndLegacyKortId() {
+        val gson = Gson()
+
+        val current = gson.fromJson(
+            """{"ok":true,"authorized":true,"court_id":"court-1"}""",
+            CourtAuthResponseDto::class.java
+        )
+        val legacy = gson.fromJson(
+            """{"ok":true,"authorized":true,"kort_id":"court-2"}""",
+            CourtAuthResponseDto::class.java
+        )
+
+        assertEquals("court-1", current.courtId)
+        assertEquals("court-2", legacy.courtId)
     }
 }

@@ -98,8 +98,14 @@ data class CourtAuthResponseDto(
     @SerializedName("authorized")
     val authorized: Boolean,
 
-    @SerializedName("kort_id")
+    @SerializedName(value = "court_id", alternate = ["kort_id"])
     val courtId: String? = null,
+
+    @SerializedName("token")
+    val token: String? = null,
+
+    @SerializedName(value = "expires_at", alternate = ["expiresAt", "expiry"])
+    val expiresAt: String? = null,
 
     @SerializedName("error")
     val error: String? = null
@@ -436,6 +442,8 @@ fun CourtAuthResponseDto.toModel(): CourtAuthResponse {
         ok = ok,
         authorized = authorized,
         courtId = courtId,
+        token = token,
+        expiresAt = expiresAt,
         error = error
     )
 }

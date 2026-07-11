@@ -209,7 +209,6 @@ class CourtSelectionActivity : AppCompatActivity() {
                             val intent = Intent(this@CourtSelectionActivity, PlayerSelectionActivity::class.java).apply {
                                 putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, court.id)
                                 putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, courtDisplayName)
-                                putExtra(PlayerSelectionActivity.EXTRA_COURT_PIN, pin)
                             }
                             AppLogger.navigate("CourtSelection", "PlayerSelection", "court=${court.id}")
                             startActivity(intent)
@@ -259,40 +258,6 @@ class CourtSelectionActivity : AppCompatActivity() {
         
         dialog.show()
         digit1.requestFocus()
-    }
-    
-    private fun verifyCourtPin(court: Court, pin: String) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.Main) {
-                binding.progressBar.visibility = View.VISIBLE
-            }
-            
-            val result = withContext(Dispatchers.IO) {
-                repository.verifyCourtPin(court.id, pin)
-            }
-            
-            withContext(Dispatchers.Main) {
-                binding.progressBar.visibility = View.GONE
-                
-                result.onSuccess { _ ->
-                    // PIN poprawny - przejdź do wyboru zawodników
-                    val courtDisplayName = court.getDisplayName(this@CourtSelectionActivity)
-                    val intent = Intent(this@CourtSelectionActivity, PlayerSelectionActivity::class.java).apply {
-                        putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, court.id)
-                        putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, courtDisplayName)
-                        putExtra(PlayerSelectionActivity.EXTRA_COURT_PIN, pin)
-                    }
-                    startActivity(intent)
-                }.onFailure { error ->
-                    // PIN niepoprawny
-                    Toast.makeText(
-                        this@CourtSelectionActivity,
-                        getString(R.string.pin_invalid, error.message),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
     }
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
