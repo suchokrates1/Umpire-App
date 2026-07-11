@@ -1,6 +1,7 @@
 package pl.vestmedia.tennisreferee
 
 import android.app.Application
+import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.repository.MatchHistoryRepository
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -19,6 +20,7 @@ class TennisRefereeApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
+        CourtSessionProvider.initialize(this)
         // Apply saved theme on app start
         themeManager.applyCurrentTheme()
         // Start health check heartbeat

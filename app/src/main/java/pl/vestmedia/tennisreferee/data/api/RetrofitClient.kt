@@ -3,6 +3,7 @@ package pl.vestmedia.tennisreferee.data.api
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import pl.vestmedia.tennisreferee.BuildConfig
+import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -20,6 +21,7 @@ object RetrofitClient {
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(ClientMetadataInterceptor())
+        .addInterceptor(BearerAuthInterceptor(CourtSessionProvider.get()))
         .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)

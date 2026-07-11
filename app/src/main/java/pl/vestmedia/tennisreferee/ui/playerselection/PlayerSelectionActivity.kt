@@ -50,13 +50,11 @@ class PlayerSelectionActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_COURT_ID = "court_id"
         const val EXTRA_COURT_NAME = "court_name"
-        const val EXTRA_COURT_PIN = "court_pin"
         const val EXTRA_MATCH_CONFIG = "match_config"
     }
     
     private var courtId: String = ""
     private var courtName: String = ""
-    private var courtPin: String = ""
     private var selectedTournamentId: Int? = null
     private var currentSuggestion: ScheduleSuggestion? = null
     private var selectedScheduleId: Int? = null
@@ -89,7 +87,6 @@ class PlayerSelectionActivity : AppCompatActivity() {
         // Pobierz dane kortu z Intent
         courtId = intent.getStringExtra(EXTRA_COURT_ID) ?: ""
         courtName = intent.getStringExtra(EXTRA_COURT_NAME) ?: ""
-        courtPin = intent.getStringExtra(EXTRA_COURT_PIN) ?: ""
         selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this)
         
         // Sprawdź czy przekazano konfigurację z poprzedniego meczu
@@ -802,7 +799,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
                 val flagCode = if (countryIndex >= 0) countryCodes[countryIndex] else "PL"
                 
                 // Dodaj zawodnika do serwera (automatycznie zaznaczy i przewinie)
-                viewModel.addPlayer(firstName, lastName, flagCode, selectedCategory, courtId, courtPin)
+                viewModel.addPlayer(firstName, lastName, flagCode, selectedCategory, courtId)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
