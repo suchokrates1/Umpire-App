@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = 'pl.vestmedia.tennisreferee'
-    compileSdk = 35
+    compileSdk = 36
 
     // ── Versioning scheme ───────────────────────────────────────
     // versionCode = MAJOR*100000 + MINOR*10000 + PATCH*1000 + BUILD
@@ -23,7 +23,7 @@ android {
     def vMajor = 1
     def vMinor = 0
     def vPatch = 0
-    def vBuild = 20           // increment for each build
+    def vBuild = 21           // increment for each build
     def vQualifier = "dev"    // "dev" | "alpha" | "beta" | "" (production)
 
     signingConfigs {
@@ -38,7 +38,7 @@ android {
     defaultConfig {
         applicationId = "pl.vestmedia.tennisreferee"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = vMajor * 100000 + vMinor * 10000 + vPatch * 1000 + vBuild
         versionName = vQualifier ? "${vMajor}.${vMinor}.${vPatch}-${vQualifier}.${vBuild}" : "${vMajor}.${vMinor}.${vPatch}"
 
