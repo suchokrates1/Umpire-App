@@ -15,13 +15,14 @@ import java.util.concurrent.TimeUnit
  * Admin/E2E HTTP client for instrumentation tests.
  *
  * Base URL resolution order:
- * 1. instrumentation arg `e2e.baseUrl` (e.g. `-Pandroid.testInstrumentationRunnerArguments.e2e.baseUrl=...`)
- * 2. env `E2E_BASE_URL` or `e2e.baseUrl`
- * 3. default `http://10.0.2.2:18087` — emulator loopback to host; host Docker e2e
- *    (`wyniki-v2/docker-compose.e2e.yml`) publishes container port 8080 as **18087**.
+ * 1. instrumentation arg `e2e.baseUrl`
+ * 2. env `E2E_BASE_URL` / `e2e.baseUrl`
+ * 3. default `http://10.0.2.2:18087` (emulator → host Docker e2e)
  *
- * Production can be selected explicitly:
- * `e2e.baseUrl=https://score.vestmedia.pl`
+ * Admin password:
+ * 1. instrumentation arg `e2e.adminPassword`
+ * 2. env `E2E_ADMIN_PASSWORD`
+ * 3. default `e2e-admin` (docker-compose.e2e.yml)
  */
 class E2EBackendClient(
     baseUrl: String = resolveBaseUrl()
@@ -35,7 +36,11 @@ class E2EBackendClient(
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
+    @Volatile
+    private var adminToken: String? = null
+
     fun createTournamentFixture(marker: String): TournamentFixture {
+        ensureAdminToken()
         val today = LocalDate.now()
         try {
             val tournament = postJson(
@@ -45,11 +50,17 @@ class E2EBackendClient(
                     .put("start_date", today.toString())
                     .put("end_date", today.plusDays(1).toString())
                     .put("active", true)
+                    .put("is_simulation", true)
+                    .put("office_password", "test")
                     .put("city", "E2E")
                     .put("country", "PL")
                     .put("court_count", 8)
             )
-            val tournamentId = tournament.getInt("id")
+            val tournamentId = when {
+                tournament.has("id") -> tournament.getInt("id")
+                tournament.has("tournament") -> tournament.getJSONObject("tournament").getInt("id")
+                else -> error("Tournament create response missing id: $tournament")
+            }
             val players = createPlayers(marker, tournamentId)
             putJson(
                 "/admin/api/tournaments/$tournamentId/bracket/groups",
@@ -78,10 +89,8 @@ class E2EBackendClient(
         }
     }
 
-    /**
-     * Attach to an existing tournament created by another device/script (shared parallel fixture).
-     */
     fun loadTournamentFixture(marker: String, tournamentId: Int): TournamentFixture {
+        ensureAdminToken()
         val playersJson = getJsonArray("/admin/api/tournaments/$tournamentId/players")
         val players = mutableListOf<E2EPlayer>()
         for (index in 0 until playersJson.length()) {
@@ -94,7 +103,6 @@ class E2EBackendClient(
                 country = row.optString("country")
             )
         }
-        // Keep creation order (P1..P8) even if API sorts differently.
         val ordered = players.sortedWith(
             compareBy<E2EPlayer> { playerOrdinal(it.lastName) }.thenBy { it.lastName }.thenBy { it.firstName }
         )
@@ -105,6 +113,7 @@ class E2EBackendClient(
     }
 
     fun cleanup(marker: String) {
+        ensureAdminToken(allowFailure = true)
         postJson("/admin/api/e2e/cleanup", JSONObject().put("marker", marker), allowFailure = true)
     }
 
@@ -136,6 +145,21 @@ class E2EBackendClient(
         return requireNotNull(result)
     }
 
+    private fun ensureAdminToken(allowFailure: Boolean = false) {
+        if (!adminToken.isNullOrBlank()) return
+        val password = resolveAdminPassword()
+        try {
+            val response = postJsonUnauthed(
+                "/admin/api/auth",
+                JSONObject().put("password", password)
+            )
+            adminToken = response.optString("token").takeIf { it.isNotBlank() }
+                ?: error("Admin auth missing token")
+        } catch (error: Throwable) {
+            if (!allowFailure) throw error
+        }
+    }
+
     private fun createPlayers(marker: String, tournamentId: Int): List<E2EPlayer> {
         val definitions = listOf(
             Triple("Ana", "F", "PL"),
@@ -165,6 +189,7 @@ class E2EBackendClient(
     }
 
     private fun fetchArtifacts(marker: String): JSONObject {
+        ensureAdminToken()
         return getJson("/admin/api/e2e/artifacts?marker=${URLEncoder.encode(marker, "UTF-8")}")
     }
 
@@ -194,18 +219,23 @@ class E2EBackendClient(
         requestObject("POST", path, body, allowFailure)
     private fun putJson(path: String, body: JSONObject): JSONObject = requestObject("PUT", path, body)
 
+    private fun postJsonUnauthed(path: String, body: JSONObject): JSONObject {
+        val text = execute("POST", path, body, allowFailure = false, withAuth = false)
+        return if (text.isBlank()) JSONObject() else JSONObject(text)
+    }
+
     private fun requestObject(
         method: String,
         path: String,
         body: JSONObject?,
         allowFailure: Boolean = false
     ): JSONObject {
-        val text = execute(method, path, body, allowFailure)
+        val text = execute(method, path, body, allowFailure, withAuth = true)
         return if (text.isBlank()) JSONObject() else JSONObject(text)
     }
 
     private fun requestArray(method: String, path: String): JSONArray {
-        val text = execute(method, path, null, allowFailure = false)
+        val text = execute(method, path, null, allowFailure = false, withAuth = true)
         return if (text.isBlank()) JSONArray() else JSONArray(text)
     }
 
@@ -213,10 +243,17 @@ class E2EBackendClient(
         method: String,
         path: String,
         body: JSONObject?,
-        allowFailure: Boolean
+        allowFailure: Boolean,
+        withAuth: Boolean
     ): String {
-        val request = Request.Builder()
-            .url("$baseUrl$path")
+        val builder = Request.Builder().url("$baseUrl$path")
+        if (withAuth) {
+            val token = adminToken
+            if (!token.isNullOrBlank()) {
+                builder.header("Authorization", "Bearer $token")
+            }
+        }
+        val request = builder
             .method(method, if (method == "GET") null else (body ?: JSONObject()).toString().toRequestBody(jsonMediaType))
             .build()
         client.newCall(request).execute().use { response ->
@@ -239,8 +276,15 @@ class E2EBackendClient(
                 .firstOrNull()
             if (fromEnv != null) return fromEnv.trimEnd('/')
 
-            // Host Docker e2e uses port 18087; emulator reaches the host via 10.0.2.2.
             return "http://10.0.2.2:18087"
+        }
+
+        fun resolveAdminPassword(): String {
+            val fromArg = instrumentationArg("e2e.adminPassword")
+            if (fromArg != null) return fromArg
+            val fromEnv = System.getenv("E2E_ADMIN_PASSWORD")?.trim()?.takeIf { it.isNotEmpty() }
+            if (fromEnv != null) return fromEnv
+            return "e2e-admin"
         }
 
         fun instrumentationArg(name: String): String? =
