@@ -6,7 +6,9 @@
   Prerequisites:
   - Host must run wyniki e2e backend on port 18087
     (wyniki-v2/docker-compose.e2e.yml maps 18087:8080).
-  - Emulators reach the host via http://10.0.2.2:18087 (default -BaseUrl).
+  - Prefer JAVA_HOME = Eclipse Adoptium JDK 17.
+  - Emulators/devices: LAN URL in -BaseUrl (tests call RetrofitClient.overrideBaseUrl).
+  - 1 AVD => sequential courts; 2-4 AVD => parallel jobs.
   - Physical devices need the host LAN IP in -BaseUrl instead of 10.0.2.2.
 
   Behavior:
@@ -42,7 +44,13 @@ param(
 
     [string]$GradleTask = "connectedDebugAndroidTest",
 
-    [string]$TestClass = "pl.vestmedia.tennisreferee.e2e.MultiCourtUmpireE2ETest"
+    [string]$TestClass = "pl.vestmedia.tennisreferee.e2e.MultiCourtUmpireE2ETest",
+
+    # When set, leave the shared E2E tournament for the orchestrator public assert.
+    [switch]$SkipCleanup,
+
+    # Optional path to write the shared marker (one line) for post-run asserts.
+    [string]$MarkerOutFile = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -191,6 +199,10 @@ $adminToken = Get-AdminToken -ApiBase $apiBase -Password $AdminPassword
 Write-Host "Creating shared fixture marker=$marker ..."
 $fixture = New-SharedE2EFixture -ApiBase $apiBase -Marker $marker -Token $adminToken
 Write-Host "Shared tournamentId=$($fixture.TournamentId)"
+Write-Host "E2E_MARKER=$marker"
+if ($MarkerOutFile) {
+    Set-Content -Path $MarkerOutFile -Value $marker -Encoding utf8
+}
 
 $gradlew = if ($IsWindows -or $env:OS -match "Windows") { ".\gradlew.bat" } else { "./gradlew" }
 $failed = $false
@@ -252,8 +264,12 @@ try {
         }
     }
 } finally {
-    Write-Host "Cleaning shared fixture marker=$($fixture.Marker) ..."
-    Remove-SharedE2EFixture -ApiBase $apiBase -Marker $fixture.Marker -Token $adminToken
+    if ($SkipCleanup) {
+        Write-Host "SkipCleanup: leaving shared fixture marker=$($fixture.Marker) for orchestrator assert"
+    } else {
+        Write-Host "Cleaning shared fixture marker=$($fixture.Marker) ..."
+        Remove-SharedE2EFixture -ApiBase $apiBase -Marker $fixture.Marker -Token $adminToken
+    }
 }
 
 if ($failed) {

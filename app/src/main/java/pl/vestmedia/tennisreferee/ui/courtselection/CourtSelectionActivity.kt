@@ -2,32 +2,20 @@ package pl.vestmedia.tennisreferee.ui.courtselection
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.InputType
-import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.databinding.ActivityCourtSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
-import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
@@ -45,6 +33,7 @@ class CourtSelectionActivity : AppCompatActivity() {
     private val viewModel: CourtSelectionViewModel by viewModels()
     private lateinit var adapter: CourtAdapter
     private val repository = TennisRepository()
+    private val pinDialogController by lazy { CourtPinDialogController(this, repository) }
     private var selectedTournamentId: Int? = null
     private var selectedTournamentName: String? = null
 
@@ -160,104 +149,7 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     private fun onCourtSelected(court: Court) {
         AppLogger.button("CourtSelection", "CourtTap", "court=${court.id} name=${court.name}")
-        showPinDialog(court)
-    }
-    
-    private fun showPinDialog(court: Court) {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_pin_input, null)
-        val textMessage = dialogView.findViewById<TextView>(R.id.textPinMessage)
-        val digit1 = dialogView.findViewById<EditText>(R.id.pinDigit1)
-        val digit2 = dialogView.findViewById<EditText>(R.id.pinDigit2)
-        val digit3 = dialogView.findViewById<EditText>(R.id.pinDigit3)
-        val digit4 = dialogView.findViewById<EditText>(R.id.pinDigit4)
-        val progressBar = dialogView.findViewById<ProgressBar>(R.id.progressBar)
-        
-        textMessage.text = getString(R.string.court_pin_message, court.getDisplayName(this))
-        
-        val dialog = AlertDialog.Builder(this)
-            .setTitle(getString(R.string.court_pin_title))
-            .setView(dialogView)
-            .setNegativeButton(getString(R.string.cancel), null)
-            .create()
-        
-        // Funkcja do pobrania pełnego PIN
-        fun getFullPin(): String = "${digit1.text}${digit2.text}${digit3.text}${digit4.text}"
-        
-        // Funkcja do automatycznego zatwierdzenia
-        fun autoSubmitIfComplete() {
-            val pin = getFullPin()
-            if (pin.length == 4) {
-                progressBar.visibility = View.VISIBLE
-                digit1.isEnabled = false
-                digit2.isEnabled = false
-                digit3.isEnabled = false
-                digit4.isEnabled = false
-                
-                lifecycleScope.launch {
-                    val result = withContext(Dispatchers.IO) {
-                        repository.verifyCourtPin(court.id, pin)
-                    }
-                    
-                    withContext(Dispatchers.Main) {
-                        progressBar.visibility = View.GONE
-                        
-                        result.onSuccess { _ ->
-                            AppLogger.action("CourtSelection", "PIN_OK", "court=${court.id}")
-                            (application as TennisRefereeApp).healthCheckManager.courtId = court.id
-                            dialog.dismiss()
-                            val courtDisplayName = court.getDisplayName(this@CourtSelectionActivity)
-                            val intent = Intent(this@CourtSelectionActivity, PlayerSelectionActivity::class.java).apply {
-                                putExtra(PlayerSelectionActivity.EXTRA_COURT_ID, court.id)
-                                putExtra(PlayerSelectionActivity.EXTRA_COURT_NAME, courtDisplayName)
-                            }
-                            AppLogger.navigate("CourtSelection", "PlayerSelection", "court=${court.id}")
-                            startActivity(intent)
-                        }.onFailure { error ->
-                            AppLogger.action("CourtSelection", "PIN_FAIL", "court=${court.id} error=${error.message}")
-                            // Wyczyść pola i włącz ponownie
-                            digit1.setText("")
-                            digit2.setText("")
-                            digit3.setText("")
-                            digit4.setText("")
-                            digit1.isEnabled = true
-                            digit2.isEnabled = true
-                            digit3.isEnabled = true
-                            digit4.isEnabled = true
-                            digit1.requestFocus()
-                            
-                            Toast.makeText(
-                                this@CourtSelectionActivity,
-                                getString(R.string.pin_invalid, error.message),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
-                }
-            }
-        }
-        
-        // TextWatcher do automatycznego przechodzenia między polami
-        fun createDigitWatcher(nextDigit: EditText?, previousDigit: EditText?): TextWatcher {
-            return object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    if (s?.length == 1) {
-                        nextDigit?.requestFocus() ?: autoSubmitIfComplete()
-                    } else if (s?.isEmpty() == true && previousDigit != null) {
-                        previousDigit.requestFocus()
-                    }
-                }
-            }
-        }
-        
-        digit1.addTextChangedListener(createDigitWatcher(digit2, null))
-        digit2.addTextChangedListener(createDigitWatcher(digit3, digit1))
-        digit3.addTextChangedListener(createDigitWatcher(digit4, digit2))
-        digit4.addTextChangedListener(createDigitWatcher(null, digit3))
-        
-        dialog.show()
-        digit1.requestFocus()
+        pinDialogController.show(court)
     }
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -158,7 +158,7 @@
     <string name="sync_status_syncing">Synchronizacja...</string>
     <string name="sync_status_synced">Zsynchronizowano</string>
     <string name="sync_status_failed">Błąd synchronizacji</string>
-    <string name="sync_status_offline">Offline - ponowimy próbę</string>
+    <string name="sync_status_offline">Oczekuje na sieć — w kolejce synchronizacji</string>
     <string name="sync_status_idle">Jeszcze nie synchronizowano</string>
     
     <!-- Errors -->
