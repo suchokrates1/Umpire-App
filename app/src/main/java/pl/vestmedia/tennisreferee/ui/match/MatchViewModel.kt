@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.data.database.RoomMatchOutboxStore
+import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.model.*
 import pl.vestmedia.tennisreferee.domain.match.model.*
 import pl.vestmedia.tennisreferee.domain.match.MatchActionReducer
@@ -78,13 +80,23 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         continueFromAnnouncement()
     }
     
+    private val outboxApiClient = RetrofitMatchApiClient(RetrofitClient.apiService)
+    private val outboxStore = RoomMatchOutboxStore(
+        TennisDatabase.getDatabase(application).outboxMutationDao()
+    )
+    private val outboxFlusher = MatchOutboxFlusher(
+        outboxStore = outboxStore,
+        apiClient = outboxApiClient
+    )
+
     private val matchSyncCoordinator = MatchSyncCoordinator(
-        apiService = RetrofitClient.apiService,
-        matchHistoryRepository = (application as TennisRefereeApp).matchHistoryRepository,
+        apiClient = outboxApiClient,
+        matchHistorySaver = RoomMatchHistorySaver((application as TennisRefereeApp).matchHistoryRepository),
         batteryInfoProvider = { batteryInfoProvider.current() },
         onSyncStatus = { status -> _syncStatus.postValue(status) },
         onBracketWarning = { warning, matchId -> _bracketWarning.postValue(BracketWarningEvent(warning, matchId)) },
-        onSyncDiagnostics = { status, error -> syncDiagnosticsStore.record(status, error) }
+        onSyncDiagnostics = { status, error -> syncDiagnosticsStore.record(status, error) },
+        outboxFlusher = outboxFlusher
     )
     
     /**
