@@ -12,14 +12,15 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * Room Database dla aplikacji
  */
 @Database(
-    entities = [MatchEntity::class],
-    version = 2,
+    entities = [MatchEntity::class, OutboxMutationEntity::class],
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class TennisDatabase : RoomDatabase() {
     
     abstract fun matchDao(): MatchDao
+    abstract fun outboxMutationDao(): OutboxMutationDao
     
     companion object {
         @Volatile
@@ -34,6 +35,23 @@ abstract class TennisDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE matches ADD COLUMN umpireName TEXT")
             }
         }
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS outbox_mutations (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "clientMatchUuid TEXT NOT NULL, " +
+                    "type TEXT NOT NULL, " +
+                    "payloadJson TEXT NOT NULL, " +
+                    "serverMatchId INTEGER, " +
+                    "createdAt INTEGER NOT NULL, " +
+                    "attempts INTEGER NOT NULL, " +
+                    "lastError TEXT, " +
+                    "status TEXT NOT NULL)"
+                )
+            }
+        }
         
         fun getDatabase(context: Context): TennisDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -42,7 +60,7 @@ abstract class TennisDatabase : RoomDatabase() {
                     TennisDatabase::class.java,
                     "tennis_referee_database"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance

@@ -1,5 +1,6 @@
 package pl.vestmedia.tennisreferee.ui.match
 
+import com.google.gson.Gson
 import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
 import pl.vestmedia.tennisreferee.data.api.TennisApiService
 import pl.vestmedia.tennisreferee.data.model.MatchEventFactory
@@ -17,47 +18,62 @@ class MatchSyncCoordinator(
     private val onBracketWarning: (warning: String, matchId: Int) -> Unit,
     private val retryDelay: RetryDelay = CoroutineRetryDelay,
     private val logger: MatchSyncLogger = AppLoggerMatchSyncLogger,
-    private val onSyncDiagnostics: (SyncStatus, String?) -> Unit = { _, _ -> }
+    private val onSyncDiagnostics: (SyncStatus, String?) -> Unit = { _, _ -> },
+    private val outboxFlusher: MatchOutboxFlusher? = null
 ) {
+    private val gson = Gson()
+
     constructor(
         apiService: TennisApiService,
         matchHistoryRepository: MatchHistoryRepository,
         batteryInfoProvider: () -> MatchBatteryInfo,
         onSyncStatus: (SyncStatus) -> Unit,
         onBracketWarning: (warning: String, matchId: Int) -> Unit,
-        onSyncDiagnostics: (SyncStatus, String?) -> Unit = { _, _ -> }
+        onSyncDiagnostics: (SyncStatus, String?) -> Unit = { _, _ -> },
+        outboxFlusher: MatchOutboxFlusher? = null
     ) : this(
         apiClient = RetrofitMatchApiClient(apiService),
         matchHistorySaver = RoomMatchHistorySaver(matchHistoryRepository),
         batteryInfoProvider = batteryInfoProvider,
         onSyncStatus = onSyncStatus,
         onBracketWarning = onBracketWarning,
-        onSyncDiagnostics = onSyncDiagnostics
+        onSyncDiagnostics = onSyncDiagnostics,
+        outboxFlusher = outboxFlusher
     )
 
     suspend fun logMatchEvent(state: MatchState, eventType: String) {
-        try {
+        val event = try {
             val batteryInfo = batteryInfoProvider()
-            val event = MatchEventFactory.create(
+            MatchEventFactory.create(
                 state = state,
                 eventType = eventType,
                 batteryLevel = batteryInfo.level,
                 isCharging = batteryInfo.isCharging
             )
+        } catch (e: Exception) {
+            logger.error("logMatchEvent", "$eventType: ${e.message}")
+            return
+        }
 
+        try {
             val response = requestWithRetry("log $eventType") { apiClient.logMatchEvent(event) }
             if (!response.isSuccessful) {
                 logger.error("logMatchEvent", "HTTP ${response.code()} for $eventType")
+                enqueueIfRetryable(response.code(), state.clientMatchUuid, "EVENT", state.matchId, event)
             }
         } catch (e: Exception) {
             logger.error("logMatchEvent", "$eventType: ${e.message}")
+            enqueueToOutbox(state.clientMatchUuid, "EVENT", state.matchId, event)
         }
     }
 
     suspend fun syncMatch(state: MatchState) {
+        tryFlushOutbox()
+
+        val payload = MatchApiPayloadFactory.toMatch(state)
         try {
             if (state.matchId == null) {
-                val response = requestWithRetry("create match") { apiClient.createMatch(MatchApiPayloadFactory.toMatch(state)) }
+                val response = requestWithRetry("create match") { apiClient.createMatch(payload) }
 
                 if (response.isSuccessful && response.body() != null) {
                     val created = response.body()!!
@@ -69,18 +85,26 @@ class MatchSyncCoordinator(
                     }
                 } else {
                     logger.api("createMatch", "FAIL ${response.code()}")
+                    enqueueIfRetryable(response.code(), state.clientMatchUuid, "CREATE", null, payload)
                 }
             } else {
                 val response = requestWithRetry("update match") {
-                    apiClient.updateMatch(state.matchId!!, MatchApiPayloadFactory.toMatch(state))
+                    apiClient.updateMatch(state.matchId!!, payload)
                 }
 
                 if (!response.isSuccessful) {
                     logger.api("updateMatch", "FAIL ${response.code()}")
+                    enqueueIfRetryable(response.code(), state.clientMatchUuid, "UPDATE", state.matchId, payload)
                 }
             }
         } catch (e: Exception) {
             logger.error("syncMatchWithServer", e)
+            enqueueToOutbox(
+                state.clientMatchUuid,
+                if (state.matchId == null) "CREATE" else "UPDATE",
+                state.matchId,
+                payload
+            )
         }
     }
 
@@ -88,21 +112,36 @@ class MatchSyncCoordinator(
         state: MatchState,
         finishRequest: FinishMatchRequest = MatchApiPayloadFactory.toFinishRequest(state)
     ) {
+        tryFlushOutbox()
+
         try {
             try {
                 if (state.matchId == null) {
-                    val response = requestWithRetry("create final match") { apiClient.createMatch(MatchApiPayloadFactory.toMatch(state)) }
+                    val matchPayload = MatchApiPayloadFactory.toMatch(state)
+                    val response = requestWithRetry("create final match") { apiClient.createMatch(matchPayload) }
                     if (response.isSuccessful && response.body() != null) {
                         state.matchId = response.body()!!.id
                         logger.api("createFinalMatch", "OK id=${state.matchId}")
+                    } else {
+                        enqueueIfRetryable(response.code(), state.clientMatchUuid, "CREATE", null, matchPayload)
                     }
                 }
 
                 state.matchId?.let { matchId ->
-                    requestWithRetry("sync final state") { apiClient.updateMatch(matchId, MatchApiPayloadFactory.toMatch(state)) }
+                    val updatePayload = MatchApiPayloadFactory.toMatch(state)
+                    val response = requestWithRetry("sync final state") { apiClient.updateMatch(matchId, updatePayload) }
+                    if (!response.isSuccessful) {
+                        enqueueIfRetryable(response.code(), state.clientMatchUuid, "UPDATE", matchId, updatePayload)
+                    }
                 }
             } catch (e: Exception) {
                 logger.error("finalizeMatch", "sync final state: ${e.message}")
+                enqueueToOutbox(
+                    state.clientMatchUuid,
+                    if (state.matchId == null) "CREATE" else "UPDATE",
+                    state.matchId,
+                    MatchApiPayloadFactory.toMatch(state)
+                )
             }
 
             if (state.matchId == null) {
@@ -117,24 +156,35 @@ class MatchSyncCoordinator(
                     batteryLevel = batteryInfo.level,
                     isCharging = batteryInfo.isCharging
                 )
-                requestWithRetry("match_end event") { apiClient.logMatchEvent(event) }
+                val response = requestWithRetry("match_end event") { apiClient.logMatchEvent(event) }
+                if (!response.isSuccessful) {
+                    enqueueIfRetryable(response.code(), state.clientMatchUuid, "EVENT", state.matchId, event)
+                }
             } catch (e: Exception) {
                 logger.error("finalizeMatch", "match_end event: ${e.message}")
             }
 
             state.matchId?.let { matchId ->
                 try {
-                    requestWithRetry("finish match") { apiClient.finishMatch(matchId, finishRequest) }
+                    val response = requestWithRetry("finish match") { apiClient.finishMatch(matchId, finishRequest) }
+                    if (!response.isSuccessful) {
+                        enqueueIfRetryable(response.code(), state.clientMatchUuid, "FINISH", matchId, finishRequest)
+                    }
                 } catch (e: Exception) {
                     logger.error("finalizeMatch", "finish: ${e.message}")
+                    enqueueToOutbox(state.clientMatchUuid, "FINISH", matchId, finishRequest)
                 }
             }
 
             if (finishRequest.finishReason != MatchFinishReason.TEST) MatchApiPayloadFactory.toStatisticsRequest(state)?.let { statisticsRequest ->
                 try {
-                    requestWithRetry("send statistics") { apiClient.sendMatchStatistics(statisticsRequest) }
+                    val response = requestWithRetry("send statistics") { apiClient.sendMatchStatistics(statisticsRequest) }
+                    if (!response.isSuccessful) {
+                        enqueueIfRetryable(response.code(), state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
+                    }
                 } catch (e: Exception) {
                     logger.error("finalizeMatch", "statistics: ${e.message}")
+                    enqueueToOutbox(state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
                 }
             }
         } catch (e: Exception) {
@@ -159,9 +209,11 @@ class MatchSyncCoordinator(
                 val response = requestWithRetry("finish match") { apiClient.finishMatch(matchId, finishRequest) }
                 if (!response.isSuccessful) {
                     logger.api("finishMatch", "FAIL ${response.code()}")
+                    enqueueIfRetryable(response.code(), state.clientMatchUuid, "FINISH", matchId, finishRequest)
                 }
             } catch (e: Exception) {
                 logger.error("finishMatchOnServer", e)
+                enqueueToOutbox(state.clientMatchUuid, "FINISH", matchId, finishRequest)
             }
         }
     }
@@ -174,9 +226,11 @@ class MatchSyncCoordinator(
                 logger.api("sendStatistics", "OK")
             } else {
                 logger.api("sendStatistics", "FAIL ${response.code()}")
+                enqueueIfRetryable(response.code(), state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
             }
         } catch (e: Exception) {
             logger.error("sendMatchStatistics", e)
+            enqueueToOutbox(state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
         }
     }
 
@@ -228,5 +282,38 @@ class MatchSyncCoordinator(
 
     private fun Response<*>.shouldRetry(): Boolean {
         return code() in 500..599 || code() == 408 || code() == 429
+    }
+
+    private suspend fun tryFlushOutbox() {
+        try {
+            outboxFlusher?.flushPending()
+        } catch (e: Exception) {
+            logger.error("outboxFlush", e)
+        }
+    }
+
+    private suspend fun enqueueToOutbox(
+        clientMatchUuid: String,
+        type: String,
+        serverMatchId: Int?,
+        payload: Any
+    ) {
+        try {
+            outboxFlusher?.enqueue(clientMatchUuid, type, serverMatchId, gson.toJson(payload))
+        } catch (e: Exception) {
+            logger.error("outboxEnqueue", "Failed to enqueue $type: ${e.message}")
+        }
+    }
+
+    private suspend fun enqueueIfRetryable(
+        code: Int,
+        clientMatchUuid: String,
+        type: String,
+        serverMatchId: Int?,
+        payload: Any
+    ) {
+        if (code in 500..599 || code == 408 || code == 429) {
+            enqueueToOutbox(clientMatchUuid, type, serverMatchId, payload)
+        }
     }
 }
