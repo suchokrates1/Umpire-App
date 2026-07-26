@@ -29,10 +29,13 @@
 [CmdletBinding()]
 param(
     # URL seen by the Android emulator/device (instrumentation arg e2e.baseUrl).
-    [string]$BaseUrl = "http://10.0.2.2:18087",
+    # Default: minipc LAN e2e (Windows host often has no local Docker).
+    [string]$BaseUrl = $(if ($env:E2E_ANDROID_BASE_URL) { $env:E2E_ANDROID_BASE_URL } else { "http://192.168.31.5:18087" }),
 
     # URL used by this host script to create/cleanup the shared fixture.
-    [string]$HostBaseUrl = "http://localhost:18087",
+    [string]$HostBaseUrl = $(if ($env:E2E_BASE_URL) { $env:E2E_BASE_URL } else { "http://192.168.31.5:18087" }),
+
+    [string]$AdminPassword = $(if ($env:E2E_ADMIN_PASSWORD) { $env:E2E_ADMIN_PASSWORD } else { "e2e-admin" }),
 
     [ValidateRange(1, 4)]
     [int]$MaxCourts = 4,
@@ -65,12 +68,16 @@ function Invoke-Json {
         [string]$Method,
         [string]$Url,
         [hashtable]$Body = $null,
+        [string]$Token = "",
         [switch]$AllowFailure
     )
+    $headers = @{}
+    if ($Token) { $headers.Authorization = "Bearer $Token" }
     $params = @{
         Method      = $Method
         Uri         = $Url
         ContentType = "application/json"
+        Headers     = $headers
     }
     if ($null -ne $Body) {
         $params.Body = ($Body | ConvertTo-Json -Depth 8 -Compress)
@@ -86,21 +93,30 @@ function Invoke-Json {
     }
 }
 
+function Get-AdminToken {
+    param([string]$ApiBase, [string]$Password)
+    $auth = Invoke-Json -Method POST -Url "$ApiBase/admin/api/auth" -Body @{ password = $Password }
+    if (-not $auth.token) { throw "Admin auth failed against $ApiBase" }
+    return [string]$auth.token
+}
+
 function New-SharedE2EFixture {
-    param([string]$ApiBase, [string]$Marker)
+    param([string]$ApiBase, [string]$Marker, [string]$Token)
 
     $today = Get-Date -Format "yyyy-MM-dd"
     $end = (Get-Date).AddDays(1).ToString("yyyy-MM-dd")
-    $tournament = Invoke-Json -Method POST -Url "$ApiBase/admin/api/tournaments" -Body @{
-        name        = "$Marker Android Emulator Open"
-        start_date  = $today
-        end_date    = $end
-        active      = $true
-        city        = "E2E"
-        country     = "PL"
-        court_count = 8
+    $tournament = Invoke-Json -Method POST -Url "$ApiBase/admin/api/tournaments" -Token $Token -Body @{
+        name             = "$Marker Android Emulator Open"
+        start_date       = $today
+        end_date         = $end
+        active           = $true
+        is_simulation    = $true
+        office_password  = "test"
+        city             = "E2E"
+        country          = "PL"
+        court_count      = 8
     }
-    $tournamentId = [int]$tournament.id
+    $tournamentId = if ($tournament.id) { [int]$tournament.id } else { [int]$tournament.tournament.id }
     $defs = @(
         @{ first = "Ana"; gender = "F"; country = "PL" },
         @{ first = "Bartosz"; gender = "M"; country = "PL" },
@@ -117,7 +133,7 @@ function New-SharedE2EFixture {
         $d = $defs[$i]
         $last = "$Marker-P$($i + 1)"
         $full = "$($d.first) $last"
-        $created = Invoke-Json -Method POST -Url "$ApiBase/admin/api/tournaments/$tournamentId/players" -Body @{
+        $created = Invoke-Json -Method POST -Url "$ApiBase/admin/api/tournaments/$tournamentId/players" -Token $Token -Body @{
             first_name = $d.first
             last_name  = $last
             name       = $full
@@ -129,14 +145,14 @@ function New-SharedE2EFixture {
         $names += $full
     }
 
-    Invoke-Json -Method PUT -Url "$ApiBase/admin/api/tournaments/$tournamentId/bracket/groups" -Body @{
+    Invoke-Json -Method PUT -Url "$ApiBase/admin/api/tournaments/$tournamentId/bracket/groups" -Token $Token -Body @{
         groups = @(
             @{ name = "Group A"; players = @($playerIds[0], $playerIds[1], $playerIds[2], $playerIds[3]) },
             @{ name = "Group B"; players = @($playerIds[4], $playerIds[5], $playerIds[6], $playerIds[7]) }
         )
     } | Out-Null
 
-    Invoke-Json -Method PUT -Url "$ApiBase/admin/api/tournaments/$tournamentId/bracket/knockout" -Body @{
+    Invoke-Json -Method PUT -Url "$ApiBase/admin/api/tournaments/$tournamentId/bracket/knockout" -Token $Token -Body @{
         knockout = @(
             @{ phase = "semifinal"; position = 1; player1_name = $names[0]; player2_name = $names[4] },
             @{ phase = "semifinal"; position = 2; player1_name = $names[1]; player2_name = $names[5] },
@@ -149,8 +165,8 @@ function New-SharedE2EFixture {
 }
 
 function Remove-SharedE2EFixture {
-    param([string]$ApiBase, [string]$Marker)
-    Invoke-Json -Method POST -Url "$ApiBase/admin/api/e2e/cleanup" -Body @{ marker = $Marker } -AllowFailure | Out-Null
+    param([string]$ApiBase, [string]$Marker, [string]$Token)
+    Invoke-Json -Method POST -Url "$ApiBase/admin/api/e2e/cleanup" -Token $Token -Body @{ marker = $Marker } -AllowFailure | Out-Null
 }
 
 Write-Host "=== Parallel court E2E ==="
@@ -169,8 +185,11 @@ $serials | ForEach-Object { Write-Host "  - $_" }
 
 $courtCount = [Math]::Min($MaxCourts, 4)
 $marker = "E2E-{0:yyyyMMddHHmmss}-parallel" -f (Get-Date)
+$apiBase = $HostBaseUrl.TrimEnd('/')
+Write-Host "Admin auth against $apiBase ..."
+$adminToken = Get-AdminToken -ApiBase $apiBase -Password $AdminPassword
 Write-Host "Creating shared fixture marker=$marker ..."
-$fixture = New-SharedE2EFixture -ApiBase $HostBaseUrl.TrimEnd('/') -Marker $marker
+$fixture = New-SharedE2EFixture -ApiBase $apiBase -Marker $marker -Token $adminToken
 Write-Host "Shared tournamentId=$($fixture.TournamentId)"
 
 $gradlew = if ($IsWindows -or $env:OS -match "Windows") { ".\gradlew.bat" } else { "./gradlew" }
@@ -185,20 +204,21 @@ try {
             $serial = $serials[$i]
             $court = $i
             $jobs += Start-Job -Name "court-$court-$serial" -ScriptBlock {
-                param($Root, $Gradlew, $Task, $Class, $Serial, $Court, $Base, $Marker, $Tid)
+                param($Root, $Gradlew, $Task, $Class, $Serial, $Court, $Base, $Marker, $Tid, $AdminPw)
                 Set-Location $Root
                 $env:ANDROID_SERIAL = $Serial
                 $args = @(
                     $Task,
                     "-Pandroid.testInstrumentationRunnerArguments.class=$Class",
                     "-Pandroid.testInstrumentationRunnerArguments.e2e.baseUrl=$Base",
+                    "-Pandroid.testInstrumentationRunnerArguments.e2e.adminPassword=$AdminPw",
                     "-Pandroid.testInstrumentationRunnerArguments.e2e.courtIndex=$Court",
                     "-Pandroid.testInstrumentationRunnerArguments.e2e.marker=$Marker",
                     "-Pandroid.testInstrumentationRunnerArguments.e2e.tournamentId=$Tid"
                 )
                 & $Gradlew @args
                 if ($LASTEXITCODE -ne 0) { throw "Gradle failed for court=$Court serial=$Serial exit=$LASTEXITCODE" }
-            } -ArgumentList $repoRoot, $gradlew, $GradleTask, $TestClass, $serial, $court, $BaseUrl, $fixture.Marker, $fixture.TournamentId
+            } -ArgumentList $repoRoot, $gradlew, $GradleTask, $TestClass, $serial, $court, $BaseUrl, $fixture.Marker, $fixture.TournamentId, $AdminPassword
         }
 
         $jobs | Wait-Job | Out-Null
@@ -220,6 +240,7 @@ try {
             & $gradlew $GradleTask `
                 "-Pandroid.testInstrumentationRunnerArguments.class=$TestClass" `
                 "-Pandroid.testInstrumentationRunnerArguments.e2e.baseUrl=$BaseUrl" `
+                "-Pandroid.testInstrumentationRunnerArguments.e2e.adminPassword=$AdminPassword" `
                 "-Pandroid.testInstrumentationRunnerArguments.e2e.courtIndex=$court" `
                 "-Pandroid.testInstrumentationRunnerArguments.e2e.marker=$($fixture.Marker)" `
                 "-Pandroid.testInstrumentationRunnerArguments.e2e.tournamentId=$($fixture.TournamentId)"
@@ -232,7 +253,7 @@ try {
     }
 } finally {
     Write-Host "Cleaning shared fixture marker=$($fixture.Marker) ..."
-    Remove-SharedE2EFixture -ApiBase $HostBaseUrl.TrimEnd('/') -Marker $fixture.Marker
+    Remove-SharedE2EFixture -ApiBase $apiBase -Marker $fixture.Marker -Token $adminToken
 }
 
 if ($failed) {
