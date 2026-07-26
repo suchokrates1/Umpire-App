@@ -117,6 +117,25 @@ class E2EBackendClient(
         postJson("/admin/api/e2e/cleanup", JSONObject().put("marker", marker), allowFailure = true)
     }
 
+    /** Returns court PIN (default tournament courts use 0000). */
+    fun fetchCourtPin(courtId: String): String {
+        ensureAdminToken()
+        val courts = getJsonArray("/admin/api/courts")
+        for (index in 0 until courts.length()) {
+            val row = courts.getJSONObject(index)
+            if (row.optString("kort_id") == courtId || row.optString("id") == courtId) {
+                val pin = row.optString("pin").takeIf { it.isNotBlank() } ?: "0000"
+                return pin
+            }
+        }
+        return "0000"
+    }
+
+    fun setCourtPin(courtId: String, pin: String) {
+        ensureAdminToken()
+        putJson("/admin/api/courts/$courtId/pin", JSONObject().put("pin", pin))
+    }
+
     fun close() {
         client.dispatcher.executorService.shutdown()
         client.connectionPool.evictAll()

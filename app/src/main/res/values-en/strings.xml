@@ -243,7 +243,7 @@
     <string name="sync_status_syncing">Syncing...</string>
     <string name="sync_status_synced">Synced</string>
     <string name="sync_status_failed">Sync failed</string>
-    <string name="sync_status_offline">Offline - will retry</string>
+    <string name="sync_status_offline">Waiting for network — queued for sync</string>
     <string name="sync_status_idle">Not synced yet</string>
 
     <!-- Bracket warnings -->

@@ -1,12 +1,15 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
 import pl.vestmedia.tennisreferee.data.database.OutboxMutationEntity
 import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
 import retrofit2.Response
+import kotlin.math.min
+import kotlin.math.pow
 
 data class FlushResult(val flushed: Int, val failed: Int, val stoppedOnAuth: Boolean = false)
 
@@ -33,6 +36,12 @@ class MatchOutboxFlusher(
         for (original in sorted) {
             val resolved = original.serverMatchId ?: resolvedIds[original.clientMatchUuid]
             val mutation = if (resolved != null) original.copy(serverMatchId = resolved) else original
+
+            // Exponential backoff before retrying previously failed mutations.
+            if (mutation.attempts > 0) {
+                val backoffMs = min(30_000L, (500L * 2.0.pow(min(mutation.attempts, 6))).toLong())
+                delay(backoffMs)
+            }
 
             outboxStore.update(mutation.copy(
                 status = "IN_FLIGHT",
