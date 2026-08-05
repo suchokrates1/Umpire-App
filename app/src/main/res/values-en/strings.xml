@@ -207,6 +207,7 @@
 
     <!-- Settings -->
     <string name="settings">Settings</string>
+    <string name="open_match_history">Open match history</string>
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="theme_light">Light</string>
@@ -247,6 +248,13 @@
     <string name="sync_status_idle">Not synced yet</string>
 
     <!-- Bracket warnings -->
+    <string name="phase_group">Group stage</string>
+    <string name="phase_group_rematch">Group stage — rematch</string>
+    <string name="phase_knockout">Knockout stage</string>
+    <string name="phase_semifinal">Semifinal</string>
+    <string name="phase_final">Final</string>
+    <string name="phase_third_place">3rd place match</string>
+
     <string name="bracket_warning_title">Match Notice</string>
     <string name="bracket_warning_different_groups">These players are from different groups. Is this a knockout phase match?</string>
     <string name="bracket_warning_friendly">These players are not assigned to any tournament group. This match will be recorded as a friendly.</string>

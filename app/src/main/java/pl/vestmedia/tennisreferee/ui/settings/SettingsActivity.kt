@@ -3,14 +3,20 @@ package pl.vestmedia.tennisreferee.ui.settings
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.radiobutton.MaterialRadioButton
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.DeviceInfoProvider
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.databinding.ActivitySettingsBinding
+import pl.vestmedia.tennisreferee.ui.history.MatchHistoryActivity
+import pl.vestmedia.tennisreferee.ui.language.AvailableLanguages
+import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.ui.match.SyncDiagnosticsStore
 import pl.vestmedia.tennisreferee.ui.match.SyncStatus
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -19,42 +25,67 @@ import java.text.DateFormat
 import java.util.Date
 
 class SettingsActivity : AppCompatActivity() {
-    
+
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var themeManager: ThemeManager
     private lateinit var syncDiagnosticsStore: SyncDiagnosticsStore
     private lateinit var diagnosticsInfo: SettingsDiagnosticsInfo
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppLogger.screen("Settings")
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         themeManager = (application as TennisRefereeApp).themeManager
         syncDiagnosticsStore = SyncDiagnosticsStore(this)
-        
+
         setupToolbar()
+        setupLanguageSelection()
         setupThemeSelection()
+        setupMatchHistory()
         setupVersionInfo()
         setupDiagnostics()
     }
-    
+
     private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = getString(R.string.settings)
+    }
+
+    private fun setupLanguageSelection() {
+        val currentCode = LanguageSelectionActivity.getSelectedLanguage(this)
+        binding.radioGroupLanguage.removeAllViews()
+
+        AvailableLanguages.all.forEach { language ->
+            val radio = MaterialRadioButton(this).apply {
+                id = android.view.View.generateViewId()
+                tag = language.code
+                text = "${language.flagEmoji}  ${language.name}"
+                setPadding(paddingLeft, 24, paddingRight, 24)
+                isChecked = language.code == currentCode
+            }
+            binding.radioGroupLanguage.addView(radio)
+        }
+
+        binding.radioGroupLanguage.setOnCheckedChangeListener { group, checkedId ->
+            val selected = group.findViewById<MaterialRadioButton>(checkedId) ?: return@setOnCheckedChangeListener
+            val code = selected.tag as? String ?: return@setOnCheckedChangeListener
+            if (code == LanguageSelectionActivity.getSelectedLanguage(this)) return@setOnCheckedChangeListener
+            AppLogger.button("Settings", "Language", code)
+            LanguageSelectionActivity.setLanguage(this, code)
+            recreate()
         }
     }
-    
+
     private fun setupThemeSelection() {
-        // Set current theme selection
         when (themeManager.getTheme()) {
             ThemeManager.THEME_LIGHT -> binding.radioLight.isChecked = true
             ThemeManager.THEME_DARK -> binding.radioDark.isChecked = true
             ThemeManager.THEME_SYSTEM -> binding.radioSystem.isChecked = true
         }
-        
-        // Listen for theme changes
+
         binding.radioGroupTheme.setOnCheckedChangeListener { _, checkedId ->
             val theme = when (checkedId) {
                 R.id.radioLight -> ThemeManager.THEME_LIGHT
@@ -66,7 +97,14 @@ class SettingsActivity : AppCompatActivity() {
             themeManager.setTheme(theme)
         }
     }
-    
+
+    private fun setupMatchHistory() {
+        binding.cardMatchHistory.setOnClickListener {
+            AppLogger.button("Settings", "MatchHistory")
+            startActivity(Intent(this, MatchHistoryActivity::class.java))
+        }
+    }
+
     private fun setupVersionInfo() {
         try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)
@@ -131,5 +169,15 @@ class SettingsActivity : AppCompatActivity() {
     private fun formatLastSyncUpdate(timestampMillis: Long): String {
         if (timestampMillis <= 0L) return getString(R.string.diagnostics_never)
         return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM).format(Date(timestampMillis))
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

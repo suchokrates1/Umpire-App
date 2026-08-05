@@ -67,6 +67,12 @@ class TournamentSelectionActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.select_tournament)
 
         onBackPressedDispatcher.addCallback(this) {
+            if (intent.getBooleanExtra(EXTRA_FORCE_SELECTION, false)) {
+                // Wróć do wyboru kortu bez zmiany turnieju
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+                return@addCallback
+            }
             startActivity(
                 Intent(this@TournamentSelectionActivity, LanguageSelectionActivity::class.java).apply {
                     putExtra(LanguageSelectionActivity.EXTRA_FORCE_SELECTION, true)

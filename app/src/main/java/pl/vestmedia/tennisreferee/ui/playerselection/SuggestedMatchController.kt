@@ -7,6 +7,7 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.databinding.ActivityPlayerSelectionBinding
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.utils.PhaseLabels
 
 /**
  * Controls schedule suggestion card: render, apply, and dismiss.
@@ -54,7 +55,7 @@ class SuggestedMatchController(
         binding.textSuggestedMatchMeta.text = listOf(
             suggestion.scheduledTime,
             suggestion.categoryName,
-            suggestion.phase
+            PhaseLabels.localize(activity, suggestion.phase)
         ).mapNotNull { value -> value?.takeIf { it.isNotBlank() } }
             .joinToString(" • ")
         binding.cardSuggestedMatch.visibility = View.VISIBLE
