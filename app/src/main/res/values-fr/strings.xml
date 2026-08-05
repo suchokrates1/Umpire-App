@@ -203,6 +203,7 @@
 
     <!-- Settings -->
     <string name="settings">Paramètres</string>
+    <string name="open_match_history">Ouvrir l\'historique des matchs</string>
     <string name="appearance">Apparence</string>
     <string name="theme">Thème</string>
     <string name="theme_light">Clair</string>
@@ -243,6 +244,13 @@
     <string name="sync_status_idle">Pas encore synchronisé</string>
     <string name="confirm_exit_title">Quitter le match ?</string>
     <string name="confirm_exit_message">Le match est encore en cours. Voulez-vous vraiment quitter ?</string>
+
+    <string name="phase_group">Phase de groupes</string>
+    <string name="phase_group_rematch">Phase de groupes — match retour</string>
+    <string name="phase_knockout">Phase à élimination</string>
+    <string name="phase_semifinal">Demi-finale</string>
+    <string name="phase_final">Finale</string>
+    <string name="phase_third_place">Match pour la 3e place</string>
 
     <!-- Bracket warnings -->
     <string name="bracket_warning_title">Information sur le match</string>

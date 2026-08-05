@@ -20,4 +20,9 @@
         <!-- Navigation bar color -->
         <item name="android:navigationBarColor">@color/background</item>
     </style>
+
+    <style name="Theme.TennisReferee.NoActionBar" parent="Theme.TennisReferee">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>

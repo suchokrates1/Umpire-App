@@ -213,6 +213,7 @@
 
     <!-- Settings -->
     <string name="settings">Einstellungen</string>
+    <string name="open_match_history">Spielhistorie öffnen</string>
     <string name="appearance">Erscheinungsbild</string>
     <string name="theme">Design</string>
     <string name="theme_light">Hell</string>
@@ -244,6 +245,13 @@
     <string name="new_match_button">Neues Spiel</string>
     <string name="confirm_exit_title">Spiel verlassen?</string>
     <string name="confirm_exit_message">Das Spiel ist noch im Gange. Möchten Sie wirklich gehen?</string>
+
+    <string name="phase_group">Gruppenphase</string>
+    <string name="phase_group_rematch">Gruppenphase — Rückspiel</string>
+    <string name="phase_knockout">K.O.-Phase</string>
+    <string name="phase_semifinal">Halbfinale</string>
+    <string name="phase_final">Finale</string>
+    <string name="phase_third_place">Spiel um Platz 3</string>
 
     <!-- Bracket warnings -->
     <string name="bracket_warning_title">Spielhinweis</string>

@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +20,6 @@ import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
-import pl.vestmedia.tennisreferee.ui.history.MatchHistoryActivity
 import pl.vestmedia.tennisreferee.ui.settings.SettingsActivity
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -94,6 +94,11 @@ class CourtSelectionActivity : AppCompatActivity() {
         
         supportActionBar?.title = getString(R.string.select_court)
         supportActionBar?.subtitle = selectedTournamentName
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        onBackPressedDispatcher.addCallback(this) {
+            openTournamentSelection()
+        }
         
         setupRecyclerView()
         setupObservers()
@@ -101,6 +106,15 @@ class CourtSelectionActivity : AppCompatActivity() {
         
         // Załaduj korty
         viewModel.loadCourts(selectedTournamentId)
+    }
+
+    private fun openTournamentSelection() {
+        AppLogger.button("CourtSelection", "Back:ChangeTournament")
+        tournamentSelectionLauncher.launch(
+            Intent(this, TournamentSelectionActivity::class.java).apply {
+                putExtra(TournamentSelectionActivity.EXTRA_FORCE_SELECTION, true)
+            }
+        )
     }
     
     private fun setupRecyclerView() {
@@ -159,25 +173,13 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            android.R.id.home -> {
+                openTournamentSelection()
+                true
+            }
             R.id.action_settings -> {
                 AppLogger.button("CourtSelection", "Menu:Settings")
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-                true
-            }
-            R.id.action_match_history -> {
-                AppLogger.button("CourtSelection", "Menu:History")
-                val intent = Intent(this, MatchHistoryActivity::class.java)
-                startActivity(intent)
-                true
-            }
-            R.id.action_change_tournament -> {
-                AppLogger.button("CourtSelection", "Menu:ChangeTournament")
-                tournamentSelectionLauncher.launch(
-                    Intent(this, TournamentSelectionActivity::class.java).apply {
-                        putExtra(TournamentSelectionActivity.EXTRA_FORCE_SELECTION, true)
-                    }
-                )
+                startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)

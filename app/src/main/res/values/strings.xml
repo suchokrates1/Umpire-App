@@ -229,6 +229,7 @@
     
     <!-- Settings -->
     <string name="settings">Settings</string>
+    <string name="open_match_history">Open match history</string>
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="theme_light">Light</string>
@@ -252,6 +253,14 @@
     <string name="diagnostics_copy">Copy diagnostics</string>
     <string name="diagnostics_copied">Diagnostics copied</string>
     <string name="tournament_dates" translatable="false">%1$s - %2$s</string>
+
+    <!-- Match phases (backend sends Polish canonical labels) -->
+    <string name="phase_group">Group stage</string>
+    <string name="phase_group_rematch">Group stage — rematch</string>
+    <string name="phase_knockout">Knockout stage</string>
+    <string name="phase_semifinal">Semifinal</string>
+    <string name="phase_final">Final</string>
+    <string name="phase_third_place">3rd place match</string>
 
     <!-- Bracket warnings -->
     <string name="bracket_warning_title">Match Notice</string>

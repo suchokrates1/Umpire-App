@@ -47,23 +47,25 @@
             android:exported="false"
             android:parentActivityName=".ui.playerselection.PlayerSelectionActivity"/>
         
+        <!-- Settings -->
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TennisReferee.NoActionBar"
+            android:parentActivityName=".ui.courtselection.CourtSelectionActivity"/>
+
         <!-- Match History -->
         <activity
             android:name=".ui.history.MatchHistoryActivity"
             android:exported="false"
-            android:parentActivityName=".ui.courtselection.CourtSelectionActivity"/>
+            android:theme="@style/Theme.TennisReferee.NoActionBar"
+            android:parentActivityName=".ui.settings.SettingsActivity"/>
         
         <!-- Match Detail -->
         <activity
             android:name=".ui.history.MatchDetailActivity"
             android:exported="false"
             android:parentActivityName=".ui.history.MatchHistoryActivity"/>
-        
-        <!-- Settings -->
-        <activity
-            android:name=".ui.settings.SettingsActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.courtselection.CourtSelectionActivity"/>
         
     </application>
 

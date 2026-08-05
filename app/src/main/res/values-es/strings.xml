@@ -221,6 +221,7 @@
     
     <!-- Settings -->
     <string name="settings">Configuración</string>
+    <string name="open_match_history">Abrir historial de partidos</string>
     <string name="appearance">Apariencia</string>
     <string name="theme">Tema</string>
     <string name="theme_light">Claro</string>
@@ -243,6 +244,13 @@
     <string name="diagnostics_never">Nunca</string>
     <string name="diagnostics_copy">Copiar diagnóstico</string>
     <string name="diagnostics_copied">Diagnóstico copiado</string>
+
+    <string name="phase_group">Fase de grupos</string>
+    <string name="phase_group_rematch">Fase de grupos — revancha</string>
+    <string name="phase_knockout">Fase eliminatoria</string>
+    <string name="phase_semifinal">Semifinal</string>
+    <string name="phase_final">Final</string>
+    <string name="phase_third_place">Partido por el 3.º puesto</string>
 
     <!-- Bracket warnings -->
     <string name="bracket_warning_title">Aviso del partido</string>

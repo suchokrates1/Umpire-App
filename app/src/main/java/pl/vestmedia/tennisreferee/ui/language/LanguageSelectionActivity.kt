@@ -2,17 +2,16 @@ package pl.vestmedia.tennisreferee.ui.language
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.databinding.ActivityLanguageSelectionBinding
 import pl.vestmedia.tennisreferee.data.model.Language
+import pl.vestmedia.tennisreferee.databinding.ActivityLanguageSelectionBinding
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import java.util.Locale
@@ -79,16 +78,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
     }
     
     private fun setupRecyclerView() {
-        val languages = listOf(
-            Language("de", "Deutsch", "🇩🇪"),
-            Language("en", "English", "🇬🇧"),
-            Language("es", "Español", "🇪🇸"),
-            Language("fr", "Français", "🇫🇷"),
-            Language("it", "Italiano", "🇮🇹"),
-            Language("pl", "Polski", "🇵🇱")
-        )
-        
-        adapter = LanguageAdapter(languages) { language ->
+        adapter = LanguageAdapter(AvailableLanguages.all) { language ->
             onLanguageSelected(language)
         }
         

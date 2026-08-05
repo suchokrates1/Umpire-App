@@ -20,4 +20,10 @@
         <!-- Navigation bar color -->
         <item name="android:navigationBarColor">@color/background</item>
     </style>
+
+    <!-- Activities that embed MaterialToolbar via setSupportActionBar() -->
+    <style name="Theme.TennisReferee.NoActionBar" parent="Theme.TennisReferee">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>
