@@ -122,6 +122,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
             getCourtName = { courtName },
             getSelectedScheduleId = { selectedScheduleId },
             getIsDoubles = { viewModel.isDoubles.value ?: false },
+            getTeam1Name = { viewModel.appliedTeam1Name() },
+            getTeam2Name = { viewModel.appliedTeam2Name() },
             isMixedDoublesSelection = { isMixedDoublesSelection(it) },
             onPrepareForNextMatch = { reuseSetup -> prepareForNextMatch(reuseSetup) }
         )
@@ -263,8 +265,13 @@ class PlayerSelectionActivity : AppCompatActivity() {
         })
         
         binding.checkboxDoubles.setOnCheckedChangeListener { _, isChecked ->
+            if ((viewModel.isDoubles.value == true) == isChecked) {
+                return@setOnCheckedChangeListener
+            }
             AppLogger.button("PlayerSelection", "Doubles", isChecked.toString())
-            selectedScheduleId = null
+            if (!viewModel.shouldKeepScheduleIdOnDoublesToggle(isChecked)) {
+                selectedScheduleId = null
+            }
             viewModel.setDoubles(isChecked)
         }
         
