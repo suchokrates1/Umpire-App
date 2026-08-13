@@ -61,4 +61,93 @@ class ScheduleSuggestionSelectorTest {
 
         assertNull(selected)
     }
+
+    @Test
+    fun selectsFourPlayersForDoublesSuggestion() {
+        val players = listOf(
+            Player(id = 1, name = "Anna Kowalska", firstName = "Anna", lastName = "Kowalska"),
+            Player(id = 2, name = "Ewa Nowak", firstName = "Ewa", lastName = "Nowak"),
+            Player(id = 3, name = "Jan Lewandowski", firstName = "Jan", lastName = "Lewandowski"),
+            Player(id = 4, name = "Piotr Wiśniewski", firstName = "Piotr", lastName = "Wiśniewski"),
+        )
+        val suggestion = ScheduleSuggestion(
+            id = 20,
+            tournamentId = 2,
+            player1Name = "Anna Kowalska / Ewa Nowak",
+            player2Name = "Jan Lewandowski / Piotr Wiśniewski",
+            isDoubles = true,
+            player1 = players[0].copy(partner = players[1]),
+            player2 = players[2].copy(partner = players[3]),
+        )
+
+        val selected = ScheduleSuggestionSelector.selectPlayers(players, suggestion)
+
+        assertEquals(listOf(players[0], players[1], players[2], players[3]), selected)
+    }
+
+    @Test
+    fun selectsDoublesPlayersFromPairLabelsWhenIdsAreMissing() {
+        val players = listOf(
+            Player(id = 1, name = "Anna Kowalska", firstName = "Anna", lastName = "Kowalska"),
+            Player(id = 2, name = "Ewa Nowak", firstName = "Ewa", lastName = "Nowak"),
+            Player(id = 3, name = "Jan Lewandowski", firstName = "Jan", lastName = "Lewandowski"),
+            Player(id = 4, name = "Piotr Wiśniewski", firstName = "Piotr", lastName = "Wiśniewski"),
+        )
+        val suggestion = ScheduleSuggestion(
+            id = 21,
+            tournamentId = 2,
+            player1Name = "Anna Kowalska / Ewa Nowak",
+            player2Name = "Jan Lewandowski / Piotr Wiśniewski",
+            isDoubles = true,
+        )
+
+        val selected = ScheduleSuggestionSelector.selectPlayers(players, suggestion)
+
+        assertEquals(listOf(players[0], players[1], players[2], players[3]), selected)
+    }
+
+    @Test
+    fun returnsNullWhenDoublesPartnerIsMissing() {
+        val suggestion = ScheduleSuggestion(
+            id = 22,
+            tournamentId = 2,
+            player1Name = "Anna Kowalska / Ewa Nowak",
+            player2Name = "Jan Lewandowski / Piotr Wiśniewski",
+            isDoubles = true,
+        )
+
+        val selected = ScheduleSuggestionSelector.selectPlayers(
+            listOf(
+                Player(id = 1, name = "Anna Kowalska", firstName = "Anna", lastName = "Kowalska"),
+                Player(id = 3, name = "Jan Lewandowski", firstName = "Jan", lastName = "Lewandowski"),
+            ),
+            suggestion,
+        )
+
+        assertNull(selected)
+    }
+
+    @Test
+    fun keepsScheduleIdWhenDoublesToggleMatchesAppliedSuggestion() {
+        val suggestion = ScheduleSuggestion(
+            id = 23,
+            tournamentId = 2,
+            player1Name = "Anna Kowalska / Ewa Nowak",
+            player2Name = "Jan Lewandowski / Piotr Wiśniewski",
+            isDoubles = true,
+        )
+
+        assertEquals(
+            true,
+            ScheduleSuggestionSelector.shouldKeepScheduleIdOnDoublesToggle(suggestion, true)
+        )
+        assertEquals(
+            false,
+            ScheduleSuggestionSelector.shouldKeepScheduleIdOnDoublesToggle(suggestion, false)
+        )
+        assertEquals(
+            false,
+            ScheduleSuggestionSelector.shouldKeepScheduleIdOnDoublesToggle(null, true)
+        )
+    }
 }

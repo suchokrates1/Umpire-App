@@ -61,7 +61,10 @@ data class PlayerDto(
     val gender: String? = null,
 
     @SerializedName("list")
-    val list: String? = null
+    val list: String? = null,
+
+    @SerializedName("partner")
+    val partner: PlayerDto? = null
 )
 
 data class PlayersResponseDto(
@@ -169,6 +172,9 @@ data class ScheduleSuggestionDto(
 
     @SerializedName("player2_name")
     val player2Name: String,
+
+    @SerializedName("is_doubles")
+    val isDoubles: Boolean = false,
 
     @SerializedName("player1")
     val player1: PlayerDto? = null,
@@ -411,7 +417,8 @@ fun PlayerDto.toModel(): Player {
         flagUrl = flagUrl,
         group = group,
         gender = gender,
-        list = list
+        list = list,
+        partner = partner?.copy(partner = null)?.toModel()
     )
 }
 
@@ -425,7 +432,8 @@ fun Player.toDto(): PlayerDto {
         flagUrl = flagUrl,
         group = group,
         gender = gender,
-        list = list
+        list = list,
+        partner = partner?.copy(partner = null)?.toDto()
     )
 }
 
@@ -484,6 +492,7 @@ fun ScheduleSuggestionDto.toModel(): ScheduleSuggestion {
         phase = phase,
         player1Name = player1Name,
         player2Name = player2Name,
+        isDoubles = isDoubles,
         player1 = player1?.toModel(),
         player2 = player2?.toModel()
     )
@@ -501,6 +510,7 @@ fun ScheduleSuggestion.toDto(): ScheduleSuggestionDto {
         phase = phase,
         player1Name = player1Name,
         player2Name = player2Name,
+        isDoubles = isDoubles,
         player1 = player1?.toDto(),
         player2 = player2?.toDto()
     )

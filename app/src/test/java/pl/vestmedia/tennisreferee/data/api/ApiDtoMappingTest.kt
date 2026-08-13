@@ -77,6 +77,73 @@ class ApiDtoMappingTest {
         assertEquals("Anna Kowalska", suggestion.player1Name)
         assertEquals("Kowalska", suggestion.player1?.lastName)
         assertNull(suggestion.player2)
+        assertEquals(false, suggestion.isDoubles)
+    }
+
+    @Test
+    fun scheduleSuggestionDtoMapsDoublesPartnersAndFlag() {
+        val ewa = Player(id = 2, name = "Ewa Nowak", firstName = "Ewa", lastName = "Nowak", flag = "PL")
+        val jan = Player(id = 3, name = "Jan Lewandowski", firstName = "Jan", lastName = "Lewandowski", flag = "PL")
+        val piotr = Player(id = 4, name = "Piotr Wiśniewski", firstName = "Piotr", lastName = "Wiśniewski", flag = "PL")
+        val dto = ScheduleSuggestionDto(
+            id = 10,
+            tournamentId = 3,
+            player1Name = "Anna Kowalska / Ewa Nowak",
+            player2Name = "Jan Lewandowski / Piotr Wiśniewski",
+            isDoubles = true,
+            player1 = Player(
+                id = 1,
+                name = "Anna Kowalska",
+                firstName = "Anna",
+                lastName = "Kowalska",
+                flag = "PL",
+                partner = ewa
+            ).toDto(),
+            player2 = jan.copy(partner = piotr).toDto()
+        )
+
+        val suggestion = dto.toModel()
+
+        assertEquals(true, suggestion.isDoubles)
+        assertEquals("Anna", suggestion.player1?.firstName)
+        assertEquals("Ewa", suggestion.player1?.partner?.firstName)
+        assertEquals("Piotr", suggestion.player2?.partner?.firstName)
+    }
+
+    @Test
+    fun scheduleSuggestionJsonParsesIsDoublesAndPartner() {
+        val gson = Gson()
+        val dto = gson.fromJson(
+            """
+            {
+              "id": 123,
+              "tournament_id": 3,
+              "is_doubles": true,
+              "player1_name": "Anna Kowalska / Ewa Nowak",
+              "player2_name": "Jan Lewandowski / Piotr Wiśniewski",
+              "player1": {
+                "id": 1,
+                "first_name": "Anna",
+                "last_name": "Kowalska",
+                "name": "Anna Kowalska",
+                "partner": {"id": 2, "first_name": "Ewa", "last_name": "Nowak", "name": "Ewa Nowak"}
+              },
+              "player2": {
+                "id": 3,
+                "first_name": "Jan",
+                "last_name": "Lewandowski",
+                "name": "Jan Lewandowski",
+                "partner": {"id": 4, "first_name": "Piotr", "last_name": "Wiśniewski", "name": "Piotr Wiśniewski"}
+              }
+            }
+            """.trimIndent(),
+            ScheduleSuggestionDto::class.java
+        )
+
+        val suggestion = dto.toModel()
+        assertEquals(true, suggestion.isDoubles)
+        assertEquals(2, suggestion.player1?.partner?.id)
+        assertEquals("Piotr Wiśniewski", suggestion.player2?.partner?.getFullName())
     }
 
     @Test
