@@ -117,6 +117,67 @@ class E2EBackendClient(
         postJson("/admin/api/e2e/cleanup", JSONObject().put("marker", marker), allowFailure = true)
     }
 
+    /**
+     * Seeds a doubles category, two pairs, one RR slot on [courtId], and publishes it
+     * so the umpire suggestion card can apply Debel without dropping scheduleId.
+     */
+    fun seedDoublesSuggestedMatch(fixture: TournamentFixture, courtId: String) {
+        ensureAdminToken()
+        val today = LocalDate.now().toString()
+        val now = java.time.LocalTime.now().withSecond(0).withNano(0).toString().take(5)
+        val category = postJson(
+            "/admin/api/tournaments/${fixture.tournamentId}/categories",
+            JSONObject().put("label", "B1 Double").put("is_doubles", true)
+        )
+        val categoryId = when {
+            category.has("id") -> category.getInt("id")
+            category.has("category") -> category.getJSONObject("category").getInt("id")
+            else -> error("Category create response missing id: $category")
+        }
+        val teamA = createTeam(fixture.tournamentId, categoryId, fixture.players[0].id, fixture.players[1].id)
+        val teamB = createTeam(fixture.tournamentId, categoryId, fixture.players[2].id, fixture.players[3].id)
+        putJson(
+            "/admin/api/tournaments/${fixture.tournamentId}/bracket/groups",
+            JSONObject().put(
+                "groups",
+                JSONArray().put(
+                    JSONObject()
+                        .put("name", "B1 Double — Grupa A")
+                        .put("tournament_category_id", categoryId)
+                        .put("play_format", "round_robin")
+                        .put("teams", JSONArray(listOf(teamA, teamB)))
+                )
+            )
+        )
+        val schedulePayload = getJson("/admin/api/tournaments/${fixture.tournamentId}/schedule")
+        val entries = schedulePayload.optJSONArray("schedule") ?: JSONArray()
+        require(entries.length() >= 1) { "Expected generated doubles schedule, got $schedulePayload" }
+        val scheduleId = entries.getJSONObject(0).getInt("id")
+        putJson(
+            "/admin/api/tournaments/${fixture.tournamentId}/schedule/$scheduleId",
+            JSONObject()
+                .put("day_date", today)
+                .put("scheduled_time", now)
+                .put("court_id", courtId)
+                .put("status", "planned")
+        )
+    }
+
+    private fun createTeam(tournamentId: Int, categoryId: Int, player1Id: Int, player2Id: Int): Int {
+        val response = postJson(
+            "/admin/api/tournaments/$tournamentId/teams",
+            JSONObject()
+                .put("category_id", categoryId)
+                .put("player1_id", player1Id)
+                .put("player2_id", player2Id)
+        )
+        return when {
+            response.has("id") -> response.getInt("id")
+            response.has("team") -> response.getJSONObject("team").getInt("id")
+            else -> error("Team create response missing id: $response")
+        }
+    }
+
     /** Returns court PIN (default tournament courts use 0000). */
     fun fetchCourtPin(courtId: String): String {
         ensureAdminToken()
