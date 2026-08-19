@@ -25,6 +25,8 @@ data class ScheduleSuggestion(
 
     val player2Name: String,
 
+    val isDoubles: Boolean = false,
+
     val player1: Player? = null,
 
     val player2: Player? = null

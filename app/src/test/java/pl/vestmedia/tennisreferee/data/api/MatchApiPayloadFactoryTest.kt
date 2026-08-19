@@ -56,6 +56,28 @@ class MatchApiPayloadFactoryTest {
     }
 
     @Test
+    fun createsMatchPayloadFromCanonicalScheduleTeamNames() {
+        val state = MatchState(
+            player1 = playerOne,
+            player2 = playerTwo,
+            player3 = playerThree,
+            player4 = playerFour,
+            courtId = "1",
+            courtName = "Court 1",
+            scheduleId = 123,
+            isDoubles = true,
+            team1Name = "Anna Kowalska / Ewa Nowak",
+            team2Name = "Jan Lewandowski / Piotr Wiśniewski"
+        )
+
+        val payload = MatchApiPayloadFactory.toMatch(state)
+
+        assertEquals("Anna Kowalska / Ewa Nowak", payload.player1Name)
+        assertEquals("Jan Lewandowski / Piotr Wiśniewski", payload.player2Name)
+        assertEquals(123, payload.scheduleId)
+    }
+
+    @Test
     fun createsStatisticsPayloadOnlyForFinishedMatchWithId() {
         val state = singlesState().apply {
             matchId = 12

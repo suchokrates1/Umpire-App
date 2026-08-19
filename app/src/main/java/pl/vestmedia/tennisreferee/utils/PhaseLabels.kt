@@ -59,6 +59,7 @@ object PhaseLabels {
             || lower.contains("ritorno")
             || lower.contains("replay")
             || lower.contains("dogryw")
+            || lower.contains("revanš")
     }
 
     private fun isGroupStage(lower: String): Boolean {
@@ -72,6 +73,7 @@ object PhaseLabels {
             || lower.contains("fase de grupos")
             || lower.contains("phase de groupes")
             || lower.contains("poule")
+            || lower.contains("grupių")
     }
 
     private fun isKnockout(lower: String): Boolean {
@@ -80,6 +82,7 @@ object PhaseLabels {
             || lower.contains("knockout")
             || lower.contains("k.o")
             || lower.contains("eliminat")
+            || lower.contains("atkrintam")
     }
 
     private fun isSemifinal(lower: String): Boolean {
@@ -88,6 +91,7 @@ object PhaseLabels {
             || lower.contains("semif")
             || lower.contains("halbfinale")
             || lower.contains("demi-finale")
+            || lower.contains("pusfinal")
     }
 
     private fun isFinal(lower: String): Boolean {
@@ -96,6 +100,8 @@ object PhaseLabels {
             || lower == "final"
             || lower.endsWith(" finał")
             || lower.endsWith(" final")
+            || lower == "finalas"
+            || lower.endsWith(" finalas")
             || (lower.contains("finale") && !lower.contains("semi"))
     }
 
@@ -105,5 +111,6 @@ object PhaseLabels {
             || lower.contains("third place")
             || lower.contains("bronze")
             || lower.contains("o 3")
+            || lower.contains("3 viet")
     }
 }

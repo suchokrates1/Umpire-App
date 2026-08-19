@@ -25,7 +25,9 @@ data class Player(
 
     val gender: String? = null,
 
-    val list: String? = null
+    val list: String? = null,
+
+    val partner: Player? = null
 ) : Parcelable {
     /**
      * Zwraca nazwisko (do scoreboard w aplikacji)
