@@ -23,6 +23,8 @@ class NextMatchController(
     private val getCourtName: () -> String,
     private val getSelectedScheduleId: () -> Int?,
     private val getIsDoubles: () -> Boolean,
+    private val getTeam1Name: () -> String? = { null },
+    private val getTeam2Name: () -> String? = { null },
     private val isMixedDoublesSelection: (List<Player>) -> Boolean,
     private val onPrepareForNextMatch: (reuseSetup: Boolean) -> Unit
 ) {
@@ -75,6 +77,8 @@ class NextMatchController(
                 scheduleId = scheduleId,
                 isDoubles = true,
                 isMixedDoubles = isMixedDoubles,
+                team1Name = getTeam1Name(),
+                team2Name = getTeam2Name(),
                 umpireName = umpireName.ifBlank { null },
                 manualStartTime = manualStartTime,
                 currentServer = 1,

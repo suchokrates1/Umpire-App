@@ -9,6 +9,7 @@ object AvailableLanguages {
         Language("es", "Español", "🇪🇸"),
         Language("fr", "Français", "🇫🇷"),
         Language("it", "Italiano", "🇮🇹"),
+        Language("lt", "Lietuvių", "🇱🇹"),
         Language("pl", "Polski", "🇵🇱"),
     )
 

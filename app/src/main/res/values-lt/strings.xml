@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Blind Tennis Referee</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">Pasirinkite kalbą</string>
+    <string name="language_selected">Kalba pasirinkta</string>
+
+    <!-- Court Selection -->
+    <string name="select_tournament">Pasirinkite turnyrą</string>
+    <string name="change_tournament">Keisti turnyrą</string>
+    <string name="no_tournaments_available">Nėra aktyvių turnyrų</string>
+    <string name="error_loading_tournaments">Klaida įkeliant turnyrus</string>
+    <string name="select_court">Pasirinkite kortą</string>
+    <string name="refresh">Atnaujinti</string>
+    <string name="no_courts_available">Nėra galimų kortų</string>
+    <string name="court_name">Kortas %1$s</string>
+    <string name="court_available">Laisvas</string>
+    <string name="court_occupied">Užimtas</string>
+
+    <!-- Stats Mode Selection -->
+    <string name="stats_mode_title">Statistikos veiksena</string>
+    <string name="stats_mode_basic">Pagrindinė</string>
+    <string name="stats_mode_basic_desc">Supaprastintas taškavimas: tik Win ir Fault mygtukai.\nSekama: dvigubos klaidos.</string>
+    <string name="stats_mode_basic_short">WIN + FAULT\nGreitai ir paprastai</string>
+    <string name="stats_mode_advanced">Išplėstinė</string>
+    <string name="stats_mode_advanced_desc">Pilnas taškavimas: Esas, Klaida, Kamuolys žaidime, Vinneris, Išprovokuota klaida, Neišprovokuota klaida.\nSekama: esai, dvigubos klaidos, vinneriai, išprovokuotos/neišprovokuotos klaidos, padavimo %%.</string>
+    <string name="stats_mode_advanced_short">Esas, Winner, Klaidos…\nPilna statistika</string>
+
+    <!-- Match Configuration Dialog -->
+    <string name="match_config_title">Mačo nustatymai</string>
+        <string name="match_config_umpire_hint">Teisėjo vardas ir pavardė arba inicialai</string>
+        <string name="match_config_mixed_title">Mišrūs dvejetai</string>
+        <string name="match_config_mixed_desc">Pažymėti šį dvejetų mačą kaip mixed</string>
+        <string name="match_config_manual_datetime_title">Rankinė data ir laikas</string>
+        <string name="match_config_manual_datetime_empty">Automatinė dabartinė data/laikas</string>
+        <string name="match_config_set_datetime">Nustatyti</string>
+        <string name="match_config_clear_datetime">Išvalyti</string>
+    <string name="match_config_format_header">Mačo formatas</string>
+    <string name="match_config_games_per_set">Geimų iki seto</string>
+    <string name="match_config_sets_to_win">Setų iki pergalės</string>
+    <string name="match_config_tiebreak_to">Taibreikas iki</string>
+    <string name="match_config_super_tiebreak_to">Lemiamas TB iki</string>
+    <string name="match_config_options_header">Parinktys</string>
+    <string name="match_config_stats_header">Statistikos veiksena</string>
+    <string name="match_config_tb_only">Tik taibreikas</string>
+    <string name="match_config_tb_only_desc">Žaidžiamas tik taibreikas vietoj setų</string>
+    <string name="match_config_tb_only_points">Taibreikas iki</string>
+    <string name="win_point">WIN</string>
+    <string name="no_advantage_mode">Be pranašumo (Lemiamas taškas)</string>
+    <string name="next_match_same_setup">▶ Kitas mačas (tie patys nustatymai)</string>
+    <string name="next_match_new_setup">⚙ Naujas mačas (kiti nustatymai)</string>
+    <string name="no_advantage_desc">Esant lygiosioms (40–40) kitas taškas laimi geimą. Priimantysis pasirenka pusę.</string>
+    <string name="deciding_point">Lemiamas taškas!</string>
+    <string name="deciding_point_msg">Rezultatas 40–40. Priimantysis pasirenka returno pusę. Kitas taškas laimi geimą.</string>
+    <string name="zero_score">0</string>
+    <string name="court_pin_title">Korto autorizacija</string>
+    <string name="court_pin_message">Įveskite PIN kortui: %1$s</string>
+    <string name="pin_hint">Įveskite PIN</string>
+    <string name="pin_empty">PIN negali būti tuščias</string>
+    <string name="pin_invalid">Neteisingas PIN: %1$s</string>
+
+    <!-- Player Selection -->
+    <string name="select_players">Pasirinkite žaidėjus</string>
+    <string name="suggested_match_title">Siūlomas mačas iš plano</string>
+    <string name="suggested_match_use">Naudoti mačą</string>
+    <string name="suggested_match_manual">Pasirinksiu pats</string>
+    <string name="suggested_match_applied">Pasirinktas siūlomas mačas</string>
+    <string name="court_label">Kortas: %1$s</string>
+    <string name="doubles_checkbox">Dvejetai</string>
+    <string name="game_type_singles">Vienetai (2 žaidėjai)</string>
+    <string name="game_type_doubles">Dvejetai (4 žaidėjai)</string>
+    <string name="selected_info">Pasirinkta: %1$d/%2$d</string>
+    <string name="add_new_player">+ Pridėti naują žaidėją</string>
+    <string name="player_name_hint">Vardas ir pavardė</string>
+    <string name="country_code_hint">Šalies kodas (pvz. LT)</string>
+    <string name="search_players">Ieškoti žaidėjų</string>
+    <string name="add_player">+ Pridėti naują žaidėją</string>
+    <string name="player_not_found">Žaidėjas nerastas</string>
+    <string name="tap_plus_to_add">Paspauskite +, kad pridėtumėte naują žaidėją</string>
+    <string name="player_first_name">Vardas</string>
+    <string name="player_last_name">Pavardė</string>
+    <string name="player_country">Šalis</string>
+    <string name="player_category">Kategorija</string>
+    <string name="doubles">Dvejetai</string>
+    <string name="singles">Vienetai (2 žaidėjai)</string>
+    <string name="doubles_mode">Dvejetai (4 žaidėjai)</string>
+    <string name="no_players_available">Nėra galimų žaidėjų</string>
+    <string name="selected_count">Pasirinkta: %1$d/%2$d</string>
+    <string name="next">Toliau</string>
+    <string name="back">Atgal</string>
+
+    <!-- Match -->
+    <string name="undo">Atšaukti</string>
+    <string name="undo_with_icon">↶ Atšaukti</string>
+    <string name="confirm_undo">Atšaukti paskutinį veiksmą?</string>
+    <string name="confirm_finish_match">Ar tikrai norite baigti mačą?</string>
+    <string name="who_serves_first">Kas paduoda pirmas?</string>
+    <string name="swap_sides">⇄ Sukeisti puses</string>
+    <string name="player_serves">%1$s\nPaduoda</string>
+    <string name="team_serves">%1$s\nPaduoda</string>
+    <string name="first_serve">1-as padavimas</string>
+    <string name="second_serve">1-as padavimas  >  2-as padavimas</string>
+    <string name="serve">Padavimas</string>
+    <string name="ace">ESAS</string>
+    <string name="fault">KLAIDA</string>
+    <string name="second_serve_button">2. PADAVIMAS</string>
+    <string name="double_fault_button">DVIGUBA KLAIDA</string>
+    <string name="ball_in_play">KAMUOLYS ŽAIDIME</string>
+    <string name="foot_fault">KOJOS KLAIDA</string>
+    <string name="winner">VINNERIS</string>
+    <string name="forced_error">IŠPROVOKUOTA\nKLAIDA</string>
+    <string name="unforced_error">NEIŠPROVOKUOTA\nKLAIDA</string>
+    <string name="match_finished">Mačas baigtas</string>
+    <string name="winner_label">Nugalėtojas: %1$s</string>
+    <string name="finish">Baigti</string>
+    <string name="finish_match">Baigti mačą</string>
+    <string name="finish_reason_prompt">Kodėl baigiate šį mačą?</string>
+    <string name="finish_reason_normal">Įprasta pabaiga</string>
+    <string name="finish_reason_test">Bandomasis įrašas</string>
+    <string name="finish_reason_retirement">Pasitraukimas</string>
+    <string name="finish_reason_walkover">Walkover</string>
+    <string name="finish_retirement_prompt">Kuri pusė pasitraukia dėl traumos?</string>
+    <string name="finish_walkover_prompt">Kuri pusė laimi walkover?</string>
+    <string name="new_match">Naujas mačas</string>
+
+    <!-- Scoreboard -->
+    <string name="scoreboard_player">Žaidėjas</string>
+    <string name="scoreboard_points">Taškai</string>
+    <string name="scoreboard_set1">1 setas</string>
+    <string name="scoreboard_set2">2 setas</string>
+    <string name="player_name">Pavardė</string>
+    <string name="points">Taškai</string>
+    <string name="set">Setas %1$d</string>
+    <string name="tiebreak">Taibreikas (iki %1$d)</string>
+    <string name="super_tiebreak">Mačo taibreikas (iki %1$d)</string>
+    <string name="tiebreak_mode">Taibreikas (iki %1$d, pergalė 2 taškų skirtumu)</string>
+    <string name="super_tiebreak_mode">Mačo taibreikas (iki %1$d, pergalė 2 taškų skirtumu)</string>
+
+    <!-- Match announcements -->
+    <string name="announce_side_change">Pusių keitimas!</string>
+    <string name="announce_side_change_msg">Varžovai keičiasi korto pusėmis.</string>
+    <string name="announce_tiebreak">Taibreikas!</string>
+    <string name="announce_tiebreak_msg">Rezultatas %1$d–%1$d. Pradedame taibreiką (iki %2$d, pergalė 2 taškų skirtumu).</string>
+    <string name="announce_super_tiebreak">Mačo taibreikas!</string>
+    <string name="announce_super_tiebreak_msg">Setai %1$d–%1$d. Pradedame lemiamą mačo taibreiką (iki %2$d, pergalė 2 taškų skirtumu).</string>
+    <string name="continue_btn">Toliau</string>
+    <string name="dont_change_sides">Nekeisti pusių</string>
+    <string name="match_finished_title">Mačas baigtas!</string>
+    <string name="statistics">Statistika</string>
+    <string name="aces">Esai</string>
+    <string name="double_faults">Dvigubos klaidos</string>
+    <string name="player_serves_short">Paduoda</string>
+    <string name="match_metadata_umpire">Teisėjas: %1$s</string>
+    <string name="match_type_mixed">Mišrūs</string>
+    <string name="match_type_doubles">Dvejetai</string>
+    <string name="match_type_singles">Vienetai</string>
+    <string name="sync_status_syncing">Sinchronizuojama...</string>
+    <string name="sync_status_synced">Sinchronizuota</string>
+    <string name="sync_status_failed">Sinchronizavimo klaida</string>
+    <string name="sync_status_offline">Laukiama tinklo — eilėje sinchronizacijai</string>
+    <string name="sync_status_idle">Dar nesinchronizuota</string>
+
+    <!-- Errors -->
+    <string name="error_loading_courts">Klaida įkeliant kortus</string>
+    <string name="error_loading_players">Klaida įkeliant žaidėjus</string>
+    <string name="error_network">Ryšio su serveriu klaida</string>
+    <string name="error_unknown">Nežinoma klaida</string>
+    <string name="error_no_court_data">Klaida: nėra korto duomenų</string>
+    <string name="error_select_correct_players">Pasirinkite tinkamą žaidėjų skaičių</string>
+    <string name="error_enter_first_name">Įveskite žaidėjo vardą</string>
+    <string name="error_enter_last_name">Įveskite žaidėjo pavardę</string>
+    <string name="error_adding_player">Klaida pridedant žaidėją</string>
+    <string name="no_actions_to_undo">Nėra veiksmų, kuriuos būtų galima atšaukti</string>
+    <string name="undo_action_format">Atšaukta: %1$s</string>
+
+    <!-- Undo descriptions -->
+    <string name="undo_ace">ESAS - %1$s</string>
+    <string name="undo_fault_first">Klaida - Pirmas padavimas</string>
+    <string name="undo_double_fault">Dviguba klaida - %1$s</string>
+    <string name="undo_foot_fault_first">Kojos klaida - Pirmas padavimas</string>
+    <string name="undo_foot_fault_double">Kojos klaida (dviguba) - %1$s</string>
+    <string name="undo_winner">Vinneris - %1$s</string>
+    <string name="undo_forced_error">Išprovokuota klaida - %1$s</string>
+    <string name="undo_unforced_error">Neišprovokuota klaida - %1$s</string>
+    <string name="undo_win">Pergalė - %1$s</string>
+
+    <!-- Common -->
+    <string name="ok">Gerai</string>
+    <string name="cancel">Atšaukti</string>
+    <string name="yes">Taip</string>
+    <string name="no">Ne</string>
+
+    <!-- Match History -->
+    <string name="match_history_title">Mačų istorija</string>
+    <string name="match_history">Mačų istorija</string>
+    <string name="no_matches_saved">Nėra išsaugotų mačų</string>
+    <string name="match_score_format">%1$d : %2$d</string>
+    <string name="winner_format">Nugalėtojas: %1$s</string>
+    <string name="delete_match">Pašalinti mačą</string>
+    <string name="delete_all_matches">Pašalinti visus</string>
+    <string name="confirm_delete_match">Pašalinti šį mačą?</string>
+    <string name="confirm_delete_all_matches">Pašalinti visus mačus iš istorijos?</string>
+    <string name="match_deleted">Mačas pašalintas</string>
+    <string name="all_matches_deleted">Visi mačai pašalinti</string>
+    <string name="match_details">Mačo detalės</string>
+    <string name="match_details_placeholder">Mačo detalės bus rodomos čia</string>
+    <string name="match_details_not_found">Mačo detalės nerastos</string>
+    <string name="match_details_court">Kortas: %1$s</string>
+    <string name="match_details_started">Pradžia: %1$s</string>
+    <string name="match_details_duration">Trukmė: %1$s</string>
+    <string name="match_details_umpire">Teisėjas: %1$s</string>
+    <string name="match_details_sets">Setai</string>
+
+    <!-- Settings -->
+    <string name="settings">Nustatymai</string>
+    <string name="open_match_history">Atidaryti mačų istoriją</string>
+    <string name="appearance">Išvaizda</string>
+    <string name="theme">Apipavidalinimas</string>
+    <string name="theme_light">Šviesus</string>
+    <string name="theme_dark">Tamsus</string>
+    <string name="theme_system">Sisteminis</string>
+    <string name="about">Apie</string>
+    <string name="app_description">Profesionali teisėjų programėlė teniso rezultatams vesti realiuoju laiku</string>
+    <string name="version_format">Versija %1$s</string>
+    <string name="version_unknown">Versija nežinoma</string>
+    <string name="diagnostics">Diagnostika</string>
+    <string name="diagnostics_app_version">Programėlės versija</string>
+    <string name="diagnostics_backend">Backend</string>
+    <string name="diagnostics_device">Įrenginys</string>
+    <string name="diagnostics_locale">Kalba</string>
+    <string name="diagnostics_timezone">Laiko juosta</string>
+    <string name="diagnostics_sync_status">Paskutinė sinchronizacijos būsena</string>
+    <string name="diagnostics_last_update">Paskutinis sinchronizacijos atnaujinimas</string>
+    <string name="diagnostics_last_error">Paskutinė sinchronizacijos klaida</string>
+    <string name="diagnostics_no_error">Klaidos nėra</string>
+    <string name="diagnostics_never">Niekada</string>
+    <string name="diagnostics_copy">Kopijuoti diagnostiką</string>
+    <string name="diagnostics_copied">Diagnostika nukopijuota</string>
+
+    <!-- Statistics Labels -->
+    <string name="winners_stat">Vinneriai</string>
+    <string name="forced_errors_stat">Išprovokuotos klaidos</string>
+    <string name="unforced_errors_stat">Neišprovokuotos klaidos</string>
+    <string name="first_serve_pct">1-as padavimas %</string>
+    <string name="new_match_button">Naujas mačas</string>
+    <string name="confirm_exit_title">Išeiti iš mačo?</string>
+    <string name="confirm_exit_message">Mačas vis dar vyksta. Ar tikrai norite išeiti?</string>
+
+    <!-- Match phases -->
+    <string name="phase_group">Grupių etapas</string>
+    <string name="phase_group_rematch">Grupių etapas — revanšas</string>
+    <string name="phase_knockout">Atkrintamosios</string>
+    <string name="phase_semifinal">Pusfinalis</string>
+    <string name="phase_final">Finalas</string>
+    <string name="phase_third_place">Mačas dėl 3 vietos</string>
+
+    <!-- Bracket warnings -->
+    <string name="bracket_warning_title">Informacija apie mačą</string>
+    <string name="bracket_warning_different_groups">Šie varžovai yra iš skirtingų grupių. Ar tai atkrintamųjų mačas?</string>
+    <string name="bracket_warning_friendly">Šie varžovai nepriskirti jokiai turnyro grupei. Mačas bus įrašytas kaip sparingo.</string>
+</resources>

@@ -40,6 +40,15 @@ class PhaseLabelsTest {
     }
 
     @Test
+    fun recognizesLithuanianPhaseLabels() {
+        assertEquals("Group stage", PhaseLabels.localize("Grupių etapas", resolve))
+        assertEquals("Knockout stage", PhaseLabels.localize("Atkrintamosios", resolve))
+        assertEquals("Semifinal", PhaseLabels.localize("Pusfinalis", resolve))
+        assertEquals("Final", PhaseLabels.localize("Finalas", resolve))
+        assertEquals("Group stage — rematch", PhaseLabels.localize("Grupių etapas — revanšas", resolve))
+    }
+
+    @Test
     fun blankReturnsNull() {
         assertNull(PhaseLabels.localize("  ", resolve))
         assertNull(PhaseLabels.localize(null, resolve))

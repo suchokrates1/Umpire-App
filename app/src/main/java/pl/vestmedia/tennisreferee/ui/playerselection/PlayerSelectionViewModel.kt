@@ -37,6 +37,10 @@ class PlayerSelectionViewModel : ViewModel() {
 
     private val _suggestedMatch = MutableLiveData<ScheduleSuggestion?>()
     val suggestedMatch: LiveData<ScheduleSuggestion?> = _suggestedMatch
+
+    private var lastAppliedSuggestion: ScheduleSuggestion? = null
+
+    fun lastAppliedSuggestion(): ScheduleSuggestion? = lastAppliedSuggestion
     
     // Nowo dodany gracz do automatycznego zaznaczenia
     private val _newlyAddedPlayer = MutableLiveData<Player?>()
@@ -74,6 +78,7 @@ class PlayerSelectionViewModel : ViewModel() {
      */
     fun setDoubles(isDoubles: Boolean) {
         _isDoubles.value = isDoubles
+        lastAppliedSuggestion = null
         // Wyczyść wybór jeśli zmieniono tryb
         _selectedPlayers.value = mutableListOf()
         updateCanProceed()
@@ -97,6 +102,7 @@ class PlayerSelectionViewModel : ViewModel() {
         }
         
         _selectedPlayers.value = currentSelected
+        lastAppliedSuggestion = null
         updateCanProceed()
     }
 
@@ -107,11 +113,20 @@ class PlayerSelectionViewModel : ViewModel() {
             return false
         }
 
-        _isDoubles.value = false
+        lastAppliedSuggestion = suggestion
+        _isDoubles.value = suggestion.isDoubles
         _selectedPlayers.value = selectedPlayers.toMutableList()
         updateCanProceed()
         return true
     }
+
+    fun shouldKeepScheduleIdOnDoublesToggle(isDoubles: Boolean): Boolean {
+        return ScheduleSuggestionSelector.shouldKeepScheduleIdOnDoublesToggle(lastAppliedSuggestion, isDoubles)
+    }
+
+    fun appliedTeam1Name(): String? = lastAppliedSuggestion?.takeIf { it.isDoubles }?.player1Name
+
+    fun appliedTeam2Name(): String? = lastAppliedSuggestion?.takeIf { it.isDoubles }?.player2Name
     
     /**
      * Sprawdza czy wybrano odpowiednią liczbę graczy
@@ -145,6 +160,7 @@ class PlayerSelectionViewModel : ViewModel() {
 
     fun clearSelection() {
         _selectedPlayers.value = mutableListOf()
+        lastAppliedSuggestion = null
         updateCanProceed()
     }
     
