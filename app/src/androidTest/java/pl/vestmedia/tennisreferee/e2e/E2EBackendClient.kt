@@ -2,6 +2,9 @@ package pl.vestmedia.tennisreferee.e2e
 
 import androidx.test.platform.app.InstrumentationRegistry
 import okhttp3.MediaType.Companion.toMediaType
+import pl.vestmedia.tennisreferee.data.auth.CourtSession
+import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
+import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -195,6 +198,34 @@ class E2EBackendClient(
     fun setCourtPin(courtId: String, pin: String) {
         ensureAdminToken()
         putJson("/admin/api/courts/$courtId/pin", JSONObject().put("pin", pin))
+    }
+
+    fun authorizeCourt(courtId: String, pin: String): CourtSession {
+        val response = postJsonUnauthed(
+            "/api/courts/$courtId/authorize",
+            JSONObject().put("pin", pin)
+        )
+        if (!response.optBoolean("authorized", false) && !response.optBoolean("ok", false)) {
+            error("Court $courtId was not authorized: $response")
+        }
+        val token = response.optString("token").takeIf { it.isNotBlank() }
+            ?: error("Court $courtId authorize response missing token: $response")
+        val expiresRaw = sequenceOf("expires_at", "expiresAt", "expiry")
+            .map { response.optString(it) }
+            .firstOrNull { it.isNotBlank() }
+        return CourtSession(
+            courtId = response.optString("court_id").ifBlank {
+                response.optString("kort_id")
+            }.ifBlank { courtId },
+            token = token,
+            expiresAtMillis = parseSessionExpiry(expiresRaw)
+        )
+    }
+
+    /** Court-auth grace ended; MatchActivity sync needs a bearer session. */
+    fun seedAppCourtSession(courtId: String, pin: String = "4242") {
+        setCourtPin(courtId, pin)
+        CourtSessionProvider.get().save(authorizeCourt(courtId, pin))
     }
 
     fun close() {
