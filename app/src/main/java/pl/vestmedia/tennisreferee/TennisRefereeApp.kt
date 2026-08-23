@@ -11,7 +11,7 @@ import pl.vestmedia.tennisreferee.utils.ThemeManager
 /**
  * Główna klasa Application
  */
-class TennisRefereeApp : Application() {
+open class TennisRefereeApp : Application() {
     
     val database by lazy { TennisDatabase.getDatabase(this) }
     val matchHistoryRepository by lazy { MatchHistoryRepository(database.matchDao()) }
@@ -25,6 +25,10 @@ class TennisRefereeApp : Application() {
         themeManager.applyCurrentTheme()
         // Start health check heartbeat
         AppLogger.info("App started")
-        healthCheckManager.start()
+        if (shouldStartHealthCheck()) {
+            healthCheckManager.start()
+        }
     }
+
+    protected open fun shouldStartHealthCheck(): Boolean = true
 }
