@@ -66,6 +66,12 @@
 # ── Keep API service interface with full type info ──
 -keep interface pl.vestmedia.tennisreferee.data.api.** { *; }
 
+# Gson / R8: Retrofit return type is Response<List<TournamentOptionDto>>.
+# The existing -if keep only retains Response, so TournamentOptionDto is stripped
+# and Gson yields LinkedTreeMap → ClassCastException on the tournament screen.
+-keep class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
+-keepclassmembers class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
+
 # ── Kotlin ──
 -keep class kotlin.Metadata { *; }
 -dontwarn kotlin.**

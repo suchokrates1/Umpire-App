@@ -1,10 +1,13 @@
 package pl.vestmedia.tennisreferee.data.api
 
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import pl.vestmedia.tennisreferee.data.api.dto.CourtAuthResponseDto
+import pl.vestmedia.tennisreferee.data.api.dto.TournamentOptionDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchFinishReasonDto
 import pl.vestmedia.tennisreferee.data.api.dto.PlayerDto
 import pl.vestmedia.tennisreferee.data.api.dto.ScheduleSuggestionDto
@@ -210,5 +213,25 @@ class ApiDtoMappingTest {
 
         assertEquals("court-1", current.courtId)
         assertEquals("court-2", legacy.courtId)
+    }
+
+    @Test
+    fun activeTournamentListFromProductionJsonMapsWithoutClassCast() {
+        val json = """
+            [{"id":31,"name":"IBTA World Blind Tennis Championships 2026",
+              "city":"Vilnius","country":"LT","location":"Vilnius, LT",
+              "start_date":"2026-08-25","end_date":"2026-08-29",
+              "active":1,"is_public":1,"court_count":10}]
+        """.trimIndent()
+        val list: List<TournamentOptionDto> = Gson().fromJson(
+            json,
+            object : TypeToken<List<TournamentOptionDto>>() {}.type
+        )
+        assertEquals(1, list.size)
+        assertEquals(31, list[0].id)
+        assertEquals("IBTA World Blind Tennis Championships 2026", list[0].name)
+        val model = list[0].toModel()
+        assertEquals(31, model.id)
+        assertTrue(model.location!!.contains("Vilnius"))
     }
 }

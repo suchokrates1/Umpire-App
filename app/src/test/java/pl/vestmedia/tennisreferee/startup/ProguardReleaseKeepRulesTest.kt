@@ -1,6 +1,7 @@
 package pl.vestmedia.tennisreferee.startup
 
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
@@ -37,6 +38,18 @@ class ProguardReleaseKeepRulesTest {
                 text.contains("com.google.crypto.tink")
             )
         }
+    }
+
+    @Test
+    fun releaseRulesKeepGsonApiDtos() {
+        val rules = locate("app/proguard-rules.pro")
+            ?: locate("proguard-rules.pro")
+            ?: throw AssertionError("proguard-rules.pro not found from ${File(".").absolutePath}")
+        val text = rules.readText()
+        assertTrue(
+            "R8 must keep data.api.dto or release tournament list ClassCastExceptions",
+            text.contains("pl.vestmedia.tennisreferee.data.api.dto")
+        )
     }
 
     @Test
