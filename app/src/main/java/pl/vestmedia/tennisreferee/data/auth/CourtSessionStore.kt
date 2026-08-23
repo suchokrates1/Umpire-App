@@ -3,9 +3,6 @@ package pl.vestmedia.tennisreferee.data.auth
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
-import pl.vestmedia.tennisreferee.utils.AppLogger
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -29,38 +26,11 @@ interface CourtSessionStore {
 }
 
 /**
- * Stores the court authorization session encrypted with an Android Keystore-backed key.
- * A PIN is retained only for an authorization response from a legacy server that did not
- * issue a token, so the legacy player-creation request can still be authorized.
- */
-class EncryptedCourtSessionStore(context: Context) : CourtSessionStore {
-    private val preferences = EncryptedSharedPreferences.create(
-        context,
-        PREFERENCES_NAME,
-        MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build(),
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
-
-    override fun current(): CourtSession? = preferences.readCourtSession()
-
-    override fun save(session: CourtSession) = preferences.writeCourtSession(session)
-
-    override fun clear() {
-        preferences.edit().clear().apply()
-    }
-
-    companion object {
-        const val PREFERENCES_NAME = "court_session"
-    }
-}
-
-/**
- * Unencrypted fallback used when Keystore / EncryptedSharedPreferences cannot be created
- * (missing Tink classes after R8, backup-restore without the key, emulator/Robolectric).
- * Uses a separate file so a corrupted encrypted blob is never read as plaintext prefs.
+ * Court authorization session in ordinary SharedPreferences.
+ *
+ * EncryptedSharedPreferences / MasterKey / Tink must not run during process
+ * start: a broken Android Keystore can native-crash the process (logo, then
+ * the app closes) and try/catch cannot catch that.
  */
 class SharedPreferencesCourtSessionStore(context: Context) : CourtSessionStore {
     private val preferences = context.getSharedPreferences(
@@ -86,11 +56,7 @@ object CourtSessionProvider {
     private var sessionStore: CourtSessionStore? = null
 
     fun initialize(context: Context) {
-        val appContext = context.applicationContext
-        sessionStore = createCourtSessionStore(
-            encryptedFactory = { EncryptedCourtSessionStore(appContext) },
-            fallbackFactory = { SharedPreferencesCourtSessionStore(appContext) }
-        )
+        sessionStore = SharedPreferencesCourtSessionStore(context.applicationContext)
     }
 
     fun get(): CourtSessionStore {
@@ -107,31 +73,6 @@ object CourtSessionProvider {
     @VisibleForTesting
     fun resetForTests() {
         sessionStore = null
-    }
-}
-
-/**
- * Builds the court-session store used at process start.
- * EncryptedSharedPreferences / Tink / Keystore failures must not kill Application.onCreate.
- */
-internal fun createCourtSessionStore(
-    encryptedFactory: () -> CourtSessionStore,
-    fallbackFactory: () -> CourtSessionStore
-): CourtSessionStore {
-    return try {
-        encryptedFactory()
-    } catch (encryptedError: Throwable) {
-        try {
-            AppLogger.error("CourtSessionStore", encryptedError)
-        } catch (_: Throwable) {
-            // android.util.Log is unavailable in plain JVM unit tests.
-        }
-        try {
-            fallbackFactory()
-        } catch (fallbackError: Throwable) {
-            fallbackError.addSuppressed(encryptedError)
-            throw fallbackError
-        }
     }
 }
 

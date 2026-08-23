@@ -1,51 +1,68 @@
 package pl.vestmedia.tennisreferee.startup
 
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import java.io.File
 
+/**
+ * Guards the cold-start path: EncryptedSharedPreferences / Tink / Keystore
+ * must not be referenced from production startup code. A broken Keystore
+ * native-crashes the process on the launcher logo.
+ */
 class ProguardReleaseKeepRulesTest {
 
     @Test
-    fun releaseRulesKeepEncryptedSharedPreferencesAndTink() {
-        val rules = readProguardRules()
-        assertTrue(
-            "proguard-rules.pro must keep androidx.security.crypto for EncryptedSharedPreferences",
-            rules.contains("androidx.security.crypto")
-        )
-        assertTrue(
-            "proguard-rules.pro must keep com.google.crypto.tink used by MasterKey",
-            rules.contains("com.google.crypto.tink")
-        )
+    fun startupSourcesDoNotTouchEncryptedSharedPreferencesOrTink() {
+        val sources = listOf(
+            "CourtSessionStore.kt",
+            "TennisRefereeApp.kt"
+        ).map { locateSource(it) }
+
+        sources.forEach { file ->
+            val text = stripComments(file.readText())
+            assertFalse(
+                "${file.name} must not reference EncryptedSharedPreferences",
+                text.contains("EncryptedSharedPreferences")
+            )
+            assertFalse(
+                "${file.name} must not reference MasterKey",
+                text.contains("MasterKey")
+            )
+            assertFalse(
+                "${file.name} must not reference androidx.security.crypto",
+                text.contains("androidx.security.crypto")
+            )
+            assertFalse(
+                "${file.name} must not reference com.google.crypto.tink",
+                text.contains("com.google.crypto.tink")
+            )
+        }
     }
 
     @Test
-    fun releaseMappingKeepsSecurityCryptoWhenMinifyHasRun() {
-        val mapping = findReleaseMapping() ?: return
-        val text = mapping.readText()
-        assertTrue(
-            "R8 mapping.txt is missing EncryptedSharedPreferences after minifyRelease",
-            text.contains("androidx.security.crypto.EncryptedSharedPreferences")
-        )
-        assertTrue(
-            "R8 mapping.txt is missing MasterKey after minifyRelease",
-            text.contains("androidx.security.crypto.MasterKey")
-        )
-        assertTrue(
-            "R8 mapping.txt is missing com.google.crypto.tink after minifyRelease",
-            text.contains("com.google.crypto.tink")
+    fun gradleDoesNotDependOnSecurityCrypto() {
+        val gradle = locate("app/build.gradle")
+            ?: locate("build.gradle")
+            ?: throw AssertionError("app/build.gradle not found from ${File(".").absolutePath}")
+        val text = gradle.readText()
+        assertFalse(
+            "app/build.gradle must not depend on androidx.security:security-crypto",
+            text.contains("security-crypto")
         )
     }
 
-    private fun readProguardRules(): String {
-        val file = locate("proguard-rules.pro")
-            ?: throw AssertionError("proguard-rules.pro not found from ${File(".").absolutePath}")
-        return file.readText()
+    private fun locateSource(fileName: String): File {
+        return locate("app/src/main/java/pl/vestmedia/tennisreferee/data/auth/$fileName")
+            ?: locate("app/src/main/java/pl/vestmedia/tennisreferee/$fileName")
+            ?: locate("src/main/java/pl/vestmedia/tennisreferee/data/auth/$fileName")
+            ?: locate("src/main/java/pl/vestmedia/tennisreferee/$fileName")
+            ?: throw AssertionError("$fileName not found from ${File(".").absolutePath}")
     }
 
-    private fun findReleaseMapping(): File? {
-        return locate("build/outputs/mapping/release/mapping.txt")
-            ?: locate("app/build/outputs/mapping/release/mapping.txt")
+    private fun stripComments(text: String): String {
+        return text
+            .replace(Regex("/\\*.*?\\*/", setOf(RegexOption.DOT_MATCHES_ALL)), "")
+            .replace(Regex("//.*"), "")
     }
 
     private fun locate(relative: String): File? {

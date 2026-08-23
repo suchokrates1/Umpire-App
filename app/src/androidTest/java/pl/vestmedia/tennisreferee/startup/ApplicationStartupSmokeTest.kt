@@ -12,7 +12,7 @@ import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
-import pl.vestmedia.tennisreferee.data.auth.EncryptedCourtSessionStore
+import pl.vestmedia.tennisreferee.data.auth.SharedPreferencesCourtSessionStore
 
 /**
  * Device/emulator cold-start smoke. Run against the minified release APK with:
@@ -25,6 +25,7 @@ class ApplicationStartupSmokeTest {
     fun applicationOnCreateLeavesAWorkingCourtSessionStore() {
         ApplicationProvider.getApplicationContext<TennisRefereeApp>()
         val store = CourtSessionProvider.get()
+        assertTrue(store is SharedPreferencesCourtSessionStore)
         store.clear()
         try {
             store.save(
@@ -47,15 +48,5 @@ class ApplicationStartupSmokeTest {
     fun retrofitClientCanBeResolvedAfterProcessStart() {
         ApplicationProvider.getApplicationContext<TennisRefereeApp>()
         assertNotNull(RetrofitClient.apiService)
-    }
-
-    @Test
-    fun encryptedSharedPreferencesClassesSurviveR8() {
-        Class.forName("androidx.security.crypto.EncryptedSharedPreferences")
-        Class.forName("androidx.security.crypto.MasterKey")
-        Class.forName("com.google.crypto.tink.Aead")
-        EncryptedCourtSessionStore::class.java.getDeclaredConstructor(
-            android.content.Context::class.java
-        )
     }
 }
