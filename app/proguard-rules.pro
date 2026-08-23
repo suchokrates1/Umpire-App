@@ -72,3 +72,11 @@
 -dontwarn kotlin.Unit
 -dontwarn retrofit2.KotlinExtensions
 -dontwarn retrofit2.KotlinExtensions$*
+
+# ── AndroidX Security / Tink (EncryptedSharedPreferences in Application.onCreate) ──
+# Without these keeps, R8 can strip Keystore/Tink classes from the Play AAB and
+# the process dies before any Activity or E2E test body runs.
+-keep class androidx.security.crypto.** { *; }
+-keep class com.google.crypto.tink.** { *; }
+-dontwarn com.google.crypto.tink.**
+-dontwarn com.google.crypto.tink.subtle.**
