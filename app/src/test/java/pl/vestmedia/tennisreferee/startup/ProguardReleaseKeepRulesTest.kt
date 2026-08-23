@@ -24,8 +24,12 @@ class ProguardReleaseKeepRulesTest {
         val mapping = findReleaseMapping() ?: return
         val text = mapping.readText()
         assertTrue(
-            "R8 mapping.txt is missing androidx.security.crypto after minifyRelease",
-            text.contains("androidx.security.crypto")
+            "R8 mapping.txt is missing EncryptedSharedPreferences after minifyRelease",
+            text.contains("androidx.security.crypto.EncryptedSharedPreferences")
+        )
+        assertTrue(
+            "R8 mapping.txt is missing MasterKey after minifyRelease",
+            text.contains("androidx.security.crypto.MasterKey")
         )
         assertTrue(
             "R8 mapping.txt is missing com.google.crypto.tink after minifyRelease",

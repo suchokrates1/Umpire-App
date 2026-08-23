@@ -8,7 +8,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
@@ -21,12 +20,12 @@ import pl.vestmedia.tennisreferee.data.auth.SharedPreferencesCourtSessionStore
  * stripped-Tink Play build can. Application.onCreate must still finish.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TennisRefereeApp::class, sdk = [34])
+@Config(application = StartupTestApp::class, sdk = [34])
 class ApplicationStartupRobolectricTest {
 
     @Test
     fun onCreateInitializesAWorkingSessionStoreWithoutCrashing() {
-        val app = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        val app = ApplicationProvider.getApplicationContext<StartupTestApp>()
         val store = CourtSessionProvider.get()
 
         store.clear()
@@ -53,7 +52,7 @@ class ApplicationStartupRobolectricTest {
 
     @Test
     fun retrofitClientIsUsableAfterApplicationOnCreate() {
-        ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        ApplicationProvider.getApplicationContext<StartupTestApp>()
         assertNotNull(RetrofitClient.apiService)
     }
 }
