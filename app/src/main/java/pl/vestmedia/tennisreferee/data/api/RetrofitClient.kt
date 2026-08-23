@@ -33,7 +33,7 @@ object RetrofitClient {
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(ClientMetadataInterceptor())
-        .addInterceptor(BearerAuthInterceptor(CourtSessionProvider.get()))
+        .addInterceptor(BearerAuthInterceptor({ CourtSessionProvider.get() }))
         .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)

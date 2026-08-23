@@ -9,10 +9,17 @@ import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
  * intentionally remains unauthenticated so a new court session can always be established.
  */
 class BearerAuthInterceptor(
-    private val sessionStore: CourtSessionStore,
+    private val sessionStoreProvider: () -> CourtSessionStore,
     private val nowMillis: () -> Long = System::currentTimeMillis
 ) : Interceptor {
+
+    constructor(
+        sessionStore: CourtSessionStore,
+        nowMillis: () -> Long = System::currentTimeMillis
+    ) : this({ sessionStore }, nowMillis)
+
     override fun intercept(chain: Interceptor.Chain): Response {
+        val sessionStore = sessionStoreProvider()
         val request = chain.request()
         val authenticatedRequest = if (request.url.encodedPath.endsWith(AUTHORIZATION_PATH)) {
             request
