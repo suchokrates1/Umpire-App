@@ -106,6 +106,7 @@ class MultiCourtUmpireE2ETest {
             expectedSetScores = listOf(3 to 0)
         )
         val matchState = matchScenario.toMatchState(fixture, courtIndex = courtIndex)
+        backend.seedAppCourtSession(matchState.courtId)
 
         ActivityScenario.launch<MatchActivity>(intentFor(matchState)).use {
             it.onActivity { activity ->

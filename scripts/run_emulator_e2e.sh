@@ -16,9 +16,25 @@ if ! adb devices 2>/dev/null | awk 'NR>1 && $2=="device" {found=1} END {exit !fo
   exit 1
 fi
 
+dismiss_system_dialogs() {
+  local i focus
+  for i in 1 2 3 4 5 6; do
+    focus="$(adb shell dumpsys window 2>/dev/null | grep mCurrentFocus || true)"
+    if echo "$focus" | grep -Eqi 'Not Responding|Application Error|aerr_'; then
+      echo "Dismissing system dialog: $focus"
+      adb shell input tap 540 1342 || true
+      adb shell input keyevent 66 || true
+      sleep 1
+    else
+      return 0
+    fi
+  done
+}
+
 adb shell settings put global window_animation_scale 0 || true
 adb shell settings put global transition_animation_scale 0 || true
 adb shell settings put global animator_duration_scale 0 || true
+dismiss_system_dialogs
 
 cd "$ROOT"
 

@@ -25,11 +25,18 @@ if adb devices 2>/dev/null | awk 'NR>1 && $2=="device" {found=1} END {exit !foun
   exit 0
 fi
 
-emulator -avd "$AVD_NAME" \
+EMU_CMD=(emulator -avd "$AVD_NAME" \
   -no-window \
   -no-audio \
   -no-boot-anim \
   -gpu swiftshader_indirect \
   -accel on \
   -no-snapshot \
-  -memory 2048
+  -memory 2048)
+
+# Current login sessions may not yet include the kvm group after usermod.
+if command -v sg >/dev/null && getent group kvm | grep -q "${USER}"; then
+  sg kvm -c "${EMU_CMD[*]}"
+else
+  "${EMU_CMD[@]}"
+fi

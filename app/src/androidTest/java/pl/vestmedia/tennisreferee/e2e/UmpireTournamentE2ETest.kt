@@ -206,6 +206,7 @@ class UmpireTournamentE2ETest {
             ApplicationProvider.getApplicationContext<TennisRefereeApp>().matchHistoryRepository.getMatchCount()
         }
         val matchState = scenario.toMatchState(fixture)
+        backend.seedAppCourtSession(matchState.courtId)
 
         ActivityScenario.launch<MatchActivity>(intentFor(matchState)).use {
             it.onActivity { activity ->
