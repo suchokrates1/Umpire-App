@@ -15,6 +15,7 @@ Kompletny katalog funkcji i instrukcja użycia aplikacji Android dla sędziów t
 
 - [[01 - Szybki start]] — typowy dzień turnieju krok po kroku
 - [[02 - Przepływ nawigacji]] — mapa ekranów
+- [[03 - Deploy Google Play]] — build AAB + upload na wszystkie tory (też z innego PC)
 
 ## Ekrany
 
