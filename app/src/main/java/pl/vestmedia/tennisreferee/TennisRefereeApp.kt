@@ -6,6 +6,7 @@ import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.repository.MatchHistoryRepository
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.utils.HealthCheckManager
+import pl.vestmedia.tennisreferee.utils.StartupCrashLog
 import pl.vestmedia.tennisreferee.utils.ThemeManager
 
 /**
@@ -20,13 +21,17 @@ open class TennisRefereeApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
-        CourtSessionProvider.initialize(this)
-        // Apply saved theme on app start
-        themeManager.applyCurrentTheme()
-        // Start health check heartbeat
-        AppLogger.info("App started")
-        if (shouldStartHealthCheck()) {
-            healthCheckManager.start()
+        StartupCrashLog.install(this)
+        try {
+            CourtSessionProvider.initialize(this)
+            themeManager.applyCurrentTheme()
+            AppLogger.info("App started")
+            if (shouldStartHealthCheck()) {
+                healthCheckManager.start()
+            }
+        } catch (error: Throwable) {
+            StartupCrashLog.write(this, error)
+            AppLogger.error("Application.onCreate", error)
         }
     }
 

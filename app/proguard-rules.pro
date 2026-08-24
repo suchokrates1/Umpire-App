@@ -66,6 +66,12 @@
 # ── Keep API service interface with full type info ──
 -keep interface pl.vestmedia.tennisreferee.data.api.** { *; }
 
+# Gson / R8: Retrofit return type is Response<List<TournamentOptionDto>>.
+# The existing -if keep only retains Response, so TournamentOptionDto is stripped
+# and Gson yields LinkedTreeMap → ClassCastException on the tournament screen.
+-keep class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
+-keepclassmembers class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
+
 # ── Kotlin ──
 -keep class kotlin.Metadata { *; }
 -dontwarn kotlin.**
@@ -73,10 +79,5 @@
 -dontwarn retrofit2.KotlinExtensions
 -dontwarn retrofit2.KotlinExtensions$*
 
-# ── AndroidX Security / Tink (EncryptedSharedPreferences in Application.onCreate) ──
-# Without these keeps, R8 can strip Keystore/Tink classes from the Play AAB and
-# the process dies before any Activity or E2E test body runs.
--keep class androidx.security.crypto.** { *; }
--keep class com.google.crypto.tink.** { *; }
--dontwarn com.google.crypto.tink.**
--dontwarn com.google.crypto.tink.subtle.**
+# Do not initialize EncryptedSharedPreferences / Tink / Android Keystore at
+# process start. A broken Keystore native-crashes the process on the logo.

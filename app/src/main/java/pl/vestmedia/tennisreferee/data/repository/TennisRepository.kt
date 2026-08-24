@@ -37,7 +37,7 @@ class TennisRepository(
      */
     suspend fun getCourts(tournamentId: Int? = null): Result<List<Court>> {
         return request { apiService.getCourts(tournamentId) }
-            .map { response -> response.courts.map { it.toModel() } }
+            .mapCatching { response -> response.courts.map { it.toModel() } }
     }
 
     /**
@@ -45,7 +45,7 @@ class TennisRepository(
      */
     suspend fun getActiveTournaments(): Result<List<TournamentOption>> {
         return request { apiService.getActiveTournaments() }
-            .map { tournaments -> tournaments.map { it.toModel() } }
+            .mapCatching { tournaments -> tournaments.map { it.toModel() } }
     }
     
     /**
@@ -57,7 +57,7 @@ class TennisRepository(
         }
 
         return request { apiService.getPlayers(courtId) }
-            .map { response -> response.players.map { it.toModel() } }
+            .mapCatching { response -> response.players.map { it.toModel() } }
             .onSuccess { playersCache[cacheKey(courtId)] = it }
     }
 
@@ -67,7 +67,7 @@ class TennisRepository(
         at: String = currentScheduleTimeIso()
     ): Result<ScheduleSuggestion?> {
         return request { apiService.getSuggestedMatch(courtId, tournamentId, at) }
-            .map { it.suggestion?.toModel() }
+            .mapCatching { it.suggestion?.toModel() }
     }
     
     /**

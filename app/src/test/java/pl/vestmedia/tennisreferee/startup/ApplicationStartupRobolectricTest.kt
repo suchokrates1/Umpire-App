@@ -11,13 +11,11 @@ import org.robolectric.annotation.Config
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
-import pl.vestmedia.tennisreferee.data.auth.EncryptedCourtSessionStore
 import pl.vestmedia.tennisreferee.data.auth.SharedPreferencesCourtSessionStore
 
 /**
- * JVM stand-in for a cold start. Robolectric has no real Android Keystore, so
- * EncryptedSharedPreferences.create() fails the same way a backup-restore or
- * stripped-Tink Play build can. Application.onCreate must still finish.
+ * JVM stand-in for a cold start. Production must not touch Android Keystore
+ * here — EncryptedSharedPreferences.create() can native-crash a real phone.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(application = StartupTestApp::class, sdk = [34])
@@ -27,6 +25,11 @@ class ApplicationStartupRobolectricTest {
     fun onCreateInitializesAWorkingSessionStoreWithoutCrashing() {
         val app = ApplicationProvider.getApplicationContext<StartupTestApp>()
         val store = CourtSessionProvider.get()
+
+        assertTrue(
+            "Cold start must use ordinary SharedPreferences, never EncryptedSharedPreferences",
+            store is SharedPreferencesCourtSessionStore
+        )
 
         store.clear()
         store.save(
@@ -40,10 +43,6 @@ class ApplicationStartupRobolectricTest {
         val current = store.current()
         assertNotNull(current)
         assertTrue(current!!.hasValidToken())
-        assertTrue(
-            "Robolectric must use the fallback store, not die in EncryptedSharedPreferences.create()",
-            store is SharedPreferencesCourtSessionStore || store is EncryptedCourtSessionStore
-        )
 
         store.clear()
         assertNull(store.current())
