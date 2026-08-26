@@ -35,6 +35,17 @@ class MatchStartReducerTest {
     }
 
     @Test
+    fun tiebreakOnlyCapturesOpeningServerAtStart() {
+        val state = matchState().apply { isSuperTiebreak = true }
+
+        MatchStartReducer.start(state, serverNumber = 2, nowMs = 10_000L)
+
+        assertEquals(2, state.currentServer)
+        assertFalse(state.isPlayer1Serving)
+        assertEquals(2, state.tiebreakOpeningServer)
+    }
+
+    @Test
     fun doublesClampsServerNumberAndSetsServingTeam() {
         val state = matchState(isDoubles = true)
 

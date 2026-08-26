@@ -20,12 +20,8 @@ object MatchPointReducer {
         if (state.isTiebreak || state.isSuperTiebreak) {
             val totalPoints = state.player1Points + state.player2Points
 
-            if (totalPoints % 2 == 1) {
-                if (state.isDoubles) {
-                    DoublesServeRotation.rotate(state)
-                } else {
-                    state.isPlayer1Serving = !state.isPlayer1Serving
-                }
+            if (totalPoints % 2 == 1 && !state.isGameWon()) {
+                TiebreakServeRule.rotate(state)
                 events.add(MatchPointEvent.ServeChange)
             }
 

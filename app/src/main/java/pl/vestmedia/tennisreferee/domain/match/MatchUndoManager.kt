@@ -29,6 +29,7 @@ object MatchUndoManager {
             previousSidesSwapped = state.sidesSwapped,
             previousTotalGamesPlayed = state.totalGamesPlayed,
             previousCurrentServer = state.currentServer,
+            previousTiebreakOpeningServer = state.tiebreakOpeningServer,
             previousIsMatchFinished = state.isMatchFinished,
             previousPlayer1Stats = state.player1Stats.copy(),
             previousPlayer2Stats = state.player2Stats.copy(),

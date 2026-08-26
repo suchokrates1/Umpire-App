@@ -26,6 +26,7 @@ data class MatchAction(
     val previousSidesSwapped: Boolean = false,
     val previousTotalGamesPlayed: Int = 0,
     val previousCurrentServer: Int = 1,
+    val previousTiebreakOpeningServer: Int = 1,
     val previousIsMatchFinished: Boolean = false,
     
     // Statystyki przed akcją

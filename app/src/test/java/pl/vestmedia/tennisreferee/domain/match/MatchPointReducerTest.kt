@@ -95,6 +95,23 @@ class MatchPointReducerTest {
         assertFalse(result.showAnnouncementImmediately)
     }
 
+    @Test
+    fun tiebreakWinningPointDoesNotChangeServer() {
+        val state = matchState().apply {
+            isTiebreak = true
+            isPlayer1Serving = false
+            player1Points = 6
+            player2Points = 4
+        }
+
+        val result = MatchPointReducer.addPoint(state, isPlayer1 = true)
+
+        assertEquals(7, state.player1Points)
+        assertEquals(4, state.player2Points)
+        assertFalse(state.isPlayer1Serving)
+        assertEquals(listOf(MatchPointEvent.Point), result.events)
+    }
+
     private fun matchState(isDoubles: Boolean = false): MatchState {
         return MatchState(
             player1 = playerOne,
