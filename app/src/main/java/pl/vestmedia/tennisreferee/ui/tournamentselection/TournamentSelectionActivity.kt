@@ -39,7 +39,7 @@ class TournamentSelectionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTournamentSelectionBinding
     private lateinit var adapter: TournamentAdapter
-    private val repository = TennisRepository()
+    private val repository by lazy { TennisRepository() }
     private var tournaments: List<TournamentOption> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,30 +104,39 @@ class TournamentSelectionActivity : AppCompatActivity() {
             binding.emptyView.visibility = View.GONE
             binding.recyclerViewTournaments.visibility = View.GONE
 
-            val result = repository.getActiveTournaments()
-            binding.progressBar.visibility = View.GONE
+            try {
+                val result = repository.getActiveTournaments()
+                binding.progressBar.visibility = View.GONE
 
-            result.onSuccess { activeTournaments ->
-                tournaments = activeTournaments.sortedBy { it.name.lowercase() }
-                val forceSelection = intent.getBooleanExtra(EXTRA_FORCE_SELECTION, false)
-                val selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this@TournamentSelectionActivity)
+                result.onSuccess { activeTournaments ->
+                    tournaments = activeTournaments.sortedBy { it.name.lowercase() }
+                    val forceSelection = intent.getBooleanExtra(EXTRA_FORCE_SELECTION, false)
+                    val selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this@TournamentSelectionActivity)
 
-                if (!forceSelection && selectedTournamentId != null && tournaments.any { it.id == selectedTournamentId }) {
-                    navigateToCourts()
-                    return@onSuccess
+                    if (!forceSelection && selectedTournamentId != null && tournaments.any { it.id == selectedTournamentId }) {
+                        navigateToCourts()
+                        return@onSuccess
+                    }
+
+                    adapter = TournamentAdapter(tournaments) { tournament -> onTournamentSelected(tournament) }
+                    binding.recyclerViewTournaments.adapter = adapter
+                    binding.emptyView.visibility = if (tournaments.isEmpty()) View.VISIBLE else View.GONE
+                    binding.recyclerViewTournaments.visibility = if (tournaments.isEmpty()) View.GONE else View.VISIBLE
+                }.onFailure { error ->
+                    showLoadError(error)
                 }
-
-                adapter = TournamentAdapter(tournaments) { tournament -> onTournamentSelected(tournament) }
-                binding.recyclerViewTournaments.adapter = adapter
-                binding.emptyView.visibility = if (tournaments.isEmpty()) View.VISIBLE else View.GONE
-                binding.recyclerViewTournaments.visibility = if (tournaments.isEmpty()) View.GONE else View.VISIBLE
-            }.onFailure { error ->
-                AppLogger.error("TournamentSelection", error)
-                Toast.makeText(this@TournamentSelectionActivity, getString(R.string.error_loading_tournaments), Toast.LENGTH_LONG).show()
-                binding.emptyView.visibility = View.VISIBLE
-                binding.emptyView.text = getString(R.string.no_tournaments_available)
+            } catch (error: Throwable) {
+                binding.progressBar.visibility = View.GONE
+                showLoadError(error)
             }
         }
+    }
+
+    private fun showLoadError(error: Throwable) {
+        AppLogger.error("TournamentSelection", error)
+        Toast.makeText(this, getString(R.string.error_loading_tournaments), Toast.LENGTH_LONG).show()
+        binding.emptyView.visibility = View.VISIBLE
+        binding.emptyView.text = getString(R.string.no_tournaments_available)
     }
 
     private fun onTournamentSelected(tournament: TournamentOption) {
