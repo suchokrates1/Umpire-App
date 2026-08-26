@@ -19,8 +19,9 @@
 -keep,allowobfuscation,allowshrinking class retrofit2.Response
 
 # Keep generic signature of Kotlin Continuation so Retrofit can extract
-# Response<T> from suspend fun parameters (THIS fixes ParameterizedType crash)
--keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+# Response<T> from suspend fun parameters (THIS fixes ParameterizedType crash
+# right after language selection, on the first TennisApiService create()).
+-keep class kotlin.coroutines.Continuation { *; }
 
 # R8 full mode: keep Retrofit service interfaces (created via Proxy)
 -if interface * { @retrofit2.http.* <methods>; }
@@ -58,6 +59,12 @@
 # ── Keep ALL data models with fields + generic signatures ──
 -keep class pl.vestmedia.tennisreferee.data.model.** { *; }
 -keepclassmembers class pl.vestmedia.tennisreferee.data.model.** { *; }
+
+# Gson reads these by reflection. After the DTO split they left data.model,
+# so Play/R8 builds crashed on TournamentSelectionActivity (first API call
+# after language). Keep the whole dto package, not only Retrofit return types.
+-keep class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
+-keepclassmembers class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
 
 # ── Room database/entities ──
 -keep class pl.vestmedia.tennisreferee.data.database.** { *; }

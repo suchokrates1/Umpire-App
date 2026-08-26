@@ -20,6 +20,31 @@ class ProguardReleaseKeepRulesTest {
     }
 
     @Test
+    fun releaseRulesKeepGsonDtosAndRetrofitContinuation() {
+        val rules = readProguardRules()
+        assertTrue(
+            "proguard-rules.pro must keep data.api.dto after the model/DTO split",
+            rules.contains("pl.vestmedia.tennisreferee.data.api.dto")
+        )
+        assertTrue(
+            "proguard-rules.pro must keep kotlin.coroutines.Continuation for suspend Retrofit",
+            rules.contains("kotlin.coroutines.Continuation")
+        )
+        assertFalseAllowShrinkingOnContinuation(rules)
+    }
+
+    private fun assertFalseAllowShrinkingOnContinuation(rules: String) {
+        val continuationLine = rules.lineSequence()
+            .map { it.trim() }
+            .firstOrNull { it.contains("kotlin.coroutines.Continuation") && !it.startsWith("#") }
+            ?: ""
+        assertTrue(
+            "Continuation keep must not use allowshrinking (R8 dropped it after language selection)",
+            continuationLine.startsWith("-keep") && !continuationLine.contains("allowshrinking")
+        )
+    }
+
+    @Test
     fun releaseMappingKeepsSecurityCryptoWhenMinifyHasRun() {
         val mapping = findReleaseMapping() ?: return
         val text = mapping.readText()
