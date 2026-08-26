@@ -60,6 +60,8 @@ data class MatchState(
     var isMatchFinished: Boolean = false,
     var sidesSwapped: Boolean = false, // Czy gracze zamienili strony
     var totalGamesPlayed: Int = 0, // Liczba rozegranych gemów w secie
+    // Kto serwował pierwszy punkt bieżącego TB/STB (1-4); ITF: ta strona przyjmuje w następnym gemie
+    var tiebreakOpeningServer: Int = 1,
     
     // Czas
     var matchStartTime: Long = 0,

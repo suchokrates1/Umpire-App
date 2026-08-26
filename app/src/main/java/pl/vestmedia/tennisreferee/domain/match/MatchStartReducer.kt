@@ -14,6 +14,9 @@ object MatchStartReducer {
         } else {
             state.currentServer == 1
         }
+        if (state.isTiebreak || state.isSuperTiebreak) {
+            TiebreakServeRule.captureOpeningServer(state)
+        }
         state.matchStartTime = state.manualStartTime ?: nowMs
     }
 }

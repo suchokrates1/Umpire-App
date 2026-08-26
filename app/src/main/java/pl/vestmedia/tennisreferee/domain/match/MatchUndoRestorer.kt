@@ -19,6 +19,7 @@ object MatchUndoRestorer {
         state.sidesSwapped = action.previousSidesSwapped
         state.totalGamesPlayed = action.previousTotalGamesPlayed
         state.currentServer = action.previousCurrentServer
+        state.tiebreakOpeningServer = action.previousTiebreakOpeningServer
         state.isMatchFinished = action.previousIsMatchFinished
 
         while (state.setsHistory.size > action.previousSetsHistorySize) {

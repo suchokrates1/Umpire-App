@@ -44,10 +44,14 @@ class UmpireRobot(
     }
 
     fun playTiebreak(points: List<Boolean>) {
+        val openingServer = serverSlot
         points.forEachIndexed { index, team1Wins ->
             playPoint(team1Wins, tiebreakPointIndex = index + 1)
             dismissAnnouncementIfVisible()
         }
+        serverSlot = openingServer
+        advanceServer()
+        sidesSwapped = !sidesSwapped
     }
 
     private fun playNormalPoint(team1Wins: Boolean) {

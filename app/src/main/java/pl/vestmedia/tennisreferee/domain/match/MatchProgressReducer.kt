@@ -34,9 +34,10 @@ object MatchProgressReducer {
             )
         }
 
+        val completedTiebreak = state.isTiebreak || state.isSuperTiebreak
         val player1Won = state.player1Points > state.player2Points
 
-        if (state.isTiebreak || state.isSuperTiebreak) {
+        if (completedTiebreak) {
             val wasSuperTiebreak = state.isSuperTiebreak
             val tiebreakLoserPoints = if (player1Won) state.player2Points else state.player1Points
 
@@ -84,9 +85,12 @@ object MatchProgressReducer {
                 )
             }
 
+            TiebreakServeRule.assignFirstGameOfNextSet(state)
+
             val setsToWinTiebreak = state.matchConfig.setsToWin
             if (state.player1Sets == (setsToWinTiebreak - 1) && state.player2Sets == (setsToWinTiebreak - 1)) {
                 state.isSuperTiebreak = true
+                TiebreakServeRule.captureOpeningServer(state)
                 pendingAnnouncementType = ANNOUNCEMENT_SUPER_TIEBREAK
             }
         } else {
@@ -106,10 +110,8 @@ object MatchProgressReducer {
         state.player1Points = 0
         state.player2Points = 0
 
-        if (state.isDoubles) {
-            DoublesServeRotation.rotate(state)
-        } else {
-            state.isPlayer1Serving = !state.isPlayer1Serving
+        if (!completedTiebreak) {
+            TiebreakServeRule.rotate(state)
         }
         events.add(MatchProgressEvent.Game)
 
@@ -145,6 +147,7 @@ object MatchProgressReducer {
             val setsToWin = state.matchConfig.setsToWin
             if (state.player1Sets == (setsToWin - 1) && state.player2Sets == (setsToWin - 1)) {
                 state.isSuperTiebreak = true
+                TiebreakServeRule.captureOpeningServer(state)
                 pendingAnnouncementType = ANNOUNCEMENT_SUPER_TIEBREAK
             }
 
@@ -155,6 +158,7 @@ object MatchProgressReducer {
 
         if (state.shouldStartTiebreak() && !state.isSuperTiebreak) {
             state.isTiebreak = true
+            TiebreakServeRule.captureOpeningServer(state)
             pendingAnnouncementType = ANNOUNCEMENT_TIEBREAK
         }
 
