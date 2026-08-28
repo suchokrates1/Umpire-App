@@ -22,4 +22,7 @@ class RoomMatchOutboxStore(private val dao: OutboxMutationDao) : MatchOutboxStor
     override suspend fun deleteDone() = dao.deleteDone()
 
     override suspend fun hasPending(): Boolean = dao.countPendingOrInFlight() > 0
+
+    override suspend fun dropPendingUpdates(clientMatchUuid: String) =
+        dao.dropPendingUpdates(clientMatchUuid)
 }

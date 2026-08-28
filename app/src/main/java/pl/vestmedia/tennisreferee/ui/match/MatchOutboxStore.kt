@@ -9,4 +9,5 @@ interface MatchOutboxStore {
     suspend fun propagateServerMatchId(clientMatchUuid: String, serverMatchId: Int)
     suspend fun deleteDone()
     suspend fun hasPending(): Boolean
+    suspend fun dropPendingUpdates(clientMatchUuid: String)
 }

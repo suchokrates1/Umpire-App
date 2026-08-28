@@ -1,6 +1,7 @@
 package pl.vestmedia.tennisreferee.data.api
 
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
+import pl.vestmedia.tennisreferee.data.api.dto.MatchConfigDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatusDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
 import pl.vestmedia.tennisreferee.data.api.dto.PlayerStatsDto
@@ -38,7 +39,16 @@ object MatchApiPayloadFactory {
             finishReason = state.finishReason.toDto(),
             winnerName = state.finishWinnerName,
             injuredPlayerName = state.injuredPlayerName,
-            resultNote = state.resultNote
+            resultNote = state.resultNote,
+            matchConfig = MatchConfigDto(
+                gamesPerSet = state.matchConfig.gamesPerSet,
+                setsToWin = state.matchConfig.setsToWin,
+                tiebreakPoints = state.matchConfig.tiebreakPoints,
+                superTiebreakPoints = state.matchConfig.superTiebreakPoints,
+                noAdvantage = state.matchConfig.noAdvantage || state.noAdvantage,
+                tiebreakOnly = state.matchConfig.tiebreakOnly,
+                statsMode = state.statsMode.name
+            )
         )
     }
 

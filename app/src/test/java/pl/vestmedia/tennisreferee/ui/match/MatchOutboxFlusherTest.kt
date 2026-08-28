@@ -362,6 +362,14 @@ private class InMemoryOutboxStore : MatchOutboxStore {
     override suspend fun hasPending(): Boolean =
         entries.any { it.status in listOf("PENDING", "IN_FLIGHT") }
 
+    override suspend fun dropPendingUpdates(clientMatchUuid: String) {
+        entries.removeAll {
+            it.clientMatchUuid == clientMatchUuid &&
+                it.type == "UPDATE" &&
+                it.status in listOf("PENDING", "IN_FLIGHT")
+        }
+    }
+
     fun allEntries(): List<OutboxMutationEntity> = entries.toList()
 }
 
