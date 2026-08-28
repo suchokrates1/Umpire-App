@@ -39,6 +39,7 @@ Kompletny katalog funkcji i instrukcja użycia aplikacji Android dla sędziów t
 - [[30 - Przyciski punktacji - słownik]]
 - [[31 - Synchronizacja i diagnostyka]]
 - [[32 - Singiel vs debel]]
+- [[TODO]] — zdalne sterowanie tabletem z reżyserki
 
 ## Poza tym vaultem
 

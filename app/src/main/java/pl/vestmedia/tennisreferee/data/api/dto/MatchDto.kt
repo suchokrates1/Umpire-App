@@ -53,7 +53,10 @@ data class MatchDto(
     val injuredPlayerName: String? = null,
 
     @SerializedName("result_note")
-    val resultNote: String? = null
+    val resultNote: String? = null,
+
+    @SerializedName("match_config")
+    val matchConfig: MatchConfigDto? = null
 )
 
 enum class MatchStatusDto {

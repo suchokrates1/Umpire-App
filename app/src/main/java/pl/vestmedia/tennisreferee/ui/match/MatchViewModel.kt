@@ -6,13 +6,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto
+import pl.vestmedia.tennisreferee.data.auth.CourtSession
+import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
+import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.database.RoomMatchOutboxStore
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.model.*
+import pl.vestmedia.tennisreferee.domain.match.DirectorCommandApplier
 import pl.vestmedia.tennisreferee.domain.match.model.*
 import pl.vestmedia.tennisreferee.domain.match.MatchActionReducer
 import pl.vestmedia.tennisreferee.domain.match.MatchActionResult
@@ -99,11 +106,21 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         outboxFlusher = outboxFlusher
     )
     
+    private val appliedDirectorCommands = linkedSetOf<String>()
+    private var directorPollJob: Job? = null
+
     /**
      * Inicjalizuje nowy mecz
      */
     fun initializeMatch(matchState: MatchState) {
         _matchState.value = matchState
+        val app = getApplication<TennisRefereeApp>()
+        app.healthCheckManager.matchId = matchState.matchId
+        app.healthCheckManager.clientMatchUuid = matchState.clientMatchUuid
+        app.healthCheckManager.onDirectorCommands = { commands ->
+            commands.forEach { applyDirectorCommand(it) }
+        }
+        startDirectorPolling()
     }
     
     /**
@@ -452,6 +469,77 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         _matchState.value?.let { state ->
             viewModelScope.launch(Dispatchers.IO) {
                 matchSyncCoordinator.sendStatistics(state)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        directorPollJob?.cancel()
+        val app = getApplication<TennisRefereeApp>()
+        app.healthCheckManager.onDirectorCommands = null
+        app.healthCheckManager.matchId = null
+        app.healthCheckManager.clientMatchUuid = null
+        super.onCleared()
+    }
+
+    private fun startDirectorPolling() {
+        if (directorPollJob?.isActive == true) return
+        directorPollJob = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                val state = _matchState.value ?: break
+                getApplication<TennisRefereeApp>().healthCheckManager.matchId = state.matchId
+                getApplication<TennisRefereeApp>().healthCheckManager.clientMatchUuid = state.clientMatchUuid
+                try {
+                    val response = RetrofitClient.apiService.pollDirectorCommands(
+                        matchId = state.matchId,
+                        clientMatchUuid = state.clientMatchUuid,
+                        waitMs = 15_000,
+                        courtId = state.courtId
+                    )
+                    if (response.isSuccessful) {
+                        response.body()?.commands.orEmpty().forEach { applyDirectorCommand(it) }
+                    } else {
+                        kotlinx.coroutines.delay(2_000)
+                    }
+                } catch (error: Exception) {
+                    AppLogger.error("DirectorPoll", error)
+                    kotlinx.coroutines.delay(2_000)
+                }
+            }
+        }
+    }
+
+    internal fun applyDirectorCommand(command: DirectorCommandDto) {
+        val commandId = command.id?.trim().orEmpty()
+        if (commandId.isNotEmpty()) {
+            synchronized(appliedDirectorCommands) {
+                if (!appliedDirectorCommands.add(commandId)) return
+            }
+        }
+        val current = _matchState.value ?: return
+        if (!DirectorCommandApplier.appliesTo(current, command)) return
+        val next = DirectorCommandApplier.apply(current, command)
+        command.courtToken?.takeIf { it.isNotBlank() }?.let { token ->
+            val courtId = command.courtId ?: next.courtId
+            CourtSessionProvider.get().save(
+                CourtSession(
+                    courtId = courtId,
+                    token = token,
+                    expiresAtMillis = parseSessionExpiry(command.courtTokenExpiresAt)
+                )
+            )
+            getApplication<TennisRefereeApp>().healthCheckManager.courtId = courtId
+        } ?: command.courtId?.trim()?.takeIf { it.isNotEmpty() }?.let { courtId ->
+            getApplication<TennisRefereeApp>().healthCheckManager.courtId = courtId
+        }
+        _matchState.postValue(next)
+        getApplication<TennisRefereeApp>().healthCheckManager.matchId = next.matchId
+        getApplication<TennisRefereeApp>().healthCheckManager.clientMatchUuid = next.clientMatchUuid
+        AppLogger.action("Match", "DirectorCommand", "id=$commandId court=${next.courtId}")
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { outboxStore.dropPendingUpdates(next.clientMatchUuid) }
+            if (commandId.isNotEmpty()) {
+                runCatching { RetrofitClient.apiService.ackDirectorCommand(commandId) }
             }
         }
     }

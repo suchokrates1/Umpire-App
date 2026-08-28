@@ -31,4 +31,10 @@ interface OutboxMutationDao {
 
     @Query("SELECT COUNT(*) FROM outbox_mutations WHERE status IN ('PENDING', 'IN_FLIGHT')")
     suspend fun countPendingOrInFlight(): Int
+
+    @Query(
+        "DELETE FROM outbox_mutations " +
+        "WHERE clientMatchUuid = :uuid AND type IN ('UPDATE', 'EVENT') AND status IN ('PENDING', 'IN_FLIGHT')"
+    )
+    suspend fun dropPendingUpdates(uuid: String)
 }

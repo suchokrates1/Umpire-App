@@ -22,6 +22,10 @@ class HealthCheckManager(private val app: Application) {
     /** Aktualny ekran — do telemetrii */
     var currentScreen: String = "unknown"
 
+    var matchId: Int? = null
+    var clientMatchUuid: String? = null
+    var onDirectorCommands: ((List<pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto>) -> Unit)? = null
+
     /**
      * Rozpocznij wysyłanie heartbeat co [intervalMs] ms.
      * Domyślnie co 2 minuty.
@@ -55,7 +59,7 @@ class HealthCheckManager(private val app: Application) {
             val charging = isBatteryCharging()
             val version = getAppVersion()
 
-            val body = mapOf(
+            val body = mutableMapOf(
                 "court_id" to (courtId ?: ""),
                 "battery_level" to (battery?.toString() ?: ""),
                 "is_charging" to charging.toString(),
@@ -63,10 +67,16 @@ class HealthCheckManager(private val app: Application) {
                 "app_version" to version,
                 "timestamp" to System.currentTimeMillis().toString()
             )
+            matchId?.let { body["match_id"] = it.toString() }
+            clientMatchUuid?.takeIf { it.isNotBlank() }?.let { body["client_match_uuid"] = it }
 
             val response = RetrofitClient.apiService.sendHeartbeat(body)
             if (response.isSuccessful) {
                 AppLogger.health("Heartbeat OK | court=$courtId battery=$battery% charging=$charging screen=$currentScreen")
+                val commands = response.body()?.commands.orEmpty()
+                if (commands.isNotEmpty()) {
+                    onDirectorCommands?.invoke(commands)
+                }
             } else {
                 AppLogger.error("Heartbeat", "HTTP ${response.code()}")
             }

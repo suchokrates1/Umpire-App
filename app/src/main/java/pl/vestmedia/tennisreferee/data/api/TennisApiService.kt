@@ -4,7 +4,10 @@ import pl.vestmedia.tennisreferee.data.api.dto.AddPlayerResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.CourtAuthResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.CourtPinRequestDto
 import pl.vestmedia.tennisreferee.data.api.dto.CourtsResponseDto
+import pl.vestmedia.tennisreferee.data.api.dto.DirectorAckResponseDto
+import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandsResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.FinishMatchRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.HeartbeatResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventResponseDto
@@ -109,6 +112,20 @@ interface TennisApiService {
      * Heartbeat — stan baterii i status online (niezależnie od meczu)
      */
     @POST("api/umpire-heartbeat")
-    suspend fun sendHeartbeat(@Body body: Map<String, String>): Response<Unit>
+    suspend fun sendHeartbeat(@Body body: Map<String, String>): Response<HeartbeatResponseDto>
+
+    @GET("api/umpire/commands")
+    suspend fun pollDirectorCommands(
+        @Query("match_id") matchId: Int? = null,
+        @Query("client_match_uuid") clientMatchUuid: String? = null,
+        @Query("wait_ms") waitMs: Int? = null,
+        @Query("court_id") courtId: String? = null
+    ): Response<DirectorCommandsResponseDto>
+
+    @POST("api/umpire/commands/{command_id}/ack")
+    suspend fun ackDirectorCommand(
+        @Path("command_id") commandId: String,
+        @Body body: Map<String, String> = emptyMap()
+    ): Response<DirectorAckResponseDto>
 }
 
