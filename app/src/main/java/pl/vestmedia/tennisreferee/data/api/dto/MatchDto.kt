@@ -56,7 +56,10 @@ data class MatchDto(
     val resultNote: String? = null,
 
     @SerializedName("match_config")
-    val matchConfig: MatchConfigDto? = null
+    val matchConfig: MatchConfigDto? = null,
+
+    @SerializedName("match_start_time_ms")
+    val matchStartTimeMs: Long? = null
 )
 
 enum class MatchStatusDto {

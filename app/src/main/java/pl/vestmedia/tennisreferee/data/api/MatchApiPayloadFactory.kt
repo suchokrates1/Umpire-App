@@ -48,7 +48,8 @@ object MatchApiPayloadFactory {
                 noAdvantage = state.matchConfig.noAdvantage || state.noAdvantage,
                 tiebreakOnly = state.matchConfig.tiebreakOnly,
                 statsMode = state.statsMode.name
-            )
+            ),
+            matchStartTimeMs = state.matchStartTime.takeIf { it > 0L }
         )
     }
 
