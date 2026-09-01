@@ -42,6 +42,7 @@ class MatchApiPayloadFactoryTest {
         assertEquals(4, payload.score.player1Games)
         assertEquals(2, payload.score.player1Points)
         assertEquals(1, payload.score.setsHistory.size)
+        assertEquals(100L, payload.matchStartTimeMs)
     }
 
     @Test
@@ -53,6 +54,7 @@ class MatchApiPayloadFactoryTest {
         assertEquals("Team A", payload.player1Name)
         assertEquals("Team B", payload.player2Name)
         assertEquals(MatchStatusDto.NOT_STARTED, payload.status)
+        assertNull(payload.matchStartTimeMs)
     }
 
     @Test
