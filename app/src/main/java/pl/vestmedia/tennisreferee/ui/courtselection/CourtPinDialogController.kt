@@ -28,7 +28,11 @@ class CourtPinDialogController(
     private val activity: AppCompatActivity,
     private val repository: TennisRepository = TennisRepository()
 ) {
-    fun show(court: Court) {
+    fun show(
+        court: Court,
+        onDialogShown: ((AlertDialog) -> Unit)? = null,
+        onDialogDismissed: (() -> Unit)? = null,
+    ) {
         val dialogView = activity.layoutInflater.inflate(R.layout.dialog_pin_input, null)
         val textMessage = dialogView.findViewById<TextView>(R.id.textPinMessage)
         val digit1 = dialogView.findViewById<EditText>(R.id.pinDigit1)
@@ -37,7 +41,11 @@ class CourtPinDialogController(
         val digit4 = dialogView.findViewById<EditText>(R.id.pinDigit4)
         val progressBar = dialogView.findViewById<ProgressBar>(R.id.progressBar)
 
-        textMessage.text = activity.getString(R.string.court_pin_message, court.getDisplayName(activity))
+        textMessage.text = if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+            pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.stringFor(activity, "tutorialPinBody")
+        } else {
+            activity.getString(R.string.court_pin_message, court.getDisplayName(activity))
+        }
 
         val dialog = AlertDialog.Builder(activity)
             .setTitle(activity.getString(R.string.court_pin_title))
@@ -126,6 +134,12 @@ class CourtPinDialogController(
         digit3.addTextChangedListener(createDigitWatcher(digit4, digit2))
         digit4.addTextChangedListener(createDigitWatcher(null, digit3))
 
+        if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+            dialogView.findViewById<View>(R.id.tutorialPinGuide)?.visibility = View.VISIBLE
+            dialog.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        }
+        dialog.setOnShowListener { onDialogShown?.invoke(dialog) }
+        dialog.setOnDismissListener { onDialogDismissed?.invoke() }
         dialog.show()
         digit1.requestFocus()
     }
