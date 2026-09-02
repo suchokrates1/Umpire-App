@@ -175,8 +175,24 @@ class MatchActivity : AppCompatActivity() {
             onWinner = { viewModel.handleWinner(it) },
             onForcedError = { viewModel.handleForcedError(it) },
             onUnforcedError = { viewModel.handleUnforcedError(it) },
-            onBasicWin = { viewModel.handleBasicWin(it) },
-            onBasicFault = { viewModel.handleBasicFault() },
+            onBasicWin = { winner ->
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "awardPoint") {
+                        tutorialOverlay?.refresh()
+                    }
+                } else {
+                    viewModel.handleBasicWin(winner)
+                }
+            },
+            onBasicFault = {
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "awardPoint") {
+                        tutorialOverlay?.refresh()
+                    }
+                } else {
+                    viewModel.handleBasicFault()
+                }
+            },
             onButtonLogged = { action, detail -> AppLogger.button("Match", action, detail) }
         )
         announcementController = AnnouncementController(

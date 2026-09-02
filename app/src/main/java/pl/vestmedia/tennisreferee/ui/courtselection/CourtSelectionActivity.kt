@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -127,7 +128,7 @@ class CourtSelectionActivity : AppCompatActivity() {
             attachTutorialOverlay()
             val step = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.currentStep(this)
             if (step?.scene == "pin") {
-                pinDialogController.show(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.courts().first())
+                showTutorialPin(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.courts().first())
             }
         } else {
             viewModel.loadCourts(selectedTournamentId)
@@ -145,8 +146,8 @@ class CourtSelectionActivity : AppCompatActivity() {
                 pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
                 val step = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.currentStep(this)
                 if (step?.scene == "pin") {
-                    pinDialogController.show(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.courts().first())
                     tutorialOverlay?.refresh()
+                    showTutorialPin(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.courts().first())
                 } else if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
                     finish()
                 } else {
@@ -219,11 +220,26 @@ class CourtSelectionActivity : AppCompatActivity() {
             if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(this)) {
                 pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
             }
-            pinDialogController.show(court)
             tutorialOverlay?.refresh()
+            showTutorialPin(court)
             return
         }
         pinDialogController.show(court)
+    }
+
+    private fun showTutorialPin(court: Court) {
+        pinDialogController.show(
+            court,
+            onDialogShown = { dialog ->
+                val host = dialog.findViewById<ViewGroup>(R.id.tutorialPinGuide)
+                    ?: dialog.window?.decorView as? ViewGroup
+                    ?: return@show
+                tutorialOverlay?.reparent(host)
+            },
+            onDialogDismissed = {
+                tutorialOverlay?.reparent(window.decorView as ViewGroup)
+            },
+        )
     }
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
