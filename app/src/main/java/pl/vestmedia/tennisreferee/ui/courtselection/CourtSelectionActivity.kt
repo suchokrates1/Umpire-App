@@ -28,6 +28,14 @@ import pl.vestmedia.tennisreferee.utils.AppLogger
  * Activity do wyboru kortu
  */
 class CourtSelectionActivity : AppCompatActivity() {
+
+    companion object {
+        fun createTutorialIntent(context: android.content.Context): Intent {
+            return Intent(context, CourtSelectionActivity::class.java).apply {
+                putExtra(pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.EXTRA_TUTORIAL, true)
+            }
+        }
+    }
     
     private lateinit var binding: ActivityCourtSelectionBinding
     private val viewModel: CourtSelectionViewModel by viewModels()
@@ -51,8 +59,11 @@ class CourtSelectionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        val tutorial = intent.getBooleanExtra(pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.EXTRA_TUTORIAL, false)
+            || pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive
+
         // Sprawdź czy język został wybrany, jeśli nie - wróć do wyboru języka
-        if (!LanguageSelectionActivity.hasLanguageSelected(this)) {
+        if (!tutorial && !LanguageSelectionActivity.hasLanguageSelected(this)) {
             val intent = Intent(this, LanguageSelectionActivity::class.java)
             startActivity(intent)
             finish()
@@ -61,7 +72,7 @@ class CourtSelectionActivity : AppCompatActivity() {
 
         selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this)
         selectedTournamentName = TournamentSelectionStore.getSelectedTournamentNameForToday(this)
-        if (selectedTournamentId == null) {
+        if (!tutorial && selectedTournamentId == null) {
             startActivity(Intent(this, TournamentSelectionActivity::class.java))
             finish()
             return
@@ -97,15 +108,54 @@ class CourtSelectionActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         onBackPressedDispatcher.addCallback(this) {
-            openTournamentSelection()
+            if (tutorial) {
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this@CourtSelectionActivity)
+            } else {
+                openTournamentSelection()
+            }
         }
         
         setupRecyclerView()
         setupObservers()
         setupListeners()
         
-        // Załaduj korty
-        viewModel.loadCourts(selectedTournamentId)
+        if (tutorial) {
+            supportActionBar?.subtitle = getString(R.string.tutorial_demo_tournament)
+            adapter.submitList(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.courts())
+            binding.emptyView.visibility = View.GONE
+            binding.recyclerViewCourts.visibility = View.VISIBLE
+            attachTutorialOverlay()
+            val step = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.currentStep(this)
+            if (step?.scene == "pin") {
+                pinDialogController.show(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.courts().first())
+            }
+        } else {
+            viewModel.loadCourts(selectedTournamentId)
+            pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.maybeShowBanner(this)
+        }
+    }
+
+    private var tutorialOverlay: pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController? = null
+
+    private fun attachTutorialOverlay() {
+        tutorialOverlay = pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController(
+            activity = this,
+            onBack = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this) },
+            onNext = {
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
+                val step = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.currentStep(this)
+                if (step?.scene == "pin") {
+                    pinDialogController.show(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.courts().first())
+                    tutorialOverlay?.refresh()
+                } else if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
+                    finish()
+                } else {
+                    tutorialOverlay?.refresh()
+                }
+            },
+            onSkip = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this) },
+        )
+        tutorialOverlay?.attach()
     }
 
     private fun openTournamentSelection() {
@@ -163,6 +213,16 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     private fun onCourtSelected(court: Court) {
         AppLogger.button("CourtSelection", "CourtTap", "court=${court.id} name=${court.name}")
+        if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+            if (court.id != pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.COURT_1) return
+            pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("selectCourt", this)
+            if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(this)) {
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
+            }
+            pinDialogController.show(court)
+            tutorialOverlay?.refresh()
+            return
+        }
         pinDialogController.show(court)
     }
     
@@ -174,7 +234,11 @@ class CourtSelectionActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                openTournamentSelection()
+                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this)
+                } else {
+                    openTournamentSelection()
+                }
                 true
             }
             R.id.action_settings -> {

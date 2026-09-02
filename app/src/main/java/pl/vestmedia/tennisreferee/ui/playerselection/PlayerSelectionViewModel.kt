@@ -49,6 +49,13 @@ class PlayerSelectionViewModel : ViewModel() {
     /**
      * Ładuje listę zawodników z serwera
      */
+    fun setTutorialPlayers(players: List<Player>) {
+        currentCourtId = pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.COURT_1
+        _players.value = players
+        _isLoading.value = false
+        _error.value = null
+    }
+
     fun loadPlayers(courtId: String? = null) {
         currentCourtId = courtId
         viewModelScope.launch {

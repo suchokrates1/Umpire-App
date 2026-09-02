@@ -108,12 +108,14 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     
     private val appliedDirectorCommands = linkedSetOf<String>()
     private var directorPollJob: Job? = null
+    private var tutorialMode = false
 
     /**
      * Inicjalizuje nowy mecz
      */
     fun initializeMatch(matchState: MatchState) {
         _matchState.value = matchState
+        if (tutorialMode) return
         val app = getApplication<TennisRefereeApp>()
         app.healthCheckManager.matchId = matchState.matchId
         app.healthCheckManager.clientMatchUuid = matchState.clientMatchUuid
@@ -121,6 +123,19 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             commands.forEach { applyDirectorCommand(it) }
         }
         startDirectorPolling()
+    }
+
+    fun restoreTutorial(
+        matchState: MatchState,
+        view: MatchView,
+        pending: String?,
+        canUndo: Boolean,
+    ) {
+        tutorialMode = true
+        pendingAnnouncementType = pending
+        _canUndo.value = canUndo
+        _matchState.value = matchState
+        _currentView.value = view
     }
     
     /**
@@ -370,7 +385,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 _matchState.value = state
             }
 
-            if (result.finalizeMatch) {
+            if (result.finalizeMatch && !tutorialMode) {
                 finalizeMatchOnServer(state)
             }
 
@@ -380,7 +395,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 MatchProgressScreen.Scoring -> scoringViewFor(state)
             }
 
-            if (result.syncMatch) {
+            if (result.syncMatch && !tutorialMode) {
                 syncMatchWithServer()
             }
         }
@@ -417,8 +432,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             MatchFinishOutcomeApplier.apply(state, request, System.currentTimeMillis())
             _matchState.value = state
             _currentView.value = MatchView.MATCH_FINISHED
-            viewModelScope.launch(Dispatchers.IO) {
-                matchSyncCoordinator.finalizeMatch(state, request)
+            if (!tutorialMode) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    matchSyncCoordinator.finalizeMatch(state, request)
+                }
             }
         }
     }
@@ -427,6 +444,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      * Loguje zdarzenie meczowe do serwera
      */
     private fun logMatchEvent(eventType: String) {
+        if (tutorialMode) return
         val state = _matchState.value ?: return
         
         AppLogger.action("Match", eventType, "score=${state.player1Points}-${state.player2Points} games=${state.player1Games}-${state.player2Games} sets=${state.player1Sets}-${state.player2Sets}")
@@ -440,6 +458,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      * Synchronizuje aktualny stan meczu z serwerem
      */
     fun syncMatchWithServer() {
+        if (tutorialMode) return
         _matchState.value?.let { state ->
             viewModelScope.launch(Dispatchers.IO) {
                 matchSyncCoordinator.syncMatch(state)
@@ -455,6 +474,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      * Kończy mecz na serwerze
      */
     fun finishMatchOnServer() {
+        if (tutorialMode) return
         _matchState.value?.let { state ->
             viewModelScope.launch(Dispatchers.IO) {
                 matchSyncCoordinator.finishMatch(state)
@@ -466,6 +486,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      * Wysyła statystyki meczu do API
      */
     fun sendMatchStatistics() {
+        if (tutorialMode) return
         _matchState.value?.let { state ->
             viewModelScope.launch(Dispatchers.IO) {
                 matchSyncCoordinator.sendStatistics(state)
@@ -483,7 +504,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun startDirectorPolling() {
-        if (directorPollJob?.isActive == true) return
+        if (tutorialMode || directorPollJob?.isActive == true) return
         directorPollJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 val state = _matchState.value ?: break

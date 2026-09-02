@@ -1,5 +1,7 @@
 package pl.vestmedia.tennisreferee.ui.playerselection
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -36,6 +38,14 @@ class PlayerSelectionActivity : AppCompatActivity() {
         const val EXTRA_COURT_ID = "court_id"
         const val EXTRA_COURT_NAME = "court_name"
         const val EXTRA_MATCH_CONFIG = "match_config"
+
+        fun createTutorialIntent(context: Context): Intent {
+            return Intent(context, PlayerSelectionActivity::class.java).apply {
+                putExtra(EXTRA_COURT_ID, pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.COURT_1)
+                putExtra(EXTRA_COURT_NAME, "1")
+                putExtra(pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.EXTRA_TUTORIAL, true)
+            }
+        }
     }
     
     private var courtId: String = ""
@@ -92,9 +102,39 @@ class PlayerSelectionActivity : AppCompatActivity() {
         setupObservers()
         setupListeners()
         
-        // Załaduj zawodników
-        viewModel.loadPlayers(courtId)
-        viewModel.loadSuggestedMatch(courtId, selectedTournamentId)
+        val tutorial = intent.getBooleanExtra(pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.EXTRA_TUTORIAL, false)
+            || pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive
+        if (tutorial) {
+            viewModel.setTutorialPlayers(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.players(this))
+            attachTutorialOverlay()
+        } else {
+            viewModel.loadPlayers(courtId)
+            viewModel.loadSuggestedMatch(courtId, selectedTournamentId)
+        }
+    }
+
+    private var tutorialOverlay: pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController? = null
+
+    private fun attachTutorialOverlay() {
+        tutorialOverlay = pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController(
+            activity = this,
+            onBack = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this) },
+            onNext = {
+                val step = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.currentStep(this)
+                if (step?.scene == "players" || step?.scene == "config") {
+                    proceedToNextScreen()
+                    return@TutorialOverlayController
+                }
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
+                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
+                    finish()
+                } else {
+                    tutorialOverlay?.refresh()
+                }
+            },
+            onSkip = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this) },
+        )
+        tutorialOverlay?.attach()
     }
 
     private fun setupControllers() {
@@ -198,10 +238,18 @@ class PlayerSelectionActivity : AppCompatActivity() {
             // Auto-przejście gdy wybrano wymaganą ilość graczy
             val requiredCount = if (viewModel.isDoubles.value == true) 4 else 2
             if (selectedPlayers.size == requiredCount) {
-                // Opóźnienie 300ms dla lepszego UX
-                binding.buttonNext.postDelayed({
+                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("selectPlayers", this)
+                    if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(this)) {
+                        pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
+                    }
                     proceedToNextScreen()
-                }, 300)
+                    tutorialOverlay?.refresh()
+                } else {
+                    binding.buttonNext.postDelayed({
+                        proceedToNextScreen()
+                    }, 300)
+                }
             }
         }
         
@@ -295,7 +343,11 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         binding.buttonBack.setOnClickListener {
             AppLogger.button("PlayerSelection", "Back")
-            finish()
+            if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this)
+            } else {
+                finish()
+            }
         }
     }
 

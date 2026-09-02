@@ -257,4 +257,51 @@
     <string name="bracket_warning_title">Spielhinweis</string>
     <string name="bracket_warning_different_groups">Diese Spieler sind aus verschiedenen Gruppen. Ist das ein K.O.-Rundenspiel?</string>
     <string name="bracket_warning_friendly">Diese Spieler sind keiner Turniergruppe zugeordnet. Das Spiel wird als Freundschaftsspiel gespeichert.</string>
+
+    <!-- Umpire tutorial -->
+    <string name="tutorial_start">Tutorial starten</string>
+    <string name="tutorial_title">Schiedsrichter-Tutorial</string>
+    <string name="tutorial_exit">Tutorial beenden</string>
+    <string name="tutorial_next">Weiter</string>
+    <string name="tutorial_back">Zurück</string>
+    <string name="tutorial_skip">Überspringen</string>
+    <string name="tutorial_later">Später</string>
+    <string name="tutorial_banner_title">Die Schiedsrichter-App lernen?</string>
+    <string name="tutorial_banner_message">Ein kurzes begleitetes Match: Platz, Spieler, Zählung, Seitenwechsel und Ende nach Verletzung.</string>
+    <string name="tutorial_demo_tournament">Tutorial</string>
+    <string name="tutorial_demo_player1_first">Anna</string>
+    <string name="tutorial_demo_player1_last">Costa</string>
+    <string name="tutorial_demo_player2_first">Piotr</string>
+    <string name="tutorial_demo_player2_last">Nowak</string>
+    <string name="tutorial_court_title">Pick your court</string>
+    <string name="tutorial_court_body">Choose the court number you are sitting at. In a real tournament this is the same number as on the court sign.</string>
+    <string name="tutorial_pin_title">Court PIN</string>
+    <string name="tutorial_pin_body">Enter the 4-digit PIN from the office. In this tutorial the PIN is 1234.</string>
+    <string name="tutorial_players_title">Select the two players</string>
+    <string name="tutorial_players_body">Tap the player who will stand on your left first, then the player on your right. You will line them up on court on the next screen.</string>
+    <string name="tutorial_config_title">Match setup</string>
+    <string name="tutorial_config_body">Leave Advanced off for a live match unless you need rally stats. Tap Next to start.</string>
+    <string name="tutorial_serve_swap_title">Match the court sides</string>
+    <string name="tutorial_serve_swap_body">The left button is the player to your left. Tap Swap sides until the names match who is standing where.</string>
+    <string name="tutorial_serve_pick_title">Who serves first?</string>
+    <string name="tutorial_serve_pick_body">Tap the player who won the toss and will serve the first game.</string>
+    <string name="tutorial_basic_title">Award the point</string>
+    <string name="tutorial_basic_body">WIN on the side that won the rally. 2nd serve appears on the server after a fault.</string>
+    <string name="tutorial_double_fault_title">Double fault</string>
+    <string name="tutorial_double_fault_body">After a fault the server is on second serve. Another fault is a double fault and the receiver wins the point.</string>
+    <string name="tutorial_side_change_title">Change of ends</string>
+    <string name="tutorial_side_change_body">After an odd number of games the players change ends. Continue, or tap Don’t change sides if they stay.</string>
+    <string name="tutorial_set_break_title">Set break</string>
+    <string name="tutorial_set_break_body">After a set there is a 120-second break. Continue when the players are ready.</string>
+    <string name="tutorial_tiebreak_title">Tiebreak</string>
+    <string name="tutorial_tiebreak_body">At 4–4 this format starts a tiebreak. Points are counted 1, 2, 3… and ends change every 6 points.</string>
+    <string name="tutorial_undo_title">Undo</string>
+    <string name="tutorial_undo_body">Tap Undo to take back the last point if you tapped the wrong side.</string>
+    <string name="tutorial_finish_title">Finish the match</string>
+    <string name="tutorial_finish_body">Use Finish match if play cannot continue — injury, retirement, or walkover. A normal match ends itself when the format is complete.</string>
+    <string name="tutorial_retirement_title">Retirement after injury</string>
+    <string name="tutorial_retirement_body">Choose Retirement, then the player who cannot continue. The other player is the winner. This tutorial does not send anything to the server.</string>
+    <string name="tutorial_complete_title">That’s the flow</string>
+    <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
 </resources>
+

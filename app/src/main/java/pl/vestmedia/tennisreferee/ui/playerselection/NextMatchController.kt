@@ -106,6 +106,18 @@ class NextMatchController(
             matchState.isSuperTiebreak = true
         }
 
+        if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+            pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("startMatch", activity)
+            if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(activity)) {
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(activity)
+            }
+            val snapshot = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshots.load(activity, "serve")
+            if (snapshot != null) {
+                matchLauncher.launch(MatchActivity.createTutorialIntent(activity, snapshot))
+                return
+            }
+        }
+
         activeMatchStore.save(matchState)
         matchLauncher.launch(MatchActivity.createIntent(activity, matchState.clientMatchUuid, isDoublesMatch))
     }

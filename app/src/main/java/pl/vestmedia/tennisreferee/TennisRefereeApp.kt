@@ -1,6 +1,8 @@
 package pl.vestmedia.tennisreferee
 
 import android.app.Application
+import pl.vestmedia.tennisreferee.BuildConfig
+import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.repository.MatchHistoryRepository
@@ -20,6 +22,9 @@ open class TennisRefereeApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
+        if (BuildConfig.DEBUG) {
+            RetrofitClient.overrideBaseUrl("https://test.blindtennis.app/")
+        }
         CourtSessionProvider.initialize(this)
         // Apply saved theme on app start
         themeManager.applyCurrentTheme()
