@@ -289,6 +289,8 @@
     <string name="tutorial_serve_pick_body">Tap the player who won the toss and will serve the first game.</string>
     <string name="tutorial_basic_title">Award the point</string>
     <string name="tutorial_basic_body">WIN on the side that won the rally. 2nd serve appears on the server after a fault.</string>
+    <string name="tutorial_second_serve_title">Second serve</string>
+    <string name="tutorial_second_serve_body">Tap 2nd SERVE. The server is then on second serve.</string>
     <string name="tutorial_double_fault_title">Double fault</string>
     <string name="tutorial_double_fault_body">After a fault the server is on second serve. Another fault is a double fault and the receiver wins the point.</string>
     <string name="tutorial_side_change_title">Change of ends</string>
@@ -299,6 +301,8 @@
     <string name="tutorial_tiebreak_body">At 4–4 this format starts a tiebreak. Points are counted 1, 2, 3… and ends change every 6 points.</string>
     <string name="tutorial_undo_title">Undo</string>
     <string name="tutorial_undo_body">Tap Undo to take back the last point if you tapped the wrong side.</string>
+    <string name="tutorial_server_change_title">New server</string>
+    <string name="tutorial_server_change_body">After a game the other player serves. The ball icon moves to that side.</string>
     <string name="tutorial_finish_title">Finish the match</string>
     <string name="tutorial_finish_body">Use Finish match if play cannot continue — injury, retirement, or walkover. A normal match ends itself when the format is complete.</string>
     <string name="tutorial_retirement_title">Retirement after injury</string>

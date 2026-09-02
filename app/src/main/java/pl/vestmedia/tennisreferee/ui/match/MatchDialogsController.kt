@@ -75,8 +75,7 @@ class MatchDialogsController(
             activity.getString(R.string.finish_reason_walkover)
         )
         AlertDialog.Builder(activity)
-            .setTitle(R.string.finish_match)
-            .setMessage(R.string.finish_reason_prompt)
+            .setTitle(R.string.finish_reason_prompt)
             .setItems(labels) { _, which ->
                 when (which) {
                     0 -> confirmFinish(FinishMatchRequest(MatchFinishReason.NORMAL))
@@ -94,8 +93,7 @@ class MatchDialogsController(
     private fun showRetirementPlayerDialog(state: MatchState) {
         val injuredOptions = arrayOf(state.getTeam1FullName(), state.getTeam2FullName())
         AlertDialog.Builder(activity)
-            .setTitle(R.string.finish_reason_retirement)
-            .setMessage(R.string.finish_retirement_prompt)
+            .setTitle(R.string.finish_retirement_prompt)
             .setItems(injuredOptions) { _, which ->
                 val injuredPlayerName = injuredOptions[which]
                 val winnerName = if (which == 0) state.getTeam2FullName() else state.getTeam1FullName()
@@ -114,8 +112,7 @@ class MatchDialogsController(
     private fun showWalkoverWinnerDialog(state: MatchState) {
         val winnerOptions = arrayOf(state.getTeam1FullName(), state.getTeam2FullName())
         AlertDialog.Builder(activity)
-            .setTitle(R.string.finish_reason_walkover)
-            .setMessage(R.string.finish_walkover_prompt)
+            .setTitle(R.string.finish_walkover_prompt)
             .setItems(winnerOptions) { _, which ->
                 confirmFinish(
                     FinishMatchRequest(

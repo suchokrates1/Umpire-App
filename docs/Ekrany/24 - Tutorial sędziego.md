@@ -20,8 +20,13 @@ Prowadzony mecz demo: kort, PIN, zawodnicy, strony, punktacja, zmiana stron, set
 1. Kort 1 + PIN `1234`
 2. Dwóch zawodników demo, setup Basic
 3. Swap stron i wybór serwisu
-4. Skoki: punkt, podwójny błąd, zmiana stron, set-break, TB, Undo, Finish / krecz
-5. Ekran końca — powrót do ustawień albo kortów
+4. **Na żywo** (ten sam silnik co mecz, bez skoku snapshotem):
+   - WIN
+   - 2. serwis
+   - podwójny błąd
+   - Undo — od razu, bez dialogu potwierdzenia
+5. Potem skoki snapshotem: nowy serwisujący, zmiana stron, set-break, TB, Finish / krecz
+6. Ekran końca — powrót do ustawień albo kortów
 
 ## Sandbox
 

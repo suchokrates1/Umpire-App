@@ -2,7 +2,6 @@ package pl.vestmedia.tennisreferee.domain.match.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.RawValue
 import pl.vestmedia.tennisreferee.data.model.Player
 import java.util.UUID
 
@@ -50,7 +49,7 @@ data class MatchState(
     var player2Points: Int = 0,
     
     // Historia setów
-    val setsHistory: @RawValue MutableList<SetScore> = mutableListOf(),
+    val setsHistory: MutableList<SetScore> = mutableListOf(),
     
     // Stan gry
     var isPlayer1Serving: Boolean = true,
@@ -75,7 +74,7 @@ data class MatchState(
     var statsMode: StatsMode = StatsMode.ADVANCED,
     
     // Historia akcji (do cofania)
-    val actionsHistory: @RawValue MutableList<MatchAction> = mutableListOf(),
+    val actionsHistory: MutableList<MatchAction> = mutableListOf(),
 
     // Wynik specjalny przy ręcznym zakończeniu meczu
     var finishReason: MatchFinishReason = MatchFinishReason.NORMAL,

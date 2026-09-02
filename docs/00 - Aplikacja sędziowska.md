@@ -34,6 +34,7 @@ Kompletny katalog funkcji i instrukcja użycia aplikacji Android dla sędziów t
 12. [[21 - Koniec meczu i powody zakończenia]]
 13. [[22 - Ustawienia]]
 14. [[23 - Historia i szczegóły meczu]]
+15. [[24 - Tutorial sędziego]]
 
 ## Referencje
 
