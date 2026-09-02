@@ -7,6 +7,7 @@ object TutorialTargets {
         "swapSides" -> R.id.buttonSwapSides
         "chooseServer" -> R.id.buttonPlayer1Serves
         "winButton" -> R.id.buttonWinServerLeft
+        "secondServe" -> R.id.buttonFaultServerLeft
         "doubleFault" -> R.id.buttonFaultServerLeft
         "announcementContinue" -> R.id.buttonAnnouncementContinue
         "undo" -> R.id.buttonUndo
