@@ -75,6 +75,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.app_name)
         
         setupRecyclerView()
+        pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.maybeShowBanner(this)
     }
     
     private fun setupRecyclerView() {

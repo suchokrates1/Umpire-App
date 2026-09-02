@@ -60,6 +60,26 @@ class MatchActivity : AppCompatActivity() {
         const val RESULT_NEXT_MATCH_SAME_SETUP = "next_match_same_setup"
         const val RESULT_NEXT_MATCH_NEW_SETUP = "next_match_new_setup"
 
+        const val EXTRA_TUTORIAL = "tutorial"
+        const val EXTRA_TUTORIAL_VIEW = "tutorial_view"
+        const val EXTRA_TUTORIAL_ANNOUNCEMENT = "tutorial_announcement"
+        const val EXTRA_TUTORIAL_CAN_UNDO = "tutorial_can_undo"
+        const val EXTRA_TUTORIAL_SNAPSHOT = "tutorial_snapshot"
+
+        fun createTutorialIntent(
+            context: Context,
+            snapshot: pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshot,
+        ): Intent {
+            return Intent(context, MatchActivity::class.java).apply {
+                putExtra(EXTRA_TUTORIAL, true)
+                putExtra(EXTRA_TUTORIAL_SNAPSHOT, snapshot.id)
+                putExtra(EXTRA_TUTORIAL_VIEW, snapshot.view.name)
+                putExtra(EXTRA_TUTORIAL_ANNOUNCEMENT, snapshot.pendingAnnouncementType)
+                putExtra(EXTRA_TUTORIAL_CAN_UNDO, snapshot.canUndo)
+                putExtra(EXTRA_MATCH_STATE, snapshot.state)
+            }
+        }
+
         fun createIntent(context: Context, matchUuid: String, isDoubles: Boolean): Intent {
             return Intent(context, MatchActivity::class.java).apply {
                 putExtra(EXTRA_MATCH_UUID, matchUuid)
@@ -100,9 +120,27 @@ class MatchActivity : AppCompatActivity() {
         matchToolbarRenderer = MatchToolbarRenderer(this)
         matchDialogsController = MatchDialogsController(
             activity = this,
-            onUndoConfirmed = { viewModel.undoLastAction() },
+            onUndoConfirmed = {
+                viewModel.undoLastAction()
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "undo") {
+                        tutorialOverlay?.refresh()
+                    }
+                }
+            },
             getMatchState = { viewModel.matchState.value },
-            onFinishConfirmed = { request -> viewModel.finishMatchWithOutcome(request) },
+            onFinishConfirmed = { request ->
+                viewModel.finishMatchWithOutcome(request)
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("pickRetirement", this)
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.jumpToLast(this)
+                    if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
+                        finish()
+                    } else {
+                        tutorialOverlay?.refresh()
+                    }
+                }
+            },
             onExitConfirmed = { finish() },
             onBracketWarningCleared = { viewModel.clearBracketWarning() }
         )
@@ -116,7 +154,13 @@ class MatchActivity : AppCompatActivity() {
         matchFinishController = MatchFinishController(
             activity = this,
             binding = matchFinishedBinding,
-            onNextMatch = { action -> finishWithResult(action) }
+            onNextMatch = { action ->
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this)
+                } else {
+                    finishWithResult(action)
+                }
+            }
         )
         scoringButtonsController = ScoringButtonsController(
             context = this,
@@ -147,10 +191,23 @@ class MatchActivity : AppCompatActivity() {
             context = this,
             binding = serverSelectionBinding,
             getState = { viewModel.matchState.value },
-            onServerSelected = { viewModel.setFirstServer(it) },
+            onServerSelected = { server ->
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "chooseServer") {
+                        tutorialOverlay?.refresh()
+                    }
+                } else {
+                    viewModel.setFirstServer(server)
+                }
+            },
             onSwapSides = {
                 courtSideSwapAnimator.animate()
                 viewModel.swapSides()
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "swapSides") {
+                        tutorialOverlay?.refresh()
+                    }
+                }
             },
             onButtonLogged = { AppLogger.button("Match", it) }
         )
@@ -178,7 +235,18 @@ class MatchActivity : AppCompatActivity() {
         
         activeMatchUuid = matchState.clientMatchUuid
         if (viewModel.matchState.value == null) {
-            viewModel.initializeMatch(matchState)
+            if (intent.getBooleanExtra(EXTRA_TUTORIAL, false)) {
+                val viewName = intent.getStringExtra(EXTRA_TUTORIAL_VIEW) ?: MatchView.SERVER_SELECTION.name
+                val view = runCatching { MatchView.valueOf(viewName) }.getOrDefault(MatchView.SERVER_SELECTION)
+                viewModel.restoreTutorial(
+                    matchState,
+                    view,
+                    intent.getStringExtra(EXTRA_TUTORIAL_ANNOUNCEMENT),
+                    intent.getBooleanExtra(EXTRA_TUTORIAL_CAN_UNDO, false),
+                )
+            } else {
+                viewModel.initializeMatch(matchState)
+            }
         }
         AppLogger.screen("Match", "court=${matchState.courtId} p1=${matchState.player1.getDisplayName()} p2=${matchState.player2.getDisplayName()}")
         (application as TennisRefereeApp).healthCheckManager.currentScreen = "Match"
@@ -192,6 +260,11 @@ class MatchActivity : AppCompatActivity() {
         // Obsługa przycisku wstecz - potwierdzenie podczas meczu
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (isTutorial()) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this@MatchActivity)
+                    tutorialOverlay?.refresh()
+                    return
+                }
                 val state = viewModel.matchState.value
                 if (state?.isMatchFinished == true) {
                     finish()
@@ -200,11 +273,16 @@ class MatchActivity : AppCompatActivity() {
                 }
             }
         })
+        if (intent.getBooleanExtra(EXTRA_TUTORIAL, false)) {
+            attachTutorialOverlay()
+        }
     }
     
     private fun setupObservers() {
         viewModel.matchState.observe(this) { state ->
-            activeMatchStore.save(state)
+            if (!intent.getBooleanExtra(EXTRA_TUTORIAL, false)) {
+                activeMatchStore.save(state)
+            }
             scoreboardRenderer.render(state)
             courtSideNamesRenderer.render(state)
             serverSelectionViewBinder.render(state)
@@ -258,7 +336,39 @@ class MatchActivity : AppCompatActivity() {
         } else {
             @Suppress("DEPRECATION")
             intent.getParcelableExtra(EXTRA_MATCH_STATE)
-        }?.also { activeMatchStore.save(it) }
+        }?.also {
+            if (!intent.getBooleanExtra(EXTRA_TUTORIAL, false)) activeMatchStore.save(it)
+        }
+    }
+
+    private var tutorialOverlay: pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController? = null
+
+    private fun isTutorial(): Boolean =
+        intent.getBooleanExtra(EXTRA_TUTORIAL, false) ||
+            pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive
+
+    private fun attachTutorialOverlay() {
+        tutorialOverlay = pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController(
+            activity = this,
+            onBack = {
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this)
+                tutorialOverlay?.refresh()
+            },
+            onNext = {
+                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isLast(this)) {
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this)
+                    return@TutorialOverlayController
+                }
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
+                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
+                    finish()
+                } else {
+                    tutorialOverlay?.refresh()
+                }
+            },
+            onSkip = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this) },
+        )
+        tutorialOverlay?.attach()
     }
 
     private fun finishWithResult(action: String) {
@@ -281,6 +391,10 @@ class MatchActivity : AppCompatActivity() {
         // Przycisk zakończenia meczu z potwierdzeniem
         binding.buttonBack.setOnClickListener {
             AppLogger.button("Match", "FinishMatch")
+            if (isTutorial()) {
+                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("openFinish", this)
+                tutorialOverlay?.refresh()
+            }
             matchDialogsController.showFinishMatchConfirmation()
         }
         

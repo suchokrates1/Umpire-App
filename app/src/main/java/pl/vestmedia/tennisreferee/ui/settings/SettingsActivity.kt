@@ -43,6 +43,7 @@ class SettingsActivity : AppCompatActivity() {
         setupToolbar()
         setupLanguageSelection()
         setupThemeSelection()
+        setupTutorial()
         setupMatchHistory()
         setupVersionInfo()
         setupDiagnostics()
@@ -95,6 +96,13 @@ class SettingsActivity : AppCompatActivity() {
             }
             AppLogger.button("Settings", "Theme", theme)
             themeManager.setTheme(theme)
+        }
+    }
+
+    private fun setupTutorial() {
+        binding.cardTutorial.setOnClickListener {
+            AppLogger.button("Settings", "Tutorial")
+            pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.startFromSettings(this)
         }
     }
 

@@ -259,4 +259,51 @@
     <string name="bracket_warning_title">Informacja o meczu</string>
     <string name="bracket_warning_different_groups">Ci zawodnicy są z różnych grup. Czy to mecz fazy pucharowej?</string>
     <string name="bracket_warning_friendly">Ci zawodnicy nie są przypisani do żadnej grupy turniejowej. Mecz zostanie zapisany jako sparingowy.</string>
+
+    <!-- Umpire tutorial -->
+    <string name="tutorial_start">Start tutoriala</string>
+    <string name="tutorial_title">Tutorial sędziego</string>
+    <string name="tutorial_exit">Zakończ tutorial</string>
+    <string name="tutorial_next">Dalej</string>
+    <string name="tutorial_back">Wstecz</string>
+    <string name="tutorial_skip">Pomiń</string>
+    <string name="tutorial_later">Później</string>
+    <string name="tutorial_banner_title">Nauczyć się aplikacji sędziego?</string>
+    <string name="tutorial_banner_message">Krótki mecz z przewodnikiem: kort, zawodnicy, punktacja, zmiana stron i zakończenie po kontuzji.</string>
+    <string name="tutorial_demo_tournament">Tutorial</string>
+    <string name="tutorial_demo_player1_first">Anna</string>
+    <string name="tutorial_demo_player1_last">Costa</string>
+    <string name="tutorial_demo_player2_first">Piotr</string>
+    <string name="tutorial_demo_player2_last">Nowak</string>
+    <string name="tutorial_court_title">Wybierz swój kort</string>
+    <string name="tutorial_court_body">Wybierz numer kortu, przy którym siedzisz. Na turnieju to ten sam numer co na tabliczce.</string>
+    <string name="tutorial_pin_title">PIN kortu</string>
+    <string name="tutorial_pin_body">Wpisz 4-cyfrowy PIN z biura. W tym tutorialu PIN to 1234.</string>
+    <string name="tutorial_players_title">Wybierz dwóch zawodników</string>
+    <string name="tutorial_players_body">Najpierw zawodnik po Twojej lewej, potem po prawej. Ustawienie stron dopasujesz na następnym ekranie.</string>
+    <string name="tutorial_config_title">Ustawienia meczu</string>
+    <string name="tutorial_config_body">Zostaw Advanced wyłączone, chyba że potrzebujesz pełnych statystyk. Dalej startuje mecz.</string>
+    <string name="tutorial_serve_swap_title">Dopasuj strony na korcie</string>
+    <string name="tutorial_serve_swap_body">Lewy przycisk to zawodnik po Twojej lewej. Zmień strony, aż nazwiska zgadzają się z miejscami.</string>
+    <string name="tutorial_serve_pick_title">Kto serwuje pierwszy?</string>
+    <string name="tutorial_serve_pick_body">Wybierz zawodnika, który wygrał losowanie i zagra pierwszy gem.</string>
+    <string name="tutorial_basic_title">Przyznaj punkt</string>
+    <string name="tutorial_basic_body">WIN po stronie, która wygrała wymianę. Po błędzie serwisu pojawia się 2. serwis.</string>
+    <string name="tutorial_double_fault_title">Podwójny błąd</string>
+    <string name="tutorial_double_fault_body">Po błędzie serwujący jest na drugim serwisie. Kolejny błąd to podwójny błąd i punkt dla returnującego.</string>
+    <string name="tutorial_side_change_title">Zmiana stron</string>
+    <string name="tutorial_side_change_body">Po nieparzystej liczbie gemów zawodnicy zmieniają strony. Dalej, albo „nie zmieniaj stron”.</string>
+    <string name="tutorial_set_break_title">Przerwa między setami</string>
+    <string name="tutorial_set_break_body">Po secie jest 120 sekund przerwy. Dalej, gdy zawodnicy są gotowi.</string>
+    <string name="tutorial_tiebreak_title">Tiebreak</string>
+    <string name="tutorial_tiebreak_body">Przy 4–4 ten format zaczyna tiebreak. Punkty 1, 2, 3…, zmiana stron co 6 punktów.</string>
+    <string name="tutorial_undo_title">Cofnij</string>
+    <string name="tutorial_undo_body">Cofnij zabiera ostatni punkt, jeśli trafiłeś złą stronę.</string>
+    <string name="tutorial_finish_title">Zakończ mecz</string>
+    <string name="tutorial_finish_body">Zakończ mecz, gdy nie da się grać dalej — kontuzja, krecz lub walkover. Zwykły mecz kończy się sam.</string>
+    <string name="tutorial_retirement_title">Krecz po kontuzji</string>
+    <string name="tutorial_retirement_body">Wybierz krecz, potem zawodnika, który nie może kontynuować. Drugi wygrywa. Tutorial nic nie wysyła na serwer.</string>
+    <string name="tutorial_complete_title">To cały przepływ</string>
+    <string name="tutorial_complete_body">Tutorial możesz odpalić ponownie w Ustawieniach. Na żywo wybierz dzisiejszy turniej i swój kort.</string>
 </resources>
+

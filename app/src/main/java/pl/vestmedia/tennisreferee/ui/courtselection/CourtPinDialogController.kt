@@ -54,6 +54,25 @@ class CourtPinDialogController(
             listOf(digit1, digit2, digit3, digit4).forEach { it.isEnabled = false }
 
             activity.lifecycleScope.launch {
+                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+                    progressBar.visibility = View.GONE
+                    if (pin != pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.PIN) {
+                        listOf(digit1, digit2, digit3, digit4).forEach {
+                            it.setText("")
+                            it.isEnabled = true
+                        }
+                        digit1.requestFocus()
+                        Toast.makeText(activity, activity.getString(R.string.pin_invalid, ""), Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("enterPin", activity)
+                    if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(activity)) {
+                        pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(activity)
+                    }
+                    dialog.dismiss()
+                    activity.startActivity(PlayerSelectionActivity.createTutorialIntent(activity))
+                    return@launch
+                }
                 val result = withContext(Dispatchers.IO) {
                     repository.verifyCourtPin(court.id, pin)
                 }

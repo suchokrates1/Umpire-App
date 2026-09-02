@@ -88,6 +88,7 @@ class TournamentSelectionActivity : AppCompatActivity() {
         }
 
         loadTournaments()
+        pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.maybeShowBanner(this)
     }
 
     private fun setupRecyclerView() {
