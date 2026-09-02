@@ -289,6 +289,8 @@
     <string name="tutorial_serve_pick_body">Wybierz zawodnika, który wygrał losowanie i zagra pierwszy gem.</string>
     <string name="tutorial_basic_title">Przyznaj punkt</string>
     <string name="tutorial_basic_body">WIN po stronie, która wygrała wymianę. Po błędzie serwisu pojawia się 2. serwis.</string>
+    <string name="tutorial_second_serve_title">Drugi serwis</string>
+    <string name="tutorial_second_serve_body">Kliknij 2. SERWIS. Serwujący jest wtedy na drugim serwisie.</string>
     <string name="tutorial_double_fault_title">Podwójny błąd</string>
     <string name="tutorial_double_fault_body">Po błędzie serwujący jest na drugim serwisie. Kolejny błąd to podwójny błąd i punkt dla returnującego.</string>
     <string name="tutorial_side_change_title">Zmiana stron</string>
@@ -299,6 +301,8 @@
     <string name="tutorial_tiebreak_body">Przy 4–4 ten format zaczyna tiebreak. Punkty 1, 2, 3…, zmiana stron co 6 punktów.</string>
     <string name="tutorial_undo_title">Cofnij</string>
     <string name="tutorial_undo_body">Cofnij zabiera ostatni punkt, jeśli trafiłeś złą stronę.</string>
+    <string name="tutorial_server_change_title">Zmiana serwującego</string>
+    <string name="tutorial_server_change_body">Po gemie serwuje druga strona. Ikonka piłki przechodzi na tę stronę.</string>
     <string name="tutorial_finish_title">Zakończ mecz</string>
     <string name="tutorial_finish_body">Zakończ mecz, gdy nie da się grać dalej — kontuzja, krecz lub walkover. Zwykły mecz kończy się sam.</string>
     <string name="tutorial_retirement_title">Krecz po kontuzji</string>

@@ -1,5 +1,8 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 /**
  * Model reprezentujący wynik meczu
  */
@@ -19,6 +22,7 @@ data class Score(
     val setsHistory: List<SetScore> = emptyList()
 )
 
+@Parcelize
 data class SetScore(
     val setNumber: Int,
     
@@ -29,4 +33,4 @@ data class SetScore(
     val tiebreakLoserPoints: Int? = null,  // For display like 5-4(7) — stores loser's tiebreak points
     
     val isSuperTiebreak: Boolean = false  // True when this "set" is actually a super tiebreak (stores points, not games)
-)
+) : Parcelable

@@ -176,22 +176,17 @@ class MatchActivity : AppCompatActivity() {
             onForcedError = { viewModel.handleForcedError(it) },
             onUnforcedError = { viewModel.handleUnforcedError(it) },
             onBasicWin = { winner ->
-                if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "awardPoint") {
-                        tutorialOverlay?.refresh()
-                    }
-                } else {
-                    viewModel.handleBasicWin(winner)
-                }
+                viewModel.handleBasicWin(winner)
+                noteTutorialAction("awardPoint")
             },
             onBasicFault = {
-                if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "awardPoint") {
-                        tutorialOverlay?.refresh()
-                    }
+                val faultAction = if (viewModel.matchState.value?.isFirstServe ?: true) {
+                    "secondServe"
                 } else {
-                    viewModel.handleBasicFault()
+                    "doubleFault"
                 }
+                viewModel.handleBasicFault()
+                noteTutorialAction(faultAction)
             },
             onButtonLogged = { action, detail -> AppLogger.button("Match", action, detail) }
         )
@@ -363,6 +358,13 @@ class MatchActivity : AppCompatActivity() {
         intent.getBooleanExtra(EXTRA_TUTORIAL, false) ||
             pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive
 
+    private fun noteTutorialAction(action: String) {
+        if (!isTutorial()) return
+        pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, action) {
+            tutorialOverlay?.refresh()
+        }
+    }
+
     private fun attachTutorialOverlay() {
         tutorialOverlay = pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController(
             activity = this,
@@ -398,20 +400,22 @@ class MatchActivity : AppCompatActivity() {
         scoringButtonsController.bind()
         announcementController.bind()
         
-        // Przycisk Cofnij z potwierdzeniem
+        // Przycisk Cofnij z potwierdzeniem (w tutorialu od razu, jak w PWA)
         binding.buttonUndo.setOnClickListener {
             AppLogger.button("Match", "Undo")
-            matchDialogsController.showUndoConfirmation()
+            if (isTutorial()) {
+                viewModel.undoLastAction()
+                noteTutorialAction("undo")
+            } else {
+                matchDialogsController.showUndoConfirmation()
+            }
         }
         
         // Przycisk zakończenia meczu z potwierdzeniem
         binding.buttonBack.setOnClickListener {
             AppLogger.button("Match", "FinishMatch")
-            if (isTutorial()) {
-                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("openFinish", this)
-                tutorialOverlay?.refresh()
-            }
             matchDialogsController.showFinishMatchConfirmation()
+            noteTutorialAction("openFinish")
         }
         
     }
