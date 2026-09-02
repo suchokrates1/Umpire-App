@@ -16,6 +16,7 @@ Kompletny katalog funkcji i instrukcja użycia aplikacji Android dla sędziów t
 - [[01 - Szybki start]] — typowy dzień turnieju krok po kroku
 - [[02 - Przepływ nawigacji]] — mapa ekranów
 - [[03 - Deploy Google Play]] — build AAB + upload na wszystkie tory (też z innego PC)
+- [[34 - PWA sędzia plan wdrożenia]] — odsyłacz do kanonicznego planu w vaultcie Vest Media
 
 ## Ekrany
 
@@ -39,7 +40,7 @@ Kompletny katalog funkcji i instrukcja użycia aplikacji Android dla sędziów t
 - [[30 - Przyciski punktacji - słownik]]
 - [[31 - Synchronizacja i diagnostyka]]
 - [[32 - Singiel vs debel]]
-- [[TODO]] — zdalne sterowanie tabletem z reżyserki
+- [[TODO]] — zdalne sterowanie tabletem z reżyserki (szczegóły w planie PWA, Etap 6)
 
 ## Poza tym vaultem
 

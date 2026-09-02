@@ -9,3 +9,5 @@ Admin klika w reżyserce → tablet sędziego **od razu** dostaje nowy kort, naz
 Vilnius 2026: dwa tablety na korcie 2; González–Schmidt przeniesiony na 8 w bazie, telefon dalej pisał na 2.
 
 Wymaga: push/kanał serwer → apka (nie tylko PUT z tabletu).
+
+Pełny plan portu sędziego do przeglądarki (PWA 1:1) + Etap 6 reżyserki: w vaultcie Vest Media `notes/areas/vest-media/PWA-sedzia-plan-wdrozenia.md` ([[areas/vest-media/PWA-sedzia-plan-wdrozenia]]). Ten TODO zostaje źródłem **incydentu Vilnius**, nie drugim planem produktu.

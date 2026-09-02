@@ -30,3 +30,4 @@ Sekcja pokazuje: wersję app, URL backendu, model urządzenia, locale, strefę c
 - [[16 - Mecz - scoreboard i chrome]]
 - [[22 - Ustawienia]]
 - [[TODO]] — push stanu z reżyserki na tablet (kort, nazwiska, wynik, zasady)
+- Plan PWA + Etap 6: `notes/areas/vest-media/PWA-sedzia-plan-wdrozenia.md`
