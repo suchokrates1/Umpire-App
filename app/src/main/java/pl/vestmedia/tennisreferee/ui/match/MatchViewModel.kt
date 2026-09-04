@@ -145,9 +145,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         _matchState.value?.let { state ->
             applyMatchCommand(state, MatchCommand.StartMatch(serverNumber, System.currentTimeMillis()))
             _currentView.value = scoringViewFor(state)
-            
-            // Log match start event
             logMatchEvent("match_start")
+            // Same as PWA: persist the row at first serve so director/heartbeat have match_id
+            // before the first completed game (TB-only never hits syncMatch on a point).
+            syncMatchWithServer()
         }
     }
     
@@ -462,6 +463,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         _matchState.value?.let { state ->
             viewModelScope.launch(Dispatchers.IO) {
                 matchSyncCoordinator.syncMatch(state)
+                getApplication<TennisRefereeApp>().healthCheckManager.matchId = state.matchId
             }
         }
     }
