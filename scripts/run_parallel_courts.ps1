@@ -32,10 +32,10 @@
 param(
     # URL seen by the Android emulator/device (instrumentation arg e2e.baseUrl).
     # Default: minipc LAN e2e (Windows host often has no local Docker).
-    [string]$BaseUrl = $(if ($env:E2E_ANDROID_BASE_URL) { $env:E2E_ANDROID_BASE_URL } else { "http://192.168.31.5:18087" }),
+    [string]$BaseUrl = $(if ($env:E2E_ANDROID_BASE_URL) { $env:E2E_ANDROID_BASE_URL } else { "http://192.168.31.10:18087" }),
 
     # URL used by this host script to create/cleanup the shared fixture.
-    [string]$HostBaseUrl = $(if ($env:E2E_BASE_URL) { $env:E2E_BASE_URL } else { "http://192.168.31.5:18087" }),
+    [string]$HostBaseUrl = $(if ($env:E2E_BASE_URL) { $env:E2E_BASE_URL } else { "http://192.168.31.10:18087" }),
 
     [string]$AdminPassword = $(if ($env:E2E_ADMIN_PASSWORD) { $env:E2E_ADMIN_PASSWORD } else { "e2e-admin" }),
 

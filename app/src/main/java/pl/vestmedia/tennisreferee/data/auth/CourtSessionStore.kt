@@ -169,12 +169,19 @@ internal fun SharedPreferences.writeCourtSession(session: CourtSession) {
         .apply()
 }
 
+private val FRACTION_REGEX = Regex("""\.(\d+)(?=[Zz+-]|$)""")
+
 internal fun parseSessionExpiry(value: String?): Long? {
     val normalized = value?.trim()?.takeIf { it.isNotEmpty() } ?: return null
     normalized.toLongOrNull()?.let { numeric ->
         return if (numeric < 10_000_000_000L) numeric * 1_000L else numeric
     }
 
+    // The server sends Python isoformat() (microseconds, +00:00): SimpleDateFormat reads
+    // milliseconds only, so the fraction is cut or padded to exactly three digits.
+    val iso = FRACTION_REGEX.replace(normalized) { match ->
+        "." + match.groupValues[1].take(3).padEnd(3, '0')
+    }
     val formats = listOf(
         "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
         "yyyy-MM-dd'T'HH:mm:ssXXX",
@@ -185,7 +192,7 @@ internal fun parseSessionExpiry(value: String?): Long? {
             SimpleDateFormat(pattern, Locale.US).apply {
                 timeZone = TimeZone.getTimeZone("UTC")
                 isLenient = false
-            }.parse(normalized)?.time
+            }.parse(iso)?.time
         } catch (_: ParseException) {
             null
         }

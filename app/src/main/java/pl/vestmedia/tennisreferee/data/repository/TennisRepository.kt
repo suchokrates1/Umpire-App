@@ -198,10 +198,8 @@ class TennisRepository(
         var lastFailure: Exception? = null
         repeat(maxAttempts) { attempt ->
             try {
+                // BearerAuthInterceptor clears the session when the token it sent is rejected
                 val response = call()
-                if (response.code() == 401) {
-                    sessionStore.clear()
-                }
                 if (response.isSuccessful || !response.shouldRetry()) {
                     return response.toResult()
                 }

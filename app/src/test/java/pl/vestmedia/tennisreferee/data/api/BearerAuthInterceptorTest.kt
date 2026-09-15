@@ -65,6 +65,49 @@ class BearerAuthInterceptorTest {
         assertNull(store.current())
     }
 
+    @Test
+    fun keepsSessionSavedWhileAnOlderRequestWasInFlight() {
+        val store = FakeCourtSessionStore(null)
+        server.enqueue(MockResponse().setResponseCode(401))
+        server.start()
+        OkHttpClient.Builder()
+            .addInterceptor(BearerAuthInterceptor(store, nowMillis = { 1_000L }))
+            .addInterceptor { chain ->
+                // a PIN authorization finishes while the tokenless request is on the wire
+                store.save(CourtSession("1", token = "new-token", expiresAtMillis = 2_000L))
+                chain.proceed(chain.request())
+            }
+            .build()
+            .newCall(Request.Builder().url(server.url("/api/umpire-heartbeat")).build())
+            .execute()
+            .close()
+
+        assertNull(server.takeRequest().getHeader("Authorization"))
+        assertEquals("new-token", store.current()?.token)
+    }
+
+    @Test
+    fun keepsNewerTokenWhenAnOldTokenIsRejected() {
+        val store = FakeCourtSessionStore(
+            CourtSession("1", token = "old-token", expiresAtMillis = 2_000L)
+        )
+        server.enqueue(MockResponse().setResponseCode(401))
+        server.start()
+        OkHttpClient.Builder()
+            .addInterceptor(BearerAuthInterceptor(store, nowMillis = { 1_000L }))
+            .addInterceptor { chain ->
+                store.save(CourtSession("1", token = "new-token", expiresAtMillis = 2_000L))
+                chain.proceed(chain.request())
+            }
+            .build()
+            .newCall(Request.Builder().url(server.url("/api/matches")).build())
+            .execute()
+            .close()
+
+        assertEquals("Bearer old-token", server.takeRequest().getHeader("Authorization"))
+        assertEquals("new-token", store.current()?.token)
+    }
+
     private fun execute(store: CourtSessionStore, path: String, responseCode: Int) {
         server.enqueue(MockResponse().setResponseCode(responseCode))
         server.start()
