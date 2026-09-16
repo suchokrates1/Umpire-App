@@ -42,7 +42,7 @@ class E2EBackendClient(
     @Volatile
     private var adminToken: String? = null
 
-    fun createTournamentFixture(marker: String): TournamentFixture {
+    fun createTournamentFixture(marker: String, publicOverlay: Boolean = false): TournamentFixture {
         ensureAdminToken()
         val today = LocalDate.now()
         try {
@@ -53,7 +53,8 @@ class E2EBackendClient(
                     .put("start_date", today.toString())
                     .put("end_date", today.plusDays(1).toString())
                     .put("active", true)
-                    .put("is_simulation", true)
+                    .put("is_simulation", !publicOverlay)
+                    .put("is_public", publicOverlay)
                     .put("office_password", "test")
                     .put("city", "E2E")
                     .put("country", "PL")
@@ -239,6 +240,52 @@ class E2EBackendClient(
             val match = findMatch(fetchArtifacts(marker).getJSONArray("matches"), player1Name, player2Name)
             match?.optString("status") == "in_progress"
         }
+    }
+
+    fun waitForMatch(
+        marker: String,
+        timeoutMs: Long = 30_000,
+        description: String = "match",
+        predicate: (JSONObject) -> Boolean
+    ): JSONObject {
+        var found: JSONObject? = null
+        waitUntil(description, timeoutMs) {
+            val matches = fetchArtifacts(marker).getJSONArray("matches")
+            for (index in 0 until matches.length()) {
+                val match = matches.getJSONObject(index)
+                if (predicate(match)) {
+                    found = match
+                    return@waitUntil true
+                }
+            }
+            false
+        }
+        return requireNotNull(found)
+    }
+
+    fun directorControl(matchId: Int, body: JSONObject): JSONObject {
+        ensureAdminToken()
+        return postJson("/admin/api/matches/$matchId/control", body)
+    }
+
+    fun fetchCourtSnapshot(courtId: String): JSONObject? {
+        val text = execute("GET", "/api/snapshot", null, allowFailure = false, withAuth = false)
+        val courts = (if (text.isBlank()) JSONObject() else JSONObject(text)).optJSONObject("courts")
+        return courts?.optJSONObject(courtId)
+    }
+
+    fun waitForCourtSnapshot(
+        courtId: String,
+        timeoutMs: Long = 20_000,
+        description: String = "overlay $courtId",
+        predicate: (JSONObject) -> Boolean
+    ): JSONObject {
+        var last: JSONObject? = null
+        waitUntil(description, timeoutMs) {
+            last = fetchCourtSnapshot(courtId)
+            last != null && predicate(last!!)
+        }
+        return requireNotNull(last)
     }
 
     fun waitForFinishedArtifacts(marker: String, player1Name: String, player2Name: String): FinishedArtifacts {

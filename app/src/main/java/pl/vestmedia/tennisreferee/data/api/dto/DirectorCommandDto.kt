@@ -15,6 +15,103 @@ data class HeartbeatResponseDto(
     val commands: List<DirectorCommandDto> = emptyList()
 )
 
+data class HeartbeatRequestDto(
+    @SerializedName("court_id")
+    val courtId: String = "",
+
+    @SerializedName("screen")
+    val screen: String = "",
+
+    @SerializedName("app_version")
+    val appVersion: String = "",
+
+    @SerializedName("timestamp")
+    val timestamp: String = "",
+
+    @SerializedName("match_id")
+    val matchId: String? = null,
+
+    @SerializedName("client_match_uuid")
+    val clientMatchUuid: String? = null,
+
+    @SerializedName("battery_level")
+    val batteryLevel: String? = null,
+
+    @SerializedName("is_charging")
+    val isCharging: String? = null,
+
+    @SerializedName("snapshot")
+    val snapshot: DirectorDeviceSnapshotDto? = null
+)
+
+data class DirectorDeviceSnapshotDto(
+    @SerializedName("court_id")
+    val courtId: String? = null,
+
+    @SerializedName("court_name")
+    val courtName: String? = null,
+
+    @SerializedName("player1_name")
+    val player1Name: String? = null,
+
+    @SerializedName("player2_name")
+    val player2Name: String? = null,
+
+    @SerializedName("is_doubles")
+    val isDoubles: Boolean? = null,
+
+    @SerializedName("player1_sets")
+    val player1Sets: Int? = null,
+
+    @SerializedName("player2_sets")
+    val player2Sets: Int? = null,
+
+    @SerializedName("player1_games")
+    val player1Games: Int? = null,
+
+    @SerializedName("player2_games")
+    val player2Games: Int? = null,
+
+    @SerializedName("player1_points")
+    val player1Points: Int? = null,
+
+    @SerializedName("player2_points")
+    val player2Points: Int? = null,
+
+    @SerializedName("sets_history")
+    val setsHistory: List<SetScoreDto>? = null,
+
+    @SerializedName("is_player1_serving")
+    val isPlayer1Serving: Boolean? = null,
+
+    @SerializedName("is_tiebreak")
+    val isTiebreak: Boolean? = null,
+
+    @SerializedName("is_super_tiebreak")
+    val isSuperTiebreak: Boolean? = null,
+
+    @SerializedName("match_start_time_ms")
+    val matchStartTimeMs: Long? = null,
+
+    @SerializedName("match_duration_ms")
+    val matchDurationMs: Long? = null,
+
+    @SerializedName("games_per_set")
+    val gamesPerSet: Int? = null,
+
+    @SerializedName("sets_to_win")
+    val setsToWin: Int? = null,
+
+    @SerializedName("no_advantage")
+    val noAdvantage: Boolean? = null,
+
+    @SerializedName("tiebreak_only")
+    val tiebreakOnly: Boolean? = null,
+
+    @SerializedName("stats_mode")
+    val statsMode: String? = null
+)
+
 data class DirectorAckResponseDto(
     @SerializedName("ok")
     val ok: Boolean = false,

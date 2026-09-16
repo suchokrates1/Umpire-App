@@ -11,6 +11,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
+import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
@@ -119,9 +120,13 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         val app = getApplication<TennisRefereeApp>()
         app.healthCheckManager.matchId = matchState.matchId
         app.healthCheckManager.clientMatchUuid = matchState.clientMatchUuid
+        app.healthCheckManager.snapshotProvider = {
+            _matchState.value?.let { MatchApiPayloadFactory.toDirectorSnapshot(it) }
+        }
         app.healthCheckManager.onDirectorCommands = { commands ->
             commands.forEach { applyDirectorCommand(it) }
         }
+        app.healthCheckManager.sendNow()
         startDirectorPolling()
     }
 
@@ -500,6 +505,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         directorPollJob?.cancel()
         val app = getApplication<TennisRefereeApp>()
         app.healthCheckManager.onDirectorCommands = null
+        app.healthCheckManager.snapshotProvider = null
         app.healthCheckManager.matchId = null
         app.healthCheckManager.clientMatchUuid = null
         super.onCleared()

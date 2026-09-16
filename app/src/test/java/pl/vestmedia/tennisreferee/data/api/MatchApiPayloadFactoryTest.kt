@@ -46,6 +46,28 @@ class MatchApiPayloadFactoryTest {
     }
 
     @Test
+    fun directorSnapshotKeepsInGamePointsAndClock() {
+        val state = singlesState().apply {
+            matchId = 9
+            matchStartTime = 100L
+            player1Games = 1
+            player1Points = 2
+            isPlayer1Serving = true
+        }
+
+        val snapshot = MatchApiPayloadFactory.toDirectorSnapshot(state)
+
+        assertEquals("1", snapshot.courtId)
+        assertEquals("Court 1", snapshot.courtName)
+        assertEquals("Jan Kowalski", snapshot.player1Name)
+        assertEquals(1, snapshot.player1Games)
+        assertEquals(2, snapshot.player1Points)
+        assertEquals(true, snapshot.isPlayer1Serving)
+        assertEquals(100L, snapshot.matchStartTimeMs)
+        assertEquals(4, snapshot.gamesPerSet)
+    }
+
+    @Test
     fun createsMatchPayloadForDoublesTeamNames() {
         val state = doublesState()
 

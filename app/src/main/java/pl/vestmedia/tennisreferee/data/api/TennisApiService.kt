@@ -7,6 +7,7 @@ import pl.vestmedia.tennisreferee.data.api.dto.CourtsResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorAckResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandsResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.FinishMatchRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.HeartbeatRequestDto
 import pl.vestmedia.tennisreferee.data.api.dto.HeartbeatResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
@@ -112,7 +113,7 @@ interface TennisApiService {
      * Heartbeat — stan baterii i status online (niezależnie od meczu)
      */
     @POST("api/umpire-heartbeat")
-    suspend fun sendHeartbeat(@Body body: Map<String, String>): Response<HeartbeatResponseDto>
+    suspend fun sendHeartbeat(@Body body: HeartbeatRequestDto): Response<HeartbeatResponseDto>
 
     @GET("api/umpire/commands")
     suspend fun pollDirectorCommands(

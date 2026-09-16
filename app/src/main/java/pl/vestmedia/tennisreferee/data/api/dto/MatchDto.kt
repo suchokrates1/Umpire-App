@@ -59,7 +59,10 @@ data class MatchDto(
     val matchConfig: MatchConfigDto? = null,
 
     @SerializedName("match_start_time_ms")
-    val matchStartTimeMs: Long? = null
+    val matchStartTimeMs: Long? = null,
+
+    @SerializedName("serve")
+    val serve: String? = null
 )
 
 enum class MatchStatusDto {

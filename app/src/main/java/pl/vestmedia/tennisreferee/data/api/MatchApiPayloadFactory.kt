@@ -1,7 +1,8 @@
 package pl.vestmedia.tennisreferee.data.api
 
-import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
+import pl.vestmedia.tennisreferee.data.api.dto.DirectorDeviceSnapshotDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchConfigDto
+import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatusDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
 import pl.vestmedia.tennisreferee.data.api.dto.PlayerStatsDto
@@ -49,7 +50,36 @@ object MatchApiPayloadFactory {
                 tiebreakOnly = state.matchConfig.tiebreakOnly,
                 statsMode = state.statsMode.name
             ),
-            matchStartTimeMs = state.matchStartTime.takeIf { it > 0L }
+            matchStartTimeMs = state.matchStartTime.takeIf { it > 0L },
+            serve = if (state.isPlayer1Serving) "A" else "B"
+        )
+    }
+
+    fun toDirectorSnapshot(state: MatchState): DirectorDeviceSnapshotDto {
+        val match = toMatch(state)
+        return DirectorDeviceSnapshotDto(
+            courtId = match.courtId,
+            courtName = state.courtName.ifBlank { match.courtId },
+            player1Name = match.player1Name,
+            player2Name = match.player2Name,
+            isDoubles = state.isDoubles,
+            player1Sets = match.score.player1Sets,
+            player2Sets = match.score.player2Sets,
+            player1Games = match.score.player1Games,
+            player2Games = match.score.player2Games,
+            player1Points = match.score.player1Points,
+            player2Points = match.score.player2Points,
+            setsHistory = match.score.setsHistory,
+            isPlayer1Serving = state.isPlayer1Serving,
+            isTiebreak = state.isTiebreak,
+            isSuperTiebreak = state.isSuperTiebreak,
+            matchStartTimeMs = match.matchStartTimeMs,
+            matchDurationMs = state.matchDuration,
+            gamesPerSet = match.matchConfig?.gamesPerSet,
+            setsToWin = match.matchConfig?.setsToWin,
+            noAdvantage = match.matchConfig?.noAdvantage,
+            tiebreakOnly = match.matchConfig?.tiebreakOnly,
+            statsMode = match.matchConfig?.statsMode
         )
     }
 

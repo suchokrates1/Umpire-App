@@ -6,6 +6,8 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import kotlinx.coroutines.*
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.data.api.dto.DirectorDeviceSnapshotDto
+import pl.vestmedia.tennisreferee.data.api.dto.HeartbeatRequestDto
 
 /**
  * Wysyła periodyczny heartbeat do serwera ze stanem baterii i statusem online.
@@ -24,6 +26,7 @@ class HealthCheckManager(private val app: Application) {
 
     var matchId: Int? = null
     var clientMatchUuid: String? = null
+    var snapshotProvider: (() -> DirectorDeviceSnapshotDto?)? = null
     var onDirectorCommands: ((List<pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto>) -> Unit)? = null
 
     /**
@@ -59,16 +62,17 @@ class HealthCheckManager(private val app: Application) {
             val charging = isBatteryCharging()
             val version = getAppVersion()
 
-            val body = mutableMapOf(
-                "court_id" to (courtId ?: ""),
-                "battery_level" to (battery?.toString() ?: ""),
-                "is_charging" to charging.toString(),
-                "screen" to currentScreen,
-                "app_version" to version,
-                "timestamp" to System.currentTimeMillis().toString()
+            val body = HeartbeatRequestDto(
+                courtId = courtId ?: "",
+                screen = currentScreen,
+                appVersion = version,
+                timestamp = System.currentTimeMillis().toString(),
+                matchId = matchId?.toString(),
+                clientMatchUuid = clientMatchUuid?.takeIf { it.isNotBlank() },
+                batteryLevel = battery?.toString(),
+                isCharging = charging.toString(),
+                snapshot = snapshotProvider?.invoke()
             )
-            matchId?.let { body["match_id"] = it.toString() }
-            clientMatchUuid?.takeIf { it.isNotBlank() }?.let { body["client_match_uuid"] = it }
 
             val response = RetrofitClient.apiService.sendHeartbeat(body)
             if (response.isSuccessful) {
