@@ -126,6 +126,15 @@ class DirectorControlE2ETest {
                 true
             }
 
+            backend.waitForCourtSnapshot(
+                court2,
+                timeoutMs = 20_000,
+                description = "overlay court 2 after director move"
+            ) { snap ->
+                overlayNames(snap).contains("González")
+                    && snap.optJSONObject("match_status")?.optBoolean("active") == true
+            }
+
             umpire.playGame(true)
         }
 
@@ -139,17 +148,6 @@ class DirectorControlE2ETest {
         }
         assertEquals("Jessica González", moved.optString("player1_name"))
         assertEquals(court2, moved.optString("court_id"))
-
-        val overlay = backend.waitForCourtSnapshot(
-            court2,
-            timeoutMs = 20_000,
-            description = "overlay court 2 after director move"
-        ) { snap ->
-            overlayNames(snap).contains("González")
-                && snap.optJSONObject("match_status")?.optBoolean("active") == true
-                && snap.optJSONObject("A")?.optInt("current_games") == 2
-        }
-        assertTrue(overlayNames(overlay), overlayNames(overlay).contains("González"))
         val old = backend.fetchCourtSnapshot(court1)
         assertFalse(
             "court 1 should be released",

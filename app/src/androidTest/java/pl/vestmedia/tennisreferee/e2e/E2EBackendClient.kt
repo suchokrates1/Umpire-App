@@ -281,9 +281,13 @@ class E2EBackendClient(
         predicate: (JSONObject) -> Boolean
     ): JSONObject {
         var last: JSONObject? = null
-        waitUntil(description, timeoutMs) {
-            last = fetchCourtSnapshot(courtId)
-            last != null && predicate(last!!)
+        try {
+            waitUntil(description, timeoutMs) {
+                last = fetchCourtSnapshot(courtId)
+                last != null && predicate(last!!)
+            }
+        } catch (error: AssertionError) {
+            throw AssertionError("$description last=${last ?: "null"}", error)
         }
         return requireNotNull(last)
     }
