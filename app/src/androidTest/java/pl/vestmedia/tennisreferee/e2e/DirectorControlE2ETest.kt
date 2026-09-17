@@ -157,6 +157,76 @@ class DirectorControlE2ETest {
         )
     }
 
+    @Test
+    fun directorCorrectsScoreAndRules() {
+        val matchScenario = scenario(
+            name = "director_score_and_rules",
+            playerIndexes = listOf(0, 1),
+            config = MatchConfig(gamesPerSet = 4, setsToWin = 1, statsMode = StatsMode.ADVANCED),
+            steps = emptyList(),
+            expectedSets = 0 to 0,
+            expectedSetScores = emptyList()
+        )
+        val matchState = matchScenario.toMatchState(fixture, courtIndex = 0)
+        val court1 = fixture.courtIdFor(0)
+        val originalP1 = matchState.getTeam1FullName()
+        val originalP2 = matchState.getTeam2FullName()
+        backend.seedAppCourtSession(court1)
+
+        ActivityScenario.launch<MatchActivity>(intentFor(matchState)).use {
+            UmpireRobot.waitForView(R.id.buttonPlayer1Serves)
+            UmpireRobot.clickServerButton(matchScenario.firstServer)
+            val umpire = UmpireRobot(doubles = false, firstServer = matchScenario.firstServer)
+            umpire.playGame(true)
+
+            val live = backend.waitForMatch(
+                marker = fixture.marker,
+                description = "in-progress match for score correction"
+            ) { row ->
+                row.optString("player1_name") == originalP1
+                    && row.optString("player2_name") == originalP2
+                    && row.optString("status") == "in_progress"
+            }
+
+            backend.directorControl(
+                live.getInt("id"),
+                JSONObject()
+                    .put(
+                        "score",
+                        JSONObject()
+                            .put("player1_sets", 0)
+                            .put("player2_sets", 0)
+                            .put("player1_games", 2)
+                            .put("player2_games", 0)
+                            .put("player1_points", 2)
+                            .put("player2_points", 0)
+                    )
+                    .put(
+                        "match_config",
+                        JSONObject()
+                            .put("games_per_set", 3)
+                            .put("sets_to_win", 1)
+                            .put("no_advantage", true)
+                    )
+            )
+
+            waitUntil("director score 2 games and 30 on the board", timeoutMs = 25_000) {
+                onView(withId(R.id.textPlayer1Points)).check(matches(withText("30")))
+                onView(withId(R.id.textPlayer1Set1)).check(matches(withText("2")))
+                true
+            }
+        }
+
+        backend.waitForCourtSnapshot(
+            court1,
+            timeoutMs = 20_000,
+            description = "overlay 2:0 30 after director score"
+        ) { snap ->
+            snap.optJSONObject("A")?.optInt("current_games") == 2
+                && snap.optJSONObject("A")?.optString("points") == "30"
+        }
+    }
+
     private fun overlayNames(snap: JSONObject): String {
         val side = snap.optJSONObject("A") ?: return ""
         return "${side.optString("full_name")} ${side.optString("surname")}"
