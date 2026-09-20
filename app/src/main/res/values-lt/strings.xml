@@ -220,6 +220,7 @@
     <string name="theme_light">Šviesus</string>
     <string name="theme_dark">Tamsus</string>
     <string name="theme_system">Sisteminis</string>
+    <string name="privacy_policy">Privatumo politika</string>
     <string name="about">Apie</string>
     <string name="app_description">Profesionali teisėjų programėlė teniso rezultatams vesti realiuoju laiku</string>
     <string name="version_format">Versija %1$s</string>

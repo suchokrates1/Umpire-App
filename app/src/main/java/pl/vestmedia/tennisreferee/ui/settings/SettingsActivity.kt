@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
@@ -45,6 +46,7 @@ class SettingsActivity : AppCompatActivity() {
         setupThemeSelection()
         setupTutorial()
         setupMatchHistory()
+        setupPrivacyPolicy()
         setupVersionInfo()
         setupDiagnostics()
     }
@@ -110,6 +112,15 @@ class SettingsActivity : AppCompatActivity() {
         binding.cardMatchHistory.setOnClickListener {
             AppLogger.button("Settings", "MatchHistory")
             startActivity(Intent(this, MatchHistoryActivity::class.java))
+        }
+    }
+
+    private fun setupPrivacyPolicy() {
+        binding.cardPrivacyPolicy.setOnClickListener {
+            val lang = LanguageSelectionActivity.getSelectedLanguage(this)
+            val uri = Uri.parse("https://blindtennis.app/privacy?lang=$lang")
+            AppLogger.button("Settings", "PrivacyPolicy", lang)
+            startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
     }
 

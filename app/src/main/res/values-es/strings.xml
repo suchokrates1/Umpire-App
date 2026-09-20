@@ -227,6 +227,7 @@
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
     <string name="theme_system">Predeterminado del sistema</string>
+    <string name="privacy_policy">Política de privacidad</string>
     <string name="about">Acerca de</string>
     <string name="app_description">Aplicación profesional de árbitro de tenis para puntuación de partidos en tiempo real</string>
     <string name="version_format">Versión %1$s</string>

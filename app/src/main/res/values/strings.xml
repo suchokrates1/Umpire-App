@@ -235,6 +235,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System Default</string>
+    <string name="privacy_policy">Privacy policy</string>
     <string name="about">About</string>
     <string name="app_description">Professional tennis referee application for real-time match scoring</string>
     <string name="version_format">Version %1$s</string>

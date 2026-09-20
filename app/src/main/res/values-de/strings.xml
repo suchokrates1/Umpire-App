@@ -219,6 +219,7 @@
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="theme_system">Systemstandard</string>
+    <string name="privacy_policy">Datenschutzerklärung</string>
     <string name="about">Über</string>
     <string name="app_description">Professionelle Tennis-Schiedsrichter-App für Echtzeit-Spielstanderfassung</string>
     <string name="version_format">Version %1$s</string>
