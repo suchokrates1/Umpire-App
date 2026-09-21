@@ -134,7 +134,10 @@ data class TournamentOptionDto(
     val startDate: String? = null,
 
     @SerializedName("end_date")
-    val endDate: String? = null
+    val endDate: String? = null,
+
+    @SerializedName("is_simulation")
+    val isSimulation: Int? = null
 )
 
 data class ScheduleSuggestionResponseDto(
@@ -464,7 +467,8 @@ fun TournamentOptionDto.toModel(): TournamentOption {
         country = country,
         location = location,
         startDate = startDate,
-        endDate = endDate
+        endDate = endDate,
+        isSimulation = isSimulation == 1
     )
 }
 
@@ -476,7 +480,8 @@ fun TournamentOption.toDto(): TournamentOptionDto {
         country = country,
         location = location,
         startDate = startDate,
-        endDate = endDate
+        endDate = endDate,
+        isSimulation = if (isSimulation) 1 else 0
     )
 }
 

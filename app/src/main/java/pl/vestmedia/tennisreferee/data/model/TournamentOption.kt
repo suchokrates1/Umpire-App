@@ -14,4 +14,7 @@ data class TournamentOption(
     val startDate: String? = null,
 
     val endDate: String? = null,
+
+    /** Play-review sandbox (server `is_simulation`): the only event an automated test may open. */
+    val isSimulation: Boolean = false,
 )

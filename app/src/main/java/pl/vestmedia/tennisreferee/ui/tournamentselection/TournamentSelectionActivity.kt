@@ -19,6 +19,7 @@ import pl.vestmedia.tennisreferee.databinding.ActivityTournamentSelectionBinding
 import pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.utils.TestLab
 
 class TournamentSelectionActivity : AppCompatActivity() {
 
@@ -110,7 +111,10 @@ class TournamentSelectionActivity : AppCompatActivity() {
                 binding.progressBar.visibility = View.GONE
 
                 result.onSuccess { activeTournaments ->
-                    tournaments = activeTournaments.sortedBy { it.name.lowercase() }
+                    tournaments = TestLab.visibleTournaments(
+                        activeTournaments,
+                        TestLab.isRunning(this@TournamentSelectionActivity),
+                    ).sortedBy { it.name.lowercase() }
                     val forceSelection = intent.getBooleanExtra(EXTRA_FORCE_SELECTION, false)
                     val selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this@TournamentSelectionActivity)
 
