@@ -1,6 +1,5 @@
 package pl.vestmedia.tennisreferee.startup
 
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
@@ -13,7 +12,7 @@ import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
-import pl.vestmedia.tennisreferee.data.auth.EncryptedCourtSessionStore
+import pl.vestmedia.tennisreferee.data.auth.KeystoreCourtSessionStore
 
 /**
  * Device/emulator cold-start smoke. Run against the minified release APK with:
@@ -51,12 +50,38 @@ class ApplicationStartupSmokeTest {
     }
 
     @Test
-    fun encryptedSharedPreferencesClassesSurviveR8() {
-        Class.forName("androidx.security.crypto.EncryptedSharedPreferences")
-        Class.forName("androidx.security.crypto.MasterKey")
-        Class.forName("com.google.crypto.tink.Aead")
-        EncryptedCourtSessionStore::class.java.getDeclaredConstructor(
-            Context::class.java
+    fun deviceUsesTheKeystoreStore() {
+        ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        assertTrue(
+            "a real device must not fall back to plaintext preferences",
+            CourtSessionProvider.get() is KeystoreCourtSessionStore
         )
+    }
+
+    @Test
+    fun keystoreStoreKeepsEveryFieldAcrossInstances() {
+        val context = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        val session = CourtSession(
+            courtId = "t1-3",
+            token = "instrumented-token",
+            expiresAtMillis = 1_900_000_000_000L,
+            legacyPin = "1234"
+        )
+        KeystoreCourtSessionStore(context).save(session)
+        try {
+            assertEquals(session, KeystoreCourtSessionStore(context).current())
+        } finally {
+            KeystoreCourtSessionStore(context).clear()
+        }
+    }
+
+    @Test
+    fun keystoreStoreDropsATamperedSession() {
+        val context = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        val store = KeystoreCourtSessionStore(context)
+        store.save(CourtSession(courtId = "t1-3", token = "instrumented-token"))
+        context.getSharedPreferences(KeystoreCourtSessionStore.PREFERENCES_NAME, 0)
+            .edit().putString("session", "AAAA:AAAA").commit()
+        assertNull(store.current())
     }
 }

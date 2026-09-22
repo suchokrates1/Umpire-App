@@ -2,14 +2,21 @@ package pl.vestmedia.tennisreferee.data.auth
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import android.util.Base64
 import androidx.annotation.VisibleForTesting
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import org.json.JSONObject
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import java.security.KeyStore
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
 
 data class CourtSession(
     val courtId: String,
@@ -29,37 +36,83 @@ interface CourtSessionStore {
 }
 
 /**
- * Stores the court authorization session encrypted with an Android Keystore-backed key.
- * A PIN is retained only for an authorization response from a legacy server that did not
- * issue a token, so the legacy player-creation request can still be authorized.
+ * Stores the court authorization session as one AES-256-GCM blob whose key never leaves
+ * the Android Keystore. A PIN is retained only for an authorization response from a legacy
+ * server that did not issue a token, so the legacy player-creation request can still be
+ * authorized.
+ *
+ * The key is created in the constructor, so a device without a usable Keystore fails here
+ * and [createCourtSessionStore] falls back to [SharedPreferencesCourtSessionStore].
  */
-class EncryptedCourtSessionStore(context: Context) : CourtSessionStore {
-    private val preferences = EncryptedSharedPreferences.create(
-        context,
-        PREFERENCES_NAME,
-        MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build(),
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
+class KeystoreCourtSessionStore(context: Context) : CourtSessionStore {
+    private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    private val key: SecretKey = loadOrCreateKey()
 
-    override fun current(): CourtSession? = preferences.readCourtSession()
+    init {
+        // Sessions written by the removed EncryptedSharedPreferences store; the umpire
+        // authorizes the court once more after this update.
+        context.deleteSharedPreferences(LEGACY_PREFERENCES_NAME)
+    }
 
-    override fun save(session: CourtSession) = preferences.writeCourtSession(session)
+    override fun current(): CourtSession? {
+        val blob = preferences.getString(KEY_BLOB, null) ?: return null
+        return try {
+            val (iv, ciphertext) = blob.split(':', limit = 2)
+                .map { Base64.decode(it, Base64.NO_WRAP) }
+            val cipher = Cipher.getInstance(TRANSFORMATION)
+            cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(TAG_BITS, iv))
+            JSONObject(String(cipher.doFinal(ciphertext), Charsets.UTF_8)).toCourtSession()
+        } catch (_: Exception) {
+            // Tampered data or a key lost in a backup restore: the session is unusable.
+            clear()
+            null
+        }
+    }
+
+    override fun save(session: CourtSession) {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        cipher.init(Cipher.ENCRYPT_MODE, key)
+        val ciphertext = cipher.doFinal(session.toJson().toString().toByteArray(Charsets.UTF_8))
+        val blob = Base64.encodeToString(cipher.iv, Base64.NO_WRAP) + ":" +
+            Base64.encodeToString(ciphertext, Base64.NO_WRAP)
+        preferences.edit().putString(KEY_BLOB, blob).apply()
+    }
 
     override fun clear() {
         preferences.edit().clear().apply()
     }
 
+    private fun loadOrCreateKey(): SecretKey {
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+        (keyStore.getKey(KEY_ALIAS, null) as? SecretKey)?.let { return it }
+        val generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
+        generator.init(
+            KeyGenParameterSpec.Builder(
+                KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setKeySize(256)
+                .build()
+        )
+        return generator.generateKey()
+    }
+
     companion object {
-        const val PREFERENCES_NAME = "court_session"
+        const val PREFERENCES_NAME = "court_session_keystore"
+        private const val LEGACY_PREFERENCES_NAME = "court_session"
+        private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+        private const val KEY_ALIAS = "court_session_key"
+        private const val KEY_BLOB = "session"
+        private const val TRANSFORMATION = "AES/GCM/NoPadding"
+        private const val TAG_BITS = 128
     }
 }
 
 /**
- * Unencrypted fallback used when Keystore / EncryptedSharedPreferences cannot be created
- * (missing Tink classes after R8, backup-restore without the key, emulator/Robolectric).
+ * Unencrypted fallback used when the Keystore key cannot be created
+ * (no usable Keystore on the device, Robolectric).
  * Uses a separate file so a corrupted encrypted blob is never read as plaintext prefs.
  */
 class SharedPreferencesCourtSessionStore(context: Context) : CourtSessionStore {
@@ -88,7 +141,7 @@ object CourtSessionProvider {
     fun initialize(context: Context) {
         val appContext = context.applicationContext
         sessionStore = createCourtSessionStore(
-            encryptedFactory = { EncryptedCourtSessionStore(appContext) },
+            encryptedFactory = { KeystoreCourtSessionStore(appContext) },
             fallbackFactory = { SharedPreferencesCourtSessionStore(appContext) }
         )
     }
@@ -112,7 +165,7 @@ object CourtSessionProvider {
 
 /**
  * Builds the court-session store used at process start.
- * EncryptedSharedPreferences / Tink / Keystore failures must not kill Application.onCreate.
+ * Keystore failures must not kill Application.onCreate.
  */
 internal fun createCourtSessionStore(
     encryptedFactory: () -> CourtSessionStore,
@@ -168,6 +221,20 @@ internal fun SharedPreferences.writeCourtSession(session: CourtSession) {
         }
         .apply()
 }
+
+private fun CourtSession.toJson(): JSONObject = JSONObject().apply {
+    put(KEY_COURT_ID, courtId)
+    token?.let { put(KEY_TOKEN, it) }
+    expiresAtMillis?.let { put(KEY_EXPIRES_AT, it) }
+    legacyPin?.let { put(KEY_LEGACY_PIN, it) }
+}
+
+private fun JSONObject.toCourtSession(): CourtSession = CourtSession(
+    courtId = getString(KEY_COURT_ID),
+    token = optString(KEY_TOKEN).takeIf { has(KEY_TOKEN) },
+    expiresAtMillis = if (has(KEY_EXPIRES_AT)) getLong(KEY_EXPIRES_AT) else null,
+    legacyPin = optString(KEY_LEGACY_PIN).takeIf { has(KEY_LEGACY_PIN) }
+)
 
 private val FRACTION_REGEX = Regex("""\.(\d+)(?=[Zz+-]|$)""")
 

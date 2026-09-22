@@ -30,7 +30,7 @@ class CourtSessionStoreFactoryTest {
     }
 
     @Test
-    fun createStoreFallsBackWhenEncryptedSharedPreferencesThrows() {
+    fun createStoreFallsBackWhenKeystoreThrows() {
         val fallback = InMemoryCourtSessionStore()
 
         val store = createCourtSessionStore(
@@ -45,12 +45,12 @@ class CourtSessionStoreFactoryTest {
     }
 
     @Test
-    fun createStoreFallsBackWhenR8StrippedEncryptedClasses() {
+    fun createStoreFallsBackOnLinkageError() {
         val fallback = InMemoryCourtSessionStore()
 
         val store = createCourtSessionStore(
             encryptedFactory = {
-                throw NoClassDefFoundError("androidx.security.crypto.EncryptedSharedPreferences")
+                throw NoClassDefFoundError("javax.crypto.KeyGenerator")
             },
             fallbackFactory = { fallback }
         )
