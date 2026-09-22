@@ -123,9 +123,6 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         app.healthCheckManager.snapshotProvider = {
             _matchState.value?.let { MatchApiPayloadFactory.toDirectorSnapshot(it) }
         }
-        app.healthCheckManager.onDirectorCommands = { commands ->
-            commands.forEach { applyDirectorCommand(it) }
-        }
         app.healthCheckManager.sendNow()
         startDirectorPolling()
     }
@@ -476,7 +473,6 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     override fun onCleared() {
         directorPollJob?.cancel()
         val app = getApplication<TennisRefereeApp>()
-        app.healthCheckManager.onDirectorCommands = null
         app.healthCheckManager.snapshotProvider = null
         app.healthCheckManager.matchId = null
         app.healthCheckManager.clientMatchUuid = null
