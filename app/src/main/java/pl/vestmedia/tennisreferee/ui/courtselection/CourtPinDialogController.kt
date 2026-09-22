@@ -4,6 +4,7 @@ import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -19,6 +20,8 @@ import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
@@ -41,8 +44,8 @@ class CourtPinDialogController(
         val digit4 = dialogView.findViewById<EditText>(R.id.pinDigit4)
         val progressBar = dialogView.findViewById<ProgressBar>(R.id.progressBar)
 
-        textMessage.text = if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
-            pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.stringFor(activity, "tutorialPinBody")
+        textMessage.text = if (TutorialSession.isActive) {
+            TutorialSession.stringFor(activity, "tutorialPinBody")
         } else {
             activity.getString(R.string.court_pin_message, court.getDisplayName(activity))
         }
@@ -62,9 +65,9 @@ class CourtPinDialogController(
             listOf(digit1, digit2, digit3, digit4).forEach { it.isEnabled = false }
 
             activity.lifecycleScope.launch {
-                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+                if (TutorialSession.isActive) {
                     progressBar.visibility = View.GONE
-                    if (pin != pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.PIN) {
+                    if (pin != TutorialCatalog.PIN) {
                         listOf(digit1, digit2, digit3, digit4).forEach {
                             it.setText("")
                             it.isEnabled = true
@@ -73,9 +76,9 @@ class CourtPinDialogController(
                         Toast.makeText(activity, activity.getString(R.string.pin_invalid, ""), Toast.LENGTH_LONG).show()
                         return@launch
                     }
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("enterPin", activity)
-                    if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(activity)) {
-                        pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(activity)
+                    TutorialSession.noteAction("enterPin", activity)
+                    if (TutorialSession.canAdvance(activity)) {
+                        TutorialSession.goNext(activity)
                     }
                     dialog.dismiss()
                     activity.startActivity(PlayerSelectionActivity.createTutorialIntent(activity))
@@ -134,9 +137,9 @@ class CourtPinDialogController(
         digit3.addTextChangedListener(createDigitWatcher(digit4, digit2))
         digit4.addTextChangedListener(createDigitWatcher(null, digit3))
 
-        if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
+        if (TutorialSession.isActive) {
             dialogView.findViewById<View>(R.id.tutorialPinGuide)?.visibility = View.VISIBLE
-            dialog.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            dialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         }
         dialog.setOnShowListener { onDialogShown?.invoke(dialog) }
         dialog.setOnDismissListener { onDialogDismissed?.invoke() }

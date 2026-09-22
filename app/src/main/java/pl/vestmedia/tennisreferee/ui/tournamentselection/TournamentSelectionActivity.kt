@@ -18,6 +18,7 @@ import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.databinding.ActivityTournamentSelectionBinding
 import pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.utils.TestLab
 
@@ -89,7 +90,7 @@ class TournamentSelectionActivity : AppCompatActivity() {
         }
 
         loadTournaments()
-        pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.maybeShowBanner(this)
+        TutorialNavigator.maybeShowBanner(this)
     }
 
     private fun setupRecyclerView() {

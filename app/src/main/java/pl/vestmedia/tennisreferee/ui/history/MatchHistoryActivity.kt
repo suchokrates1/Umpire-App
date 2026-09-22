@@ -4,11 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import pl.vestmedia.tennisreferee.R
+import pl.vestmedia.tennisreferee.data.database.MatchEntity
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchHistoryBinding
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
@@ -61,16 +63,16 @@ class MatchHistoryActivity : AppCompatActivity() {
             adapter.submitList(matches)
             
             if (matches.isEmpty()) {
-                binding.textViewEmpty.visibility = android.view.View.VISIBLE
-                binding.recyclerViewMatches.visibility = android.view.View.GONE
+                binding.textViewEmpty.visibility = View.VISIBLE
+                binding.recyclerViewMatches.visibility = View.GONE
             } else {
-                binding.textViewEmpty.visibility = android.view.View.GONE
-                binding.recyclerViewMatches.visibility = android.view.View.VISIBLE
+                binding.textViewEmpty.visibility = View.GONE
+                binding.recyclerViewMatches.visibility = View.VISIBLE
             }
         }
     }
     
-    private fun showDeleteConfirmation(match: pl.vestmedia.tennisreferee.data.database.MatchEntity) {
+    private fun showDeleteConfirmation(match: MatchEntity) {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete_match)
             .setMessage(R.string.confirm_delete_match)

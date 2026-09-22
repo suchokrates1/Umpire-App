@@ -3,6 +3,7 @@ package pl.vestmedia.tennisreferee.e2e
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
@@ -16,6 +17,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.After
@@ -30,7 +32,6 @@ import pl.vestmedia.tennisreferee.data.model.TournamentOption
 import pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
-import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -92,13 +93,13 @@ class DoublesSuggestionE2ETest {
             waitUntil("courts loaded into recycler", timeoutMs = 45_000) {
                 var count = 0
                 scenario.onActivity { activity ->
-                    val rv = activity.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerViewCourts)
+                    val rv = activity.findViewById<RecyclerView>(R.id.recyclerViewCourts)
                     count = rv?.adapter?.itemCount ?: 0
                 }
                 count > 0
             }
             onView(withId(R.id.recyclerViewCourts)).perform(
-                RecyclerViewActions.actionOnItemAtPosition<androidx.recyclerview.widget.RecyclerView.ViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
                     0,
                     click()
                 )

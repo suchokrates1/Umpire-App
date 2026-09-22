@@ -30,7 +30,7 @@ class MatchOutboxFlusherTest {
     @Test
     fun flushEmptyOutboxReturnsZero() = runBlocking {
         val store = InMemoryOutboxStore()
-        val flusher = MatchOutboxFlusher(store, TestApiClient(), SilentLogger)
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
 
         val result = flusher.flushPending()
 
@@ -45,7 +45,7 @@ class MatchOutboxFlusherTest {
         val api = TestApiClient().apply {
             createResults += Response.success(apiMatch(id = 42))
         }
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
 
         val result = flusher.flushPending()
@@ -62,7 +62,7 @@ class MatchOutboxFlusherTest {
             createResults += Response.success(apiMatch(id = 42))
             updateResults += Response.success(apiMatch(id = 42))
         }
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
         flusher.enqueue("uuid-1", "UPDATE", null, gson.toJson(apiMatch()))
 
@@ -80,7 +80,7 @@ class MatchOutboxFlusherTest {
             createResults += Response.success(apiMatch(id = 42))
             updateResults += Response.success(apiMatch(id = 42))
         }
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "UPDATE", null, gson.toJson(apiMatch()))
         flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
 
@@ -96,7 +96,7 @@ class MatchOutboxFlusherTest {
         val api = TestApiClient().apply {
             createResults += httpError(401)
         }
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
 
         val result = flusher.flushPending()
@@ -113,7 +113,7 @@ class MatchOutboxFlusherTest {
         val api = TestApiClient().apply {
             createResults += null
         }
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
 
         val result = flusher.flushPending()
@@ -129,7 +129,7 @@ class MatchOutboxFlusherTest {
     fun flushSkipsUpdateWithoutServerMatchId() = runBlocking {
         val store = InMemoryOutboxStore()
         val api = TestApiClient()
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "UPDATE", null, gson.toJson(apiMatch()))
 
         val result = flusher.flushPending()
@@ -143,7 +143,7 @@ class MatchOutboxFlusherTest {
     @Test
     fun enqueueCoalescesUpdatesForSameUuid() = runBlocking {
         val store = InMemoryOutboxStore()
-        val flusher = MatchOutboxFlusher(store, TestApiClient(), SilentLogger)
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
 
         flusher.enqueue("uuid-1", "UPDATE", 10, "payload1")
         flusher.enqueue("uuid-1", "UPDATE", 10, "payload2")
@@ -161,7 +161,7 @@ class MatchOutboxFlusherTest {
             createResults += Response.success(apiMatch(id = 42))
             createResults += Response.success(apiMatch(id = 42))
         }
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
 
         flusher.flushPending()
@@ -178,7 +178,7 @@ class MatchOutboxFlusherTest {
             createResults += Response.success(apiMatch(id = 55))
             finishResults += httpError(500)
         }
-        val flusher = MatchOutboxFlusher(store, api, SilentLogger)
+        val flusher = MatchOutboxFlusher(store, api)
         flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
         flusher.enqueue("uuid-1", "FINISH", null, gson.toJson(FinishMatchRequest()))
 
@@ -199,7 +199,7 @@ class MatchOutboxFlusherTest {
             createResults += null
             createResults += null
         }
-        val flusher = MatchOutboxFlusher(store, TestApiClient(), SilentLogger)
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
         val coordinator = MatchSyncCoordinator(
             apiClient = api,
             matchHistorySaver = StubHistorySaver,
@@ -228,7 +228,7 @@ class MatchOutboxFlusherTest {
             createResults += httpError(502)
             createResults += httpError(503)
         }
-        val flusher = MatchOutboxFlusher(store, TestApiClient(), SilentLogger)
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
         val coordinator = MatchSyncCoordinator(
             apiClient = api,
             matchHistorySaver = StubHistorySaver,
@@ -254,7 +254,7 @@ class MatchOutboxFlusherTest {
         val api = TestApiClient().apply {
             createResults += httpError(400)
         }
-        val flusher = MatchOutboxFlusher(store, TestApiClient(), SilentLogger)
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
         val coordinator = MatchSyncCoordinator(
             apiClient = api,
             matchHistorySaver = StubHistorySaver,
@@ -279,7 +279,7 @@ class MatchOutboxFlusherTest {
             updateResults += null
             updateResults += null
         }
-        val flusher = MatchOutboxFlusher(store, TestApiClient(), SilentLogger)
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
         val coordinator = MatchSyncCoordinator(
             apiClient = api,
             matchHistorySaver = StubHistorySaver,

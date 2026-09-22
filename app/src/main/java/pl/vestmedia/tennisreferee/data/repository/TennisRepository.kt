@@ -10,10 +10,8 @@ import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.model.Court
-import pl.vestmedia.tennisreferee.domain.match.model.Match
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
-import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.data.model.TournamentOption
 import retrofit2.Response
@@ -113,38 +111,6 @@ class TennisRepository(
                 },
                 onFailure = { Result.failure(it) }
             )
-    }
-    
-    /**
-     * Pobiera szczegóły meczu
-     */
-    suspend fun getMatch(matchId: Int): Result<Match> {
-        return request { apiService.getMatch(matchId) }
-            .map { it.toModel() }
-    }
-    
-    /**
-     * Tworzy nowy mecz
-     */
-    suspend fun createMatch(match: Match): Result<Match> {
-        return request { apiService.createMatch(match.toDto()) }
-            .map { it.toModel() }
-    }
-    
-    /**
-     * Aktualizuje wynik meczu
-     */
-    suspend fun updateMatch(matchId: Int, match: Match): Result<Match> {
-        return request { apiService.updateMatch(matchId, match.toDto()) }
-            .map { it.toModel() }
-    }
-    
-    /**
-     * Kończy mecz
-     */
-    suspend fun finishMatch(matchId: Int): Result<Match> {
-        return request { apiService.finishMatch(matchId, FinishMatchRequest().toDto()) }
-            .map { it.toModel() }
     }
     
     /**

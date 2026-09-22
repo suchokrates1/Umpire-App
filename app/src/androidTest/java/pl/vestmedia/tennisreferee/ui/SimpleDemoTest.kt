@@ -1,9 +1,11 @@
 package pl.vestmedia.tennisreferee.ui
 
+import android.os.Environment
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import java.io.File
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +25,7 @@ class SimpleDemoTest {
     @Test
     fun demonstrateAppFlow() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val screenshotDir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES)
+        val screenshotDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         
         println("=================================================")
         println("SCREENSHOT DIRECTORY: ${screenshotDir?.absolutePath}/screenshots")
@@ -52,7 +54,7 @@ class SimpleDemoTest {
         println("=================================================")
         
         // Lista plików w katalogu
-        val screenshotsFolder = java.io.File(screenshotDir, "screenshots")
+        val screenshotsFolder = File(screenshotDir, "screenshots")
         if (screenshotsFolder.exists()) {
             println("Files in screenshots folder:")
             screenshotsFolder.listFiles()?.forEach {

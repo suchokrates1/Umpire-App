@@ -400,16 +400,6 @@ fun CourtDto.toModel(): Court {
     )
 }
 
-fun Court.toDto(): CourtDto {
-    return CourtDto(
-        id = id,
-        overlayId = overlayId,
-        name = name,
-        isAvailable = isAvailable,
-        currentMatchId = currentMatchId
-    )
-}
-
 fun PlayerDto.toModel(): Player {
     return Player(
         id = id,
@@ -472,19 +462,6 @@ fun TournamentOptionDto.toModel(): TournamentOption {
     )
 }
 
-fun TournamentOption.toDto(): TournamentOptionDto {
-    return TournamentOptionDto(
-        id = id,
-        name = name,
-        city = city,
-        country = country,
-        location = location,
-        startDate = startDate,
-        endDate = endDate,
-        isSimulation = if (isSimulation) 1 else 0
-    )
-}
-
 fun ScheduleSuggestionDto.toModel(): ScheduleSuggestion {
     return ScheduleSuggestion(
         id = id,
@@ -500,24 +477,6 @@ fun ScheduleSuggestionDto.toModel(): ScheduleSuggestion {
         isDoubles = isDoubles,
         player1 = player1?.toModel(),
         player2 = player2?.toModel()
-    )
-}
-
-fun ScheduleSuggestion.toDto(): ScheduleSuggestionDto {
-    return ScheduleSuggestionDto(
-        id = id,
-        tournamentId = tournamentId,
-        dayDate = dayDate,
-        scheduledTime = scheduledTime,
-        courtId = courtId,
-        courtLabel = courtLabel,
-        categoryName = categoryName,
-        phase = phase,
-        player1Name = player1Name,
-        player2Name = player2Name,
-        isDoubles = isDoubles,
-        player1 = player1?.toDto(),
-        player2 = player2?.toDto()
     )
 }
 

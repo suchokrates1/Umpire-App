@@ -1,5 +1,6 @@
 package pl.vestmedia.tennisreferee.startup
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
@@ -55,7 +56,7 @@ class ApplicationStartupSmokeTest {
         Class.forName("androidx.security.crypto.MasterKey")
         Class.forName("com.google.crypto.tink.Aead")
         EncryptedCourtSessionStore::class.java.getDeclaredConstructor(
-            android.content.Context::class.java
+            Context::class.java
         )
     }
 }

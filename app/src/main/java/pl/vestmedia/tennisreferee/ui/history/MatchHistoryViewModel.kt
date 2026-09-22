@@ -18,10 +18,6 @@ class MatchHistoryViewModel(application: Application) : AndroidViewModel(applica
     
     val allMatches: LiveData<List<MatchEntity>> = repository.allMatches.asLiveData()
     
-    fun getRecentMatches(limit: Int = 20): LiveData<List<MatchEntity>> {
-        return repository.getRecentMatches(limit).asLiveData()
-    }
-    
     fun deleteMatch(match: MatchEntity) = viewModelScope.launch {
         repository.deleteMatch(match)
     }

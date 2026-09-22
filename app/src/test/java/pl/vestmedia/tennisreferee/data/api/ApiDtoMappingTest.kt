@@ -12,47 +12,12 @@ import pl.vestmedia.tennisreferee.data.api.dto.toDto
 import pl.vestmedia.tennisreferee.data.api.dto.toModel
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
-import pl.vestmedia.tennisreferee.domain.match.model.Match
 import pl.vestmedia.tennisreferee.domain.match.model.MatchFinishReason
-import pl.vestmedia.tennisreferee.domain.match.model.MatchStatus
-import pl.vestmedia.tennisreferee.domain.match.model.Score
-import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 class ApiDtoMappingTest {
     @Test
-    fun matchDtoRoundTripPreservesDomainFields() {
-        val match = Match(
-            id = 42,
-            courtId = "T1-1",
-            player1Name = "Anna Kowalska",
-            player2Name = "Ewa Nowak",
-            score = Score(
-                player1Sets = 1,
-                player2Sets = 0,
-                player1Games = 4,
-                player2Games = 3,
-                player1Points = 2,
-                player2Points = 1,
-                setsHistory = listOf(SetScore(1, 4, 3, tiebreakLoserPoints = 5))
-            ),
-            status = MatchStatus.FINISHED,
-            createdAt = "2026-05-29T10:00:00Z",
-            updatedAt = "2026-05-29T11:00:00Z",
-            bracketWarning = "knockout",
-            phase = "semifinal",
-            scheduleId = 7,
-            clientMatchUuid = "uuid-1",
-            finishReason = MatchFinishReason.RETIREMENT,
-            winnerName = "Anna Kowalska",
-            injuredPlayerName = "Ewa Nowak",
-            resultNote = "Retirement"
-        )
-
-        val dto = match.toDto()
-        val roundTrip = dto.toModel()
-
-        assertEquals(MatchFinishReasonDto.RETIREMENT, dto.finishReason)
-        assertEquals(match, roundTrip)
+    fun finishReasonMapsToApiEnum() {
+        assertEquals(MatchFinishReasonDto.RETIREMENT, MatchFinishReason.RETIREMENT.toDto())
     }
 
     @Test

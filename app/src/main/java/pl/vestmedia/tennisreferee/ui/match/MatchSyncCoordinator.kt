@@ -200,40 +200,6 @@ class MatchSyncCoordinator(
         }
     }
 
-    suspend fun finishMatch(
-        state: MatchState,
-        finishRequest: FinishMatchRequest = MatchApiPayloadFactory.toFinishRequest(state)
-    ) {
-        state.matchId?.let { matchId ->
-            try {
-                val response = requestWithRetry("finish match") { apiClient.finishMatch(matchId, finishRequest) }
-                if (!response.isSuccessful) {
-                    logger.api("finishMatch", "FAIL ${response.code()}")
-                    enqueueIfRetryable(response.code(), state.clientMatchUuid, "FINISH", matchId, finishRequest)
-                }
-            } catch (e: Exception) {
-                logger.error("finishMatchOnServer", e)
-                enqueueToOutbox(state.clientMatchUuid, "FINISH", matchId, finishRequest)
-            }
-        }
-    }
-
-    suspend fun sendStatistics(state: MatchState) {
-        val statisticsRequest = MatchApiPayloadFactory.toStatisticsRequest(state) ?: return
-        try {
-            val response = requestWithRetry("send statistics") { apiClient.sendMatchStatistics(statisticsRequest) }
-            if (response.isSuccessful) {
-                logger.api("sendStatistics", "OK")
-            } else {
-                logger.api("sendStatistics", "FAIL ${response.code()}")
-                enqueueIfRetryable(response.code(), state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
-            }
-        } catch (e: Exception) {
-            logger.error("sendMatchStatistics", e)
-            enqueueToOutbox(state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
-        }
-    }
-
     private suspend fun <T> requestWithRetry(
         operation: String,
         maxAttempts: Int = 3,
@@ -280,9 +246,9 @@ class MatchSyncCoordinator(
         onSyncDiagnostics(status, errorMessage)
     }
 
-    private fun Response<*>.shouldRetry(): Boolean {
-        return code() in 500..599 || code() == 408 || code() == 429
-    }
+    private fun Response<*>.shouldRetry(): Boolean = isRetryable(code())
+
+    private fun isRetryable(code: Int): Boolean = code in 500..599 || code == 408 || code == 429
 
     private suspend fun tryFlushOutbox() {
         try {
@@ -312,7 +278,7 @@ class MatchSyncCoordinator(
         serverMatchId: Int?,
         payload: Any
     ) {
-        if (code in 500..599 || code == 408 || code == 429) {
+        if (isRetryable(code)) {
             enqueueToOutbox(clientMatchUuid, type, serverMatchId, payload)
         }
     }

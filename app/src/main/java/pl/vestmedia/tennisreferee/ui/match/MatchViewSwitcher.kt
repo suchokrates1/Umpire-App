@@ -1,9 +1,11 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import android.view.View
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import androidx.core.view.isVisible
-import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchBinding
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 
 class MatchViewSwitcher(
     private val binding: ActivityMatchBinding,
@@ -67,7 +69,7 @@ class MatchViewSwitcher(
                     .alpha(1f)
                     .translationX(0f)
                     .setDuration(300)
-                    .setInterpolator(android.view.animation.DecelerateInterpolator())
+                    .setInterpolator(DecelerateInterpolator())
                     .start()
             }
             View.GONE -> {
@@ -76,7 +78,7 @@ class MatchViewSwitcher(
                         .alpha(0f)
                         .translationX(-100f)
                         .setDuration(200)
-                        .setInterpolator(android.view.animation.AccelerateInterpolator())
+                        .setInterpolator(AccelerateInterpolator())
                         .withEndAction {
                             view.visibility = View.GONE
                             view.alpha = 1f

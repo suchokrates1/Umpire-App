@@ -1,6 +1,5 @@
 package pl.vestmedia.tennisreferee.ui.tutorial
 
-import android.app.Activity
 import android.content.Context
 
 object TutorialSession {
@@ -75,9 +74,4 @@ object TutorialSession {
         return if (id != 0) context.getString(id) else camelKey
     }
 
-    fun finishHost(activity: Activity) {
-        if (returnToSettings) {
-            activity.finish()
-        }
-    }
 }

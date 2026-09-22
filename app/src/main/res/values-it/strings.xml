@@ -4,11 +4,9 @@
     
     <!-- Language Selection -->
     <string name="select_language">Seleziona lingua</string>
-    <string name="language_selected">Lingua selezionata</string>
     
     <!-- Court Selection -->
     <string name="select_tournament">Seleziona torneo</string>
-    <string name="change_tournament">Cambia torneo</string>
     <string name="no_tournaments_available">Nessun torneo attivo disponibile</string>
     <string name="error_loading_tournaments">Errore nel caricamento dei tornei</string>
     <string name="select_court">Seleziona campo</string>
@@ -19,8 +17,6 @@
     <string name="court_occupied">Occupato</string>
     <string name="court_pin_title">Autorizzazione campo</string>
     <string name="court_pin_message">Inserisci il PIN per il campo: %1$s</string>
-    <string name="pin_hint">Inserisci PIN</string>
-    <string name="pin_empty">Il PIN non può essere vuoto</string>
     <string name="pin_invalid">PIN non valido: %1$s</string>
     
     <!-- Player Selection -->
@@ -34,9 +30,6 @@
     <string name="game_type_singles">Singolo (2 giocatori)</string>
     <string name="game_type_doubles">Doppio (4 giocatori)</string>
     <string name="selected_info">Selezionati: %1$d/%2$d</string>
-    <string name="add_new_player">+ Aggiungi nuovo giocatore</string>
-    <string name="player_name_hint">Nome giocatore</string>
-    <string name="country_code_hint">Codice paese (es. IT)</string>
     <string name="search_players">Cerca giocatori</string>
     <string name="add_player">+ Aggiungi nuovo giocatore</string>
     <string name="player_not_found">Giocatore non trovato</string>
@@ -45,11 +38,7 @@
     <string name="player_last_name">Cognome</string>
     <string name="player_country">Paese</string>
     <string name="player_category">Categoria</string>
-    <string name="doubles">Doppio</string>
-    <string name="singles">Singolo (2 giocatori)</string>
-    <string name="doubles_mode">Doppio (4 giocatori)</string>
     <string name="no_players_available">Nessun giocatore disponibile</string>
-    <string name="selected_count">Selezionati: %1$d/%2$d</string>
     <string name="next">Avanti</string>
     <string name="back">Indietro</string>
     
@@ -57,14 +46,11 @@
     <string name="undo">Annulla</string>
     <string name="undo_with_icon">↶ Annulla</string>
     <string name="confirm_undo">Annullare l\'ultima azione?</string>
-    <string name="confirm_finish_match">Sei sicuro di voler terminare la partita?</string>
     <string name="who_serves_first">Chi serve per primo?</string>
     <string name="swap_sides">⇄ Scambia lati</string>
     <string name="player_serves">%1$s\nServe</string>
-    <string name="team_serves">%1$s\nServe</string>
     <string name="first_serve">1° Servizio</string>
     <string name="second_serve">1° servizio  >  2° servizio</string>
-    <string name="serve">Servizio</string>
     <string name="ace">ACE</string>
     <string name="fault">FALLO</string>
     <string name="second_serve_button">2° SERVIZIO</string>
@@ -74,7 +60,6 @@
     <string name="winner">VINCENTE</string>
     <string name="forced_error">ERRORE\nFORZATO</string>
     <string name="unforced_error">ERRORE\nNON FORZATO</string>
-    <string name="match_finished">Partita terminata</string>
     <string name="winner_label">Vincitore: %1$s</string>
     <string name="finish">Fine</string>
     <string name="finish_match">Termina partita</string>
@@ -85,7 +70,6 @@
     <string name="finish_reason_walkover">Walkover</string>
     <string name="finish_retirement_prompt">Quale giocatore si ritira per infortunio?</string>
     <string name="finish_walkover_prompt">Quale giocatore vince per walkover?</string>
-    <string name="new_match">Nuova partita</string>
     <string name="next_match_same_setup">▶ Prossima partita (stessa configurazione)</string>
     <string name="next_match_new_setup">⚙ Nuova partita (altra configurazione)</string>
     
@@ -94,11 +78,7 @@
     <string name="scoreboard_points">Punti</string>
     <string name="scoreboard_set1">Set 1</string>
     <string name="scoreboard_set2">Set 2</string>
-    <string name="player_name">Nome</string>
-    <string name="points">Punti</string>
-    <string name="set">Set %1$d</string>
     <string name="tiebreak">Tie-break (a %1$d)</string>
-    <string name="super_tiebreak">Match tie-break (a %1$d)</string>
     <string name="tiebreak_mode">Tie-break (a %1$d, vittoria per 2)</string>
     <string name="super_tiebreak_mode">Match Tie-break (a %1$d, vittoria per 2)</string>
 
@@ -118,15 +98,10 @@
     <string name="player_serves_short">Serve</string>
     
     <!-- Errors -->
-    <string name="error_loading_courts">Errore nel caricamento dei campi</string>
-    <string name="error_loading_players">Errore nel caricamento dei giocatori</string>
-    <string name="error_network">Errore di connessione di rete</string>
-    <string name="error_unknown">Errore sconosciuto</string>
     <string name="error_no_court_data">Errore: Dati del campo mancanti</string>
     <string name="error_select_correct_players">Seleziona il numero corretto di giocatori</string>
     <string name="error_enter_first_name">Inserisci il nome del giocatore</string>
     <string name="error_enter_last_name">Inserisci il cognome del giocatore</string>
-    <string name="error_adding_player">Errore nell\'aggiunta del giocatore</string>
     <string name="no_actions_to_undo">Nessuna azione da annullare</string>
     <string name="undo_action_format">Annullato: %1$s</string>
 
@@ -142,12 +117,9 @@
     <string name="undo_win">Vittoria - %1$s</string>
     
     <!-- Stats Mode Selection -->
-    <string name="stats_mode_title">Modalità statistiche</string>
     <string name="stats_mode_basic">Base</string>
-    <string name="stats_mode_basic_desc">Punteggio semplificato: solo pulsanti Win e Fallo.\nTiene traccia: doppi falli.</string>
     <string name="stats_mode_basic_short">WIN + FALLO\nVeloce e semplice</string>
     <string name="stats_mode_advanced">Avanzata</string>
-    <string name="stats_mode_advanced_desc">Punteggio completo: Ace, Fallo, Palla in gioco, Vincente, Errore forzato, Errore non forzato.\nTiene traccia: ace, doppi falli, vincenti, errori forzati/non forzati, %% di servizio.</string>
     <string name="stats_mode_advanced_short">Ace, Vincente, Errori…\nStatistiche complete</string>
         <string name="match_config_title">Configurazione partita</string>
             <string name="match_config_umpire_hint">Nome o iniziali arbitro</string>
@@ -190,8 +162,6 @@
     <string name="delete_all_matches">Elimina tutto</string>
     <string name="confirm_delete_match">Eliminare questa partita?</string>
     <string name="confirm_delete_all_matches">Eliminare tutte le partite dallo storico?</string>
-    <string name="match_deleted">Partita eliminata</string>
-    <string name="all_matches_deleted">Tutte le partite eliminate</string>
     <string name="match_details">Dettagli partita</string>
     <string name="match_details_placeholder">I dettagli della partita verranno visualizzati qui</string>
     <string name="match_details_not_found">Dettagli partita non trovati</string>
@@ -230,10 +200,8 @@
 
     <!-- Statistics Labels -->
     <string name="winners_stat">Vincenti</string>
-    <string name="forced_errors_stat">Errori forzati</string>
     <string name="unforced_errors_stat">Errori non forzati</string>
     <string name="first_serve_pct">1° servizio %</string>
-    <string name="new_match_button">Nuova partita</string>
     <string name="match_metadata_umpire">Arbitro: %1$s</string>
     <string name="match_type_mixed">Misto</string>
     <string name="match_type_doubles">Doppio</string>

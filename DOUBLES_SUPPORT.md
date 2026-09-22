@@ -48,9 +48,9 @@ var currentServer: Int = 1         // 1-4, current server in doubles
 - `getTeam2DisplayName()` - Returns "Player2 / Player4" or custom team name
 - `getCurrentServerName()` - Returns name of player currently serving (1-4)
 
-### 5. ViewModel Logic
+### 5. Serve rotation
 
-#### `rotateDoublesServer(state: MatchState)`
+#### `DoublesServeRotation.rotate(state: MatchState)` (`domain/match`)
 Handles serving rotation after each game:
 ```kotlin
 1 -> 2  // Team A (Player 1) → Team B (Player 2)
@@ -128,35 +128,6 @@ Statistics are tracked per team (Team A vs Team B) not per individual player in 
    - Undo last action
    - Verify server rotation state restored correctly
 
-## Implementation Files
-
-### Modified Files
-1. **MatchState.kt**
-   - Added player3, player4, isDoubles, team names
-   - Added currentServer field
-   - Added helper methods for team display
-   - Updated toMatch() to send team names
-
-2. **PlayerSelectionActivity.kt**
-   - Updated proceedToNextScreen() to create doubles MatchState
-   - Passes all 4 players when isDoubles = true
-
-3. **MatchActivity.kt**
-   - Updated updatePlayerNames() for doubles team display
-   - Updated updateScoreboard() to show team names
-   - Added team color support
-
-4. **MatchViewModel.kt**
-   - Added rotateDoublesServer() function
-   - Modified addPoint() tiebreak logic for doubles
-   - Modified checkGameAndSetStatus() to call rotateDoublesServer()
-
-5. **strings.xml**
-   - Added `team_serves` string resource
-
-6. **colors.xml**
-   - Already had team1_color and team2_color defined
-
 ## Known Limitations
 
 1. **Backend**: Backend currently receives team names as single strings, not individual player IDs
@@ -194,7 +165,7 @@ Statistics are tracked per team (Team A vs Team B) not per individual player in 
 
 ### Server rotation not working
 - Check `state.isDoubles` is true
-- Verify `rotateDoublesServer()` is called after game win
+- Verify `DoublesServeRotation.rotate()` is called after game win
 - Check `currentServer` value (should be 1-4)
 
 ### Team names not showing

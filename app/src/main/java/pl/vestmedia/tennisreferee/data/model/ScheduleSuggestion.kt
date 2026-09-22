@@ -1,9 +1,5 @@
 package pl.vestmedia.tennisreferee.data.model
 
-data class ScheduleSuggestionResponse(
-    val suggestion: ScheduleSuggestion? = null
-)
-
 data class ScheduleSuggestion(
     val id: Int,
 

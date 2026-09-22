@@ -177,17 +177,6 @@ data class MatchState(
     }
 
     /**
-     * Zwraca etykietę typu meczu do wyświetlenia w UI.
-     */
-    fun getMatchTypeLabel(): String {
-        return when {
-            isMixedDoubles -> "Mixed"
-            isDoubles -> "Doubles"
-            else -> "Singles"
-        }
-    }
-    
-    /**
      * Zwraca punkty w formacie tenisowym (0, 15, 30, 40, ADV)
      */
     fun getPlayer1PointsDisplay(): String {

@@ -2,9 +2,14 @@ package pl.vestmedia.tennisreferee.ui.playerselection
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,13 +20,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.databinding.ActivityPlayerSelectionBinding
-import pl.vestmedia.tennisreferee.data.model.Player
-import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.TennisRefereeApp
-import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.data.model.Player
+import pl.vestmedia.tennisreferee.databinding.ActivityPlayerSelectionBinding
+import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.ui.match.ActiveMatchStore
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
+import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * Activity do wyboru zawodników (singiel lub debel)
@@ -41,9 +50,9 @@ class PlayerSelectionActivity : AppCompatActivity() {
 
         fun createTutorialIntent(context: Context): Intent {
             return Intent(context, PlayerSelectionActivity::class.java).apply {
-                putExtra(EXTRA_COURT_ID, pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.COURT_1)
+                putExtra(EXTRA_COURT_ID, TutorialCatalog.COURT_1)
                 putExtra(EXTRA_COURT_NAME, "1")
-                putExtra(pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.EXTRA_TUTORIAL, true)
+                putExtra(TutorialNavigator.EXTRA_TUTORIAL, true)
             }
         }
     }
@@ -102,10 +111,10 @@ class PlayerSelectionActivity : AppCompatActivity() {
         setupObservers()
         setupListeners()
         
-        val tutorial = intent.getBooleanExtra(pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.EXTRA_TUTORIAL, false)
-            || pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive
+        val tutorial = intent.getBooleanExtra(TutorialNavigator.EXTRA_TUTORIAL, false)
+            || TutorialSession.isActive
         if (tutorial) {
-            viewModel.setTutorialPlayers(pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.players(this))
+            viewModel.setTutorialPlayers(TutorialCatalog.players(this))
             attachTutorialOverlay()
         } else {
             viewModel.loadPlayers(courtId)
@@ -113,26 +122,26 @@ class PlayerSelectionActivity : AppCompatActivity() {
         }
     }
 
-    private var tutorialOverlay: pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController? = null
+    private var tutorialOverlay: TutorialOverlayController? = null
 
     private fun attachTutorialOverlay() {
-        tutorialOverlay = pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController(
+        tutorialOverlay = TutorialOverlayController(
             activity = this,
-            onBack = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this) },
+            onBack = { TutorialNavigator.goBackScene(this) },
             onNext = {
-                val step = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.currentStep(this)
+                val step = TutorialSession.currentStep(this)
                 if (step?.scene == "players" || step?.scene == "config") {
                     proceedToNextScreen()
                     return@TutorialOverlayController
                 }
-                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
-                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
+                TutorialSession.goNext(this)
+                if (TutorialNavigator.applyStep(this)) {
                     finish()
                 } else {
                     tutorialOverlay?.refresh()
                 }
             },
-            onSkip = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this) },
+            onSkip = { TutorialNavigator.exit(this) },
         )
         tutorialOverlay?.attach()
     }
@@ -238,10 +247,10 @@ class PlayerSelectionActivity : AppCompatActivity() {
             // Auto-przejście gdy wybrano wymaganą ilość graczy
             val requiredCount = if (viewModel.isDoubles.value == true) 4 else 2
             if (selectedPlayers.size == requiredCount) {
-                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("selectPlayers", this)
-                    if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(this)) {
-                        pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
+                if (TutorialSession.isActive) {
+                    TutorialSession.noteAction("selectPlayers", this)
+                    if (TutorialSession.canAdvance(this)) {
+                        TutorialSession.goNext(this)
                     }
                     proceedToNextScreen()
                     tutorialOverlay?.refresh()
@@ -343,8 +352,8 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         binding.buttonBack.setOnClickListener {
             AppLogger.button("PlayerSelection", "Back")
-            if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
-                pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this)
+            if (TutorialSession.isActive) {
+                TutorialNavigator.goBackScene(this)
             } else {
                 finish()
             }
@@ -455,7 +464,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
     }
 
     private fun buildDoublesSelectionText(selectedPlayers: List<Player>): CharSequence {
-        val builder = android.text.SpannableStringBuilder()
+        val builder = SpannableStringBuilder()
 
         fun appendTeamLine(text: String, colorRes: Int) {
             if (builder.isNotEmpty()) {
@@ -464,16 +473,16 @@ class PlayerSelectionActivity : AppCompatActivity() {
             val start = builder.length
             builder.append(text)
             builder.setSpan(
-                android.text.style.ForegroundColorSpan(ContextCompat.getColor(this, colorRes)),
+                ForegroundColorSpan(ContextCompat.getColor(this, colorRes)),
                 start,
                 builder.length,
-                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             builder.setSpan(
-                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                StyleSpan(Typeface.BOLD),
                 start,
                 builder.length,
-                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
 
@@ -492,10 +501,10 @@ class PlayerSelectionActivity : AppCompatActivity() {
             val start = builder.length
             builder.append(getString(R.string.match_type_mixed))
             builder.setSpan(
-                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                StyleSpan(Typeface.BOLD),
                 start,
                 builder.length,
-                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
 

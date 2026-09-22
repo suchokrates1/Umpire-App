@@ -4,11 +4,9 @@
     
     <!-- Language Selection -->
     <string name="select_language">Sprache auswählen</string>
-    <string name="language_selected">Sprache ausgewählt</string>
     
     <!-- Court Selection -->
     <string name="select_tournament">Turnier auswählen</string>
-    <string name="change_tournament">Turnier wechseln</string>
     <string name="no_tournaments_available">Keine aktiven Turniere verfügbar</string>
     <string name="error_loading_tournaments">Fehler beim Laden der Turniere</string>
     <string name="select_court">Platz auswählen</string>
@@ -19,8 +17,6 @@
     <string name="court_occupied">Belegt</string>
     <string name="court_pin_title">Platzautorisierung</string>
     <string name="court_pin_message">PIN für Platz eingeben: %1$s</string>
-    <string name="pin_hint">PIN eingeben</string>
-    <string name="pin_empty">PIN darf nicht leer sein</string>
     <string name="pin_invalid">Ungültige PIN: %1$s</string>
     
     <!-- Player Selection -->
@@ -34,9 +30,6 @@
     <string name="game_type_singles">Einzel (2 Spieler)</string>
     <string name="game_type_doubles">Doppel (4 Spieler)</string>
     <string name="selected_info">Ausgewählt: %1$d/%2$d</string>
-    <string name="add_new_player">+ Neuen Spieler hinzufügen</string>
-    <string name="player_name_hint">Spielername</string>
-    <string name="country_code_hint">Ländercode (z.B. DE)</string>
     <string name="search_players">Spieler suchen</string>
     <string name="add_player">+ Neuen Spieler hinzufügen</string>
     <string name="player_not_found">Spieler nicht gefunden</string>
@@ -45,11 +38,7 @@
     <string name="player_last_name">Nachname</string>
     <string name="player_country">Land</string>
     <string name="player_category">Kategorie</string>
-    <string name="doubles">Doppel</string>
-    <string name="singles">Einzel (2 Spieler)</string>
-    <string name="doubles_mode">Doppel (4 Spieler)</string>
     <string name="no_players_available">Keine Spieler verfügbar</string>
-    <string name="selected_count">Ausgewählt: %1$d/%2$d</string>
     <string name="next">Weiter</string>
     <string name="back">Zurück</string>
     
@@ -57,14 +46,11 @@
     <string name="undo">Rückgängig</string>
     <string name="undo_with_icon">↶ Rückgängig</string>
     <string name="confirm_undo">Letzte Aktion rückgängig machen?</string>
-    <string name="confirm_finish_match">Möchten Sie das Spiel wirklich beenden?</string>
     <string name="who_serves_first">Wer schlägt zuerst auf?</string>
     <string name="swap_sides">⇄ Seiten wechseln</string>
     <string name="player_serves">%1$s\nSchlägt auf</string>
-    <string name="team_serves">%1$s\nSchlägt auf</string>
     <string name="first_serve">1. Aufschlag</string>
     <string name="second_serve">1. Aufschlag  >  2. Aufschlag</string>
-    <string name="serve">Aufschlag</string>
     <string name="ace">ASS</string>
     <string name="fault">FEHLER</string>
     <string name="second_serve_button">2. AUFSCHLAG</string>
@@ -74,7 +60,6 @@
     <string name="winner">WINNER</string>
     <string name="forced_error">ERZWUNGENER\nFEHLER</string>
     <string name="unforced_error">UNERZWUNGENER\nFEHLER</string>
-    <string name="match_finished">Spiel beendet</string>
     <string name="winner_label">Gewinner: %1$s</string>
     <string name="finish">Beenden</string>
     <string name="finish_match">Spiel beenden</string>
@@ -85,7 +70,6 @@
     <string name="finish_reason_walkover">Walkover</string>
     <string name="finish_retirement_prompt">Welcher Spieler gibt verletzt auf?</string>
     <string name="finish_walkover_prompt">Welcher Spieler gewinnt per Walkover?</string>
-    <string name="new_match">Neues Spiel</string>
     <string name="next_match_same_setup">▶ Nächstes Spiel (gleiche Einstellungen)</string>
     <string name="next_match_new_setup">⚙ Neues Spiel (andere Einstellungen)</string>
     <string name="match_config_title">Match-Konfiguration</string>
@@ -112,11 +96,7 @@
     <string name="scoreboard_points">Punkte</string>
     <string name="scoreboard_set1">Satz 1</string>
     <string name="scoreboard_set2">Satz 2</string>
-    <string name="player_name">Name</string>
-    <string name="points">Punkte</string>
-    <string name="set">Satz %1$d</string>
     <string name="tiebreak">Tie-break (bis %1$d)</string>
-    <string name="super_tiebreak">Match-Tiebreak (bis %1$d)</string>
     <string name="tiebreak_mode">Tie-break (bis %1$d, Gewinn mit 2 Vorsprung)</string>
     <string name="super_tiebreak_mode">Match-Tiebreak (bis %1$d, Gewinn mit 2 Vorsprung)</string>
 
@@ -146,15 +126,10 @@
     <string name="sync_status_idle">Noch nicht synchronisiert</string>
     
     <!-- Errors -->
-    <string name="error_loading_courts">Fehler beim Laden der Plätze</string>
-    <string name="error_loading_players">Fehler beim Laden der Spieler</string>
-    <string name="error_network">Netzwerkverbindungsfehler</string>
-    <string name="error_unknown">Unbekannter Fehler</string>
     <string name="error_no_court_data">Fehler: Fehlende Platzdaten</string>
     <string name="error_select_correct_players">Wählen Sie die richtige Anzahl von Spielern</string>
     <string name="error_enter_first_name">Vorname des Spielers eingeben</string>
     <string name="error_enter_last_name">Nachname des Spielers eingeben</string>
-    <string name="error_adding_player">Fehler beim Hinzufügen des Spielers</string>
     <string name="no_actions_to_undo">Keine Aktionen zum Rückgängigmachen</string>
     <string name="undo_action_format">Rückgängig: %1$s</string>
 
@@ -170,12 +145,9 @@
     <string name="undo_win">Gewinn - %1$s</string>
     
     <!-- Stats Mode Selection -->
-    <string name="stats_mode_title">Statistikmodus</string>
     <string name="stats_mode_basic">Einfach</string>
-    <string name="stats_mode_basic_desc">Vereinfachte Wertung: nur Win- und Fehler-Tasten.\nErfasst: Doppelfehler.</string>
     <string name="stats_mode_basic_short">WIN + FAULT\nSchnell &amp; einfach</string>
     <string name="stats_mode_advanced">Erweitert</string>
-    <string name="stats_mode_advanced_desc">Volle Wertung: Ass, Fehler, Ball im Spiel, Winner, erzwungener Fehler, unerzwungener Fehler.\nErfasst: Asse, Doppelfehler, Winner, erzwungene/unerzwungene Fehler, Aufschlag %%.</string>
     <string name="stats_mode_advanced_short">Ass, Winner, Fehler…\nVolle Statistiken</string>
     <string name="win_point">WIN</string>
     <string name="no_advantage_mode">Ohne Vorteil (Entscheidungspunkt)</string>
@@ -200,8 +172,6 @@
     <string name="delete_all_matches">Alle löschen</string>
     <string name="confirm_delete_match">Dieses Spiel löschen?</string>
     <string name="confirm_delete_all_matches">Alle Spiele aus dem Verlauf löschen?</string>
-    <string name="match_deleted">Spiel gelöscht</string>
-    <string name="all_matches_deleted">Alle Spiele gelöscht</string>
     <string name="match_details">Spieldetails</string>
     <string name="match_details_placeholder">Spieldetails werden hier angezeigt</string>
     <string name="match_details_not_found">Spieldetails nicht gefunden</string>
@@ -240,10 +210,8 @@
 
     <!-- Statistics Labels -->
     <string name="winners_stat">Gewinner-Schläge</string>
-    <string name="forced_errors_stat">Erzwungene Fehler</string>
     <string name="unforced_errors_stat">Unerzwungene Fehler</string>
     <string name="first_serve_pct">1. Aufschlag %</string>
-    <string name="new_match_button">Neues Spiel</string>
     <string name="confirm_exit_title">Spiel verlassen?</string>
     <string name="confirm_exit_message">Das Spiel ist noch im Gange. Möchten Sie wirklich gehen?</string>
 

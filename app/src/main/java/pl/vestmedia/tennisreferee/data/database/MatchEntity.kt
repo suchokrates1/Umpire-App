@@ -3,6 +3,7 @@ package pl.vestmedia.tennisreferee.data.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import java.util.Locale
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
@@ -108,9 +109,9 @@ data class MatchEntity(
         val hours = minutes / 60
         
         return if (hours > 0) {
-            String.format(java.util.Locale.US, "%d:%02d:%02d", hours, minutes % 60, seconds % 60)
+            String.format(Locale.US, "%d:%02d:%02d", hours, minutes % 60, seconds % 60)
         } else {
-            String.format(java.util.Locale.US, "%d:%02d", minutes, seconds % 60)
+            String.format(Locale.US, "%d:%02d", minutes, seconds % 60)
         }
     }
     

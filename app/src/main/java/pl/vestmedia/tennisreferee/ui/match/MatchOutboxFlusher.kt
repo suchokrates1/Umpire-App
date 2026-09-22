@@ -16,7 +16,6 @@ data class FlushResult(val flushed: Int, val failed: Int, val stoppedOnAuth: Boo
 class MatchOutboxFlusher(
     private val outboxStore: MatchOutboxStore,
     private val apiClient: MatchApiClient,
-    private val logger: MatchSyncLogger = AppLoggerMatchSyncLogger,
     private val gson: Gson = Gson()
 ) {
 

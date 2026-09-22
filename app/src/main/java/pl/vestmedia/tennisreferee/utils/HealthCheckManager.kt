@@ -6,6 +6,7 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import kotlinx.coroutines.*
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorDeviceSnapshotDto
 import pl.vestmedia.tennisreferee.data.api.dto.HeartbeatRequestDto
 
@@ -27,7 +28,7 @@ class HealthCheckManager(private val app: Application) {
     var matchId: Int? = null
     var clientMatchUuid: String? = null
     var snapshotProvider: (() -> DirectorDeviceSnapshotDto?)? = null
-    var onDirectorCommands: ((List<pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto>) -> Unit)? = null
+    var onDirectorCommands: ((List<DirectorCommandDto>) -> Unit)? = null
 
     /**
      * Rozpocznij wysyłanie heartbeat co [intervalMs] ms.
@@ -112,8 +113,4 @@ class HealthCheckManager(private val app: Application) {
         }
     }
 
-    fun destroy() {
-        stop()
-        scope.cancel()
-    }
 }

@@ -1,9 +1,6 @@
 package pl.vestmedia.tennisreferee.data.api.dto
 
 import com.google.gson.annotations.SerializedName
-import pl.vestmedia.tennisreferee.domain.match.model.Match
-import pl.vestmedia.tennisreferee.domain.match.model.MatchStatus
-import pl.vestmedia.tennisreferee.domain.match.model.Score
 import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 data class MatchDto(
@@ -116,72 +113,6 @@ data class SetScoreDto(
     val isSuperTiebreak: Boolean = false
 )
 
-fun MatchDto.toModel(): Match {
-    return Match(
-        id = id,
-        courtId = courtId,
-        player1Name = player1Name,
-        player2Name = player2Name,
-        score = score.toModel(),
-        status = status.toModel(),
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        bracketWarning = bracketWarning,
-        phase = phase,
-        scheduleId = scheduleId,
-        clientMatchUuid = clientMatchUuid,
-        finishReason = finishReason?.toModel(),
-        winnerName = winnerName,
-        injuredPlayerName = injuredPlayerName,
-        resultNote = resultNote
-    )
-}
-
-fun Match.toDto(): MatchDto {
-    return MatchDto(
-        id = id,
-        courtId = courtId,
-        player1Name = player1Name,
-        player2Name = player2Name,
-        score = score.toDto(),
-        status = status.toDto(),
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        bracketWarning = bracketWarning,
-        phase = phase,
-        scheduleId = scheduleId,
-        clientMatchUuid = clientMatchUuid,
-        finishReason = finishReason?.toDto(),
-        winnerName = winnerName,
-        injuredPlayerName = injuredPlayerName,
-        resultNote = resultNote
-    )
-}
-
-fun ScoreDto.toModel(): Score {
-    return Score(
-        player1Sets = player1Sets,
-        player2Sets = player2Sets,
-        player1Games = player1Games,
-        player2Games = player2Games,
-        player1Points = player1Points,
-        player2Points = player2Points,
-        setsHistory = setsHistory.map { it.toModel() }
-    )
-}
-
-fun Score.toDto(): ScoreDto {
-    return ScoreDto(
-        player1Sets = player1Sets,
-        player2Sets = player2Sets,
-        player1Games = player1Games,
-        player2Games = player2Games,
-        player1Points = player1Points,
-        player2Points = player2Points,
-        setsHistory = setsHistory.map { it.toDto() }
-    )
-}
-
 fun SetScoreDto.toModel(): SetScore {
     return SetScore(
         setNumber = setNumber,
@@ -200,20 +131,4 @@ fun SetScore.toDto(): SetScoreDto {
         tiebreakLoserPoints = tiebreakLoserPoints,
         isSuperTiebreak = isSuperTiebreak
     )
-}
-
-fun MatchStatusDto.toModel(): MatchStatus {
-    return when (this) {
-        MatchStatusDto.NOT_STARTED -> MatchStatus.NOT_STARTED
-        MatchStatusDto.IN_PROGRESS -> MatchStatus.IN_PROGRESS
-        MatchStatusDto.FINISHED -> MatchStatus.FINISHED
-    }
-}
-
-fun MatchStatus.toDto(): MatchStatusDto {
-    return when (this) {
-        MatchStatus.NOT_STARTED -> MatchStatusDto.NOT_STARTED
-        MatchStatus.IN_PROGRESS -> MatchStatusDto.IN_PROGRESS
-        MatchStatus.FINISHED -> MatchStatusDto.FINISHED
-    }
 }

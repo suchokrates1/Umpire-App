@@ -10,16 +10,20 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import pl.vestmedia.tennisreferee.R
+import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchBinding
-import pl.vestmedia.tennisreferee.databinding.LayoutScoreboardBinding
-import pl.vestmedia.tennisreferee.databinding.LayoutServerSelectionBinding
-import pl.vestmedia.tennisreferee.databinding.LayoutServeBinding
-import pl.vestmedia.tennisreferee.databinding.LayoutRallyBinding
+import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
-import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
+import pl.vestmedia.tennisreferee.databinding.LayoutRallyBinding
+import pl.vestmedia.tennisreferee.databinding.LayoutScoreboardBinding
+import pl.vestmedia.tennisreferee.databinding.LayoutServeBinding
+import pl.vestmedia.tennisreferee.databinding.LayoutServerSelectionBinding
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
-import pl.vestmedia.tennisreferee.TennisRefereeApp
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshot
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
@@ -68,7 +72,7 @@ class MatchActivity : AppCompatActivity() {
 
         fun createTutorialIntent(
             context: Context,
-            snapshot: pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshot,
+            snapshot: TutorialSnapshot,
         ): Intent {
             return Intent(context, MatchActivity::class.java).apply {
                 putExtra(EXTRA_TUTORIAL, true)
@@ -123,7 +127,7 @@ class MatchActivity : AppCompatActivity() {
             onUndoConfirmed = {
                 viewModel.undoLastAction()
                 if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "undo") {
+                    TutorialNavigator.afterRequiredAction(this, "undo") {
                         tutorialOverlay?.refresh()
                     }
                 }
@@ -132,9 +136,9 @@ class MatchActivity : AppCompatActivity() {
             onFinishConfirmed = { request ->
                 viewModel.finishMatchWithOutcome(request)
                 if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("pickRetirement", this)
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.jumpToLast(this)
-                    if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
+                    TutorialSession.noteAction("pickRetirement", this)
+                    TutorialSession.jumpToLast(this)
+                    if (TutorialNavigator.applyStep(this)) {
                         finish()
                     } else {
                         tutorialOverlay?.refresh()
@@ -156,7 +160,7 @@ class MatchActivity : AppCompatActivity() {
             binding = matchFinishedBinding,
             onNextMatch = { action ->
                 if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this)
+                    TutorialNavigator.exit(this)
                 } else {
                     finishWithResult(action)
                 }
@@ -204,7 +208,7 @@ class MatchActivity : AppCompatActivity() {
             getState = { viewModel.matchState.value },
             onServerSelected = { server ->
                 if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "chooseServer") {
+                    TutorialNavigator.afterRequiredAction(this, "chooseServer") {
                         tutorialOverlay?.refresh()
                     }
                 } else {
@@ -215,7 +219,7 @@ class MatchActivity : AppCompatActivity() {
                 courtSideSwapAnimator.animate()
                 viewModel.swapSides()
                 if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, "swapSides") {
+                    TutorialNavigator.afterRequiredAction(this, "swapSides") {
                         tutorialOverlay?.refresh()
                     }
                 }
@@ -272,7 +276,7 @@ class MatchActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (isTutorial()) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this@MatchActivity)
+                    TutorialNavigator.goBackScene(this@MatchActivity)
                     tutorialOverlay?.refresh()
                     return
                 }
@@ -352,39 +356,39 @@ class MatchActivity : AppCompatActivity() {
         }
     }
 
-    private var tutorialOverlay: pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController? = null
+    private var tutorialOverlay: TutorialOverlayController? = null
 
     private fun isTutorial(): Boolean =
         intent.getBooleanExtra(EXTRA_TUTORIAL, false) ||
-            pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive
+            TutorialSession.isActive
 
     private fun noteTutorialAction(action: String) {
         if (!isTutorial()) return
-        pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.afterRequiredAction(this, action) {
+        TutorialNavigator.afterRequiredAction(this, action) {
             tutorialOverlay?.refresh()
         }
     }
 
     private fun attachTutorialOverlay() {
-        tutorialOverlay = pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController(
+        tutorialOverlay = TutorialOverlayController(
             activity = this,
             onBack = {
-                pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.goBackScene(this)
+                TutorialNavigator.goBackScene(this)
                 tutorialOverlay?.refresh()
             },
             onNext = {
-                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isLast(this)) {
-                    pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this)
+                if (TutorialSession.isLast(this)) {
+                    TutorialNavigator.exit(this)
                     return@TutorialOverlayController
                 }
-                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(this)
-                if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.applyStep(this)) {
+                TutorialSession.goNext(this)
+                if (TutorialNavigator.applyStep(this)) {
                     finish()
                 } else {
                     tutorialOverlay?.refresh()
                 }
             },
-            onSkip = { pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.exit(this) },
+            onSkip = { TutorialNavigator.exit(this) },
         )
         tutorialOverlay?.attach()
     }

@@ -1,14 +1,15 @@
 package pl.vestmedia.tennisreferee.ui.playerselection
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.databinding.ItemPlayerBinding
 import pl.vestmedia.tennisreferee.data.model.Player
+import pl.vestmedia.tennisreferee.databinding.ItemPlayerBinding
 
 /**
  * Adapter dla listy zawodników
@@ -47,7 +48,7 @@ class PlayerAdapter(
 
             binding.textPlayerName.text = player.getFullName()
             binding.textPlayerGender.text = player.getGenderShortLabel().orEmpty()
-            binding.textPlayerGender.visibility = if (player.getGenderShortLabel() != null) android.view.View.VISIBLE else android.view.View.GONE
+            binding.textPlayerGender.visibility = if (player.getGenderShortLabel() != null) View.VISIBLE else View.GONE
             
             // Pokaż grupę jeśli dostępna
             if (player.group != null) {
@@ -86,7 +87,7 @@ class PlayerAdapter(
                 binding.cardPlayer.strokeColor = ContextCompat.getColor(context, accentColorRes)
                 binding.cardPlayer.strokeWidth = if (doubles) 2 else 0
                 binding.containerPlayer.setBackgroundColor(transparent)
-                binding.viewSelectionStripe.visibility = android.view.View.VISIBLE
+                binding.viewSelectionStripe.visibility = View.VISIBLE
                 binding.viewSelectionStripe.setBackgroundColor(
                     ContextCompat.getColor(context, accentColorRes)
                 )
@@ -102,7 +103,7 @@ class PlayerAdapter(
                 binding.cardPlayer.strokeColor = transparent
                 binding.cardPlayer.strokeWidth = 0
                 binding.containerPlayer.setBackgroundColor(transparent)
-                binding.viewSelectionStripe.visibility = android.view.View.GONE
+                binding.viewSelectionStripe.visibility = View.GONE
                 
                 // Normalna wielkość
                 binding.cardPlayer.scaleX = 1.0f

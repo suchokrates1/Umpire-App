@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
@@ -19,7 +20,6 @@ import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.database.RoomMatchOutboxStore
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
-import pl.vestmedia.tennisreferee.data.model.*
 import pl.vestmedia.tennisreferee.domain.match.DirectorCommandApplier
 import pl.vestmedia.tennisreferee.domain.match.model.*
 import pl.vestmedia.tennisreferee.domain.match.MatchActionReducer
@@ -74,7 +74,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     fun continueFromAnnouncement() {
         pendingAnnouncementType = null
         val state = _matchState.value ?: return
-        _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+        _currentView.value = scoringViewFor(state)
     }
     
     /**
@@ -189,7 +189,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     _canUndo.value = result.canUndo
                     _undoMessage.value = getApplication<Application>().getString(R.string.undo_action_format, result.description)
                     _matchState.value = state
-                    _currentView.value = if (state.statsMode == StatsMode.BASIC) MatchView.BASIC_SCORING else MatchView.SERVE
+                    _currentView.value = scoringViewFor(state)
                 }
             }
         }
@@ -218,14 +218,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleFault() {
         _matchState.value?.let { state ->
-            if (state.isFirstServe) {
-                // Pierwszy serwis nieudany - przejdź na 2. serwis
-                saveStateBeforeAction(ActionType.FAULT, str(R.string.undo_fault_first))
-            } else {
-                // Podwójny błąd
-                val serverName = serverName(state)
-                saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
-            }
+            saveFaultForUndo(state)
             applyMatchCommand(state, MatchCommand.Fault)
         }
     }
@@ -309,14 +302,17 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun handleBasicFault() {
         _matchState.value?.let { state ->
-            if (state.isFirstServe) {
-                saveStateBeforeAction(ActionType.FAULT, str(R.string.undo_fault_first))
-            } else {
-                // Podwójny błąd
-                val serverName = serverName(state)
-                saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName))
-            }
+            saveFaultForUndo(state)
             applyMatchCommand(state, MatchCommand.BasicFault)
+        }
+    }
+
+    /** A first-serve fault moves to the second serve; on the second serve it is a double fault. */
+    private fun saveFaultForUndo(state: MatchState) {
+        if (state.isFirstServe) {
+            saveStateBeforeAction(ActionType.FAULT, str(R.string.undo_fault_first))
+        } else {
+            saveStateBeforeAction(ActionType.DOUBLE_FAULT, str(R.string.undo_double_fault, serverName(state)))
         }
     }
 
@@ -477,30 +473,6 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         _bracketWarning.value = null
     }
 
-    /**
-     * Kończy mecz na serwerze
-     */
-    fun finishMatchOnServer() {
-        if (tutorialMode) return
-        _matchState.value?.let { state ->
-            viewModelScope.launch(Dispatchers.IO) {
-                matchSyncCoordinator.finishMatch(state)
-            }
-        }
-    }
-    
-    /**
-     * Wysyła statystyki meczu do API
-     */
-    fun sendMatchStatistics() {
-        if (tutorialMode) return
-        _matchState.value?.let { state ->
-            viewModelScope.launch(Dispatchers.IO) {
-                matchSyncCoordinator.sendStatistics(state)
-            }
-        }
-    }
-
     override fun onCleared() {
         directorPollJob?.cancel()
         val app = getApplication<TennisRefereeApp>()
@@ -528,11 +500,11 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     if (response.isSuccessful) {
                         response.body()?.commands.orEmpty().forEach { applyDirectorCommand(it) }
                     } else {
-                        kotlinx.coroutines.delay(2_000)
+                        delay(2_000)
                     }
                 } catch (error: Exception) {
                     AppLogger.error("DirectorPoll", error)
-                    kotlinx.coroutines.delay(2_000)
+                    delay(2_000)
                 }
             }
         }

@@ -9,12 +9,13 @@ import androidx.core.os.LocaleListCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import java.util.Locale
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.model.Language
 import pl.vestmedia.tennisreferee.databinding.ActivityLanguageSelectionBinding
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
 import pl.vestmedia.tennisreferee.utils.AppLogger
-import java.util.Locale
 
 /**
  * Activity do wyboru języka aplikacji
@@ -75,7 +76,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.app_name)
         
         setupRecyclerView()
-        pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.maybeShowBanner(this)
+        TutorialNavigator.maybeShowBanner(this)
     }
     
     private fun setupRecyclerView() {

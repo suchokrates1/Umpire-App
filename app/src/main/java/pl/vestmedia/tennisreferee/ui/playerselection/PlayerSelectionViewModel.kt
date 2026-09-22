@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
 
 /**
  * ViewModel zarządzający wyborem graczy
@@ -50,7 +51,7 @@ class PlayerSelectionViewModel : ViewModel() {
      * Ładuje listę zawodników z serwera
      */
     fun setTutorialPlayers(players: List<Player>) {
-        currentCourtId = pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog.COURT_1
+        currentCourtId = TutorialCatalog.COURT_1
         _players.value = players
         _isLoading.value = false
         _error.value = null

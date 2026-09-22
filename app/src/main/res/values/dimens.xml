@@ -40,6 +40,5 @@
     <dimen name="scoring_name_min_text">14sp</dimen>
     <dimen name="scoring_name_max_text">28sp</dimen>
     <dimen name="scoring_name_height">32dp</dimen>
-    <dimen name="scoring_button_text">28sp</dimen>
 
 </resources>

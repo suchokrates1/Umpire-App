@@ -25,12 +25,6 @@ data class MatchStatistics(
         } else 0
     }
     
-    fun getSecondServePercentage(): Int {
-        return if (secondServesTotal > 0) {
-            ((secondServesIn.toFloat() / secondServesTotal) * 100).toInt()
-        } else 0
-    }
-    
     /**
      * Tworzy kopię statystyk
      */

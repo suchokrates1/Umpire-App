@@ -14,7 +14,6 @@
     
     <!-- Player colors for dark mode -->
     <color name="player_selected">#1B5E20</color>
-    <color name="player_unselected">#2C2C2C</color>
     <color name="team1_color">#4B8FFF</color>
     <color name="team2_color">#C7652B</color>
     <color name="team1_tint_color">#264B8FFF</color>
@@ -30,10 +29,5 @@
     <color name="tb_only_accent">#FF8A65</color>
     
     <!-- Button colors remain the same but slightly adjusted for dark backgrounds -->
-    <color name="button_ace">#66BB6A</color>
-    <color name="button_fault">#EF5350</color>
-    <color name="button_ball_in_play">#FFD54F</color>
-    <color name="button_winner">#66BB6A</color>
-    <color name="button_forced_error">#FFB74D</color>
     <color name="button_unforced_error">#EF5350</color>
 </resources>

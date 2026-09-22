@@ -12,22 +12,6 @@ class MatchHistoryRepository(private val matchDao: MatchDao) {
     
     val allMatches: Flow<List<MatchEntity>> = matchDao.getAllMatches()
     
-    fun getRecentMatches(limit: Int = 20): Flow<List<MatchEntity>> {
-        return matchDao.getRecentMatches(limit)
-    }
-    
-    fun getMatchesByCourt(courtId: Int): Flow<List<MatchEntity>> {
-        return matchDao.getMatchesByCourt(courtId)
-    }
-    
-    /**
-     * Pobiera mecze gracza - filtrowanie po stronie aplikacji
-     * ponieważ player1 i player2 są przechowywane jako JSON
-     */
-    fun getMatchesByPlayer(@Suppress("UNUSED_PARAMETER") playerId: Int): Flow<List<MatchEntity>> {
-        return matchDao.getAllMatchesForPlayerFilter()
-    }
-    
     suspend fun getMatchById(matchId: Long): MatchEntity? {
         return matchDao.getMatchById(matchId)
     }
@@ -41,24 +25,12 @@ class MatchHistoryRepository(private val matchDao: MatchDao) {
         return matchDao.insertMatch(matchEntity)
     }
     
-    suspend fun updateMatch(match: MatchEntity) {
-        matchDao.updateMatch(match)
-    }
-    
     suspend fun deleteMatch(match: MatchEntity) {
         matchDao.deleteMatch(match)
     }
-    
-    suspend fun deleteMatchById(matchId: Long) {
-        matchDao.deleteMatchById(matchId)
-    }
-    
+
     suspend fun deleteAllMatches() {
         matchDao.deleteAllMatches()
-    }
-    
-    fun getMatchesByDateRange(startTime: Long, endTime: Long): Flow<List<MatchEntity>> {
-        return matchDao.getMatchesByDateRange(startTime, endTime)
     }
 }
 

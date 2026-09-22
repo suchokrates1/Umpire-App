@@ -7,9 +7,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.radiobutton.MaterialRadioButton
+import java.text.DateFormat
+import java.util.Date
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.DeviceInfoProvider
@@ -20,10 +23,9 @@ import pl.vestmedia.tennisreferee.ui.language.AvailableLanguages
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.ui.match.SyncDiagnosticsStore
 import pl.vestmedia.tennisreferee.ui.match.SyncStatus
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.utils.ThemeManager
-import java.text.DateFormat
-import java.util.Date
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -63,7 +65,7 @@ class SettingsActivity : AppCompatActivity() {
 
         AvailableLanguages.all.forEach { language ->
             val radio = MaterialRadioButton(this).apply {
-                id = android.view.View.generateViewId()
+                id = View.generateViewId()
                 tag = language.code
                 text = "${language.flagEmoji}  ${language.name}"
                 setPadding(paddingLeft, 24, paddingRight, 24)
@@ -104,7 +106,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun setupTutorial() {
         binding.cardTutorial.setOnClickListener {
             AppLogger.button("Settings", "Tutorial")
-            pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator.startFromSettings(this)
+            TutorialNavigator.startFromSettings(this)
         }
     }
 

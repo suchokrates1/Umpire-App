@@ -3,19 +3,25 @@ package pl.vestmedia.tennisreferee.ui.playerselection
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.domain.match.model.StatsMode
 import pl.vestmedia.tennisreferee.utils.AppLogger
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 /**
  * Match configuration dialog (stats mode, format, umpire, manual start time).
@@ -39,13 +45,13 @@ class MatchConfigDialogController(
         val dialogContent = dialogView.findViewById<View>(R.id.dialogContent)
         val editUmpireName = dialogView.findViewById<TextInputEditText>(R.id.editUmpireName)
         val layoutMixedDoubles = dialogView.findViewById<View>(R.id.layoutMixedDoubles)
-        val textMixedStatus = dialogView.findViewById<android.widget.TextView>(R.id.textMixedStatus)
-        val textMixedDoublesSummary = dialogView.findViewById<android.widget.TextView>(R.id.textMixedDoublesSummary)
-        val textManualStartTime = dialogView.findViewById<android.widget.TextView>(R.id.textManualStartTime)
+        val textMixedStatus = dialogView.findViewById<TextView>(R.id.textMixedStatus)
+        val textMixedDoublesSummary = dialogView.findViewById<TextView>(R.id.textMixedDoublesSummary)
+        val textManualStartTime = dialogView.findViewById<TextView>(R.id.textManualStartTime)
         val buttonSelectManualDateTime =
-            dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.buttonSelectManualDateTime)
+            dialogView.findViewById<MaterialButton>(R.id.buttonSelectManualDateTime)
         val buttonClearManualDateTime =
-            dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.buttonClearManualDateTime)
+            dialogView.findViewById<MaterialButton>(R.id.buttonClearManualDateTime)
         val isDoublesMatch = getIsDoubles()
         val isMixedDoublesMatch = isDoublesMatch && isMixedDoublesSelection(selectedPlayers)
         var manualStartTime: Long? = null
@@ -59,21 +65,21 @@ class MatchConfigDialogController(
         applyBottomNavigationInset(dialogContent)
 
         val toggleGamesPerSet =
-            dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleGamesPerSet)
+            dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleGamesPerSet)
         val toggleSetsToWin =
-            dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleSetsToWin)
+            dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleSetsToWin)
         val toggleTiebreakPoints =
-            dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleTiebreakPoints)
+            dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleTiebreakPoints)
         val toggleSuperTiebreakPoints =
-            dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleSuperTiebreakPoints)
+            dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleSuperTiebreakPoints)
         val switchNoAdvantage =
-            dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchNoAdvantage)
+            dialogView.findViewById<SwitchMaterial>(R.id.switchNoAdvantage)
         val switchTiebreakOnly =
-            dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchTiebreakOnly)
-        val layoutMatchFormat = dialogView.findViewById<android.widget.LinearLayout>(R.id.layoutMatchFormat)
-        val layoutTbOnlyPoints = dialogView.findViewById<android.widget.LinearLayout>(R.id.layoutTbOnlyPoints)
+            dialogView.findViewById<SwitchMaterial>(R.id.switchTiebreakOnly)
+        val layoutMatchFormat = dialogView.findViewById<LinearLayout>(R.id.layoutMatchFormat)
+        val layoutTbOnlyPoints = dialogView.findViewById<LinearLayout>(R.id.layoutTbOnlyPoints)
         val toggleTbOnlyPoints =
-            dialogView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleTbOnlyPoints)
+            dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleTbOnlyPoints)
         layoutMixedDoubles.visibility = if (isDoublesMatch) View.VISIBLE else View.GONE
         if (isDoublesMatch) {
             textMixedStatus.text = if (isMixedDoublesMatch) {
@@ -186,7 +192,7 @@ class MatchConfigDialogController(
             )
         }
 
-        dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardBasicMode)
+        dialogView.findViewById<MaterialCardView>(R.id.cardBasicMode)
             .setOnClickListener {
                 dialog.dismiss()
                 val config = buildMatchConfig(StatsMode.BASIC)
@@ -199,7 +205,7 @@ class MatchConfigDialogController(
                 )
             }
 
-        dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardAdvancedMode)
+        dialogView.findViewById<MaterialCardView>(R.id.cardAdvancedMode)
             .setOnClickListener {
                 dialog.dismiss()
                 val config = buildMatchConfig(StatsMode.ADVANCED)

@@ -9,6 +9,8 @@ import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.ui.match.ActiveMatchStore
 import pl.vestmedia.tennisreferee.ui.match.MatchActivity
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshots
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
@@ -106,12 +108,12 @@ class NextMatchController(
             matchState.isSuperTiebreak = true
         }
 
-        if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.isActive) {
-            pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.noteAction("startMatch", activity)
-            if (pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.canAdvance(activity)) {
-                pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession.goNext(activity)
+        if (TutorialSession.isActive) {
+            TutorialSession.noteAction("startMatch", activity)
+            if (TutorialSession.canAdvance(activity)) {
+                TutorialSession.goNext(activity)
             }
-            val snapshot = pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshots.load(activity, "serve")
+            val snapshot = TutorialSnapshots.load(activity, "serve")
             if (snapshot != null) {
                 matchLauncher.launch(MatchActivity.createTutorialIntent(activity, snapshot))
                 return

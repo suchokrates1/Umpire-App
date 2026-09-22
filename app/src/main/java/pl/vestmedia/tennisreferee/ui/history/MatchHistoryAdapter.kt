@@ -1,15 +1,16 @@
 package pl.vestmedia.tennisreferee.ui.history
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.*
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.database.MatchEntity
 import pl.vestmedia.tennisreferee.databinding.ItemMatchHistoryBinding
-import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * Adapter dla listy meczów w historii
@@ -64,9 +65,9 @@ class MatchHistoryAdapter(
                 if (winnerId != null) {
                     val winnerName = match.getWinnerName()
                     textViewWinner.text = root.context.getString(R.string.winner_format, winnerName)
-                    textViewWinner.visibility = android.view.View.VISIBLE
+                    textViewWinner.visibility = View.VISIBLE
                 } else {
-                    textViewWinner.visibility = android.view.View.GONE
+                    textViewWinner.visibility = View.GONE
                 }
                 
                 // Click listeners

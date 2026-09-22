@@ -11,11 +11,12 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutRallyBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutServeBinding
+import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 
 class ScoringButtonsController(
     private val context: Context,
@@ -225,7 +226,7 @@ class ScoringButtonsController(
         AnimatorSet().apply {
             playTogether(slideDown, fadeIn, scaleX, scaleY)
             duration = 450
-            interpolator = android.view.animation.OvershootInterpolator(1.2f)
+            interpolator = OvershootInterpolator(1.2f)
             start()
         }
 
