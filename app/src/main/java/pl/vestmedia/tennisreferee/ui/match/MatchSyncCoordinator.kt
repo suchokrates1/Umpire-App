@@ -1,7 +1,11 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import com.google.gson.Gson
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializerOrNull
 import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
+import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 import pl.vestmedia.tennisreferee.data.api.TennisApiService
 import pl.vestmedia.tennisreferee.data.model.MatchEventFactory
 import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
@@ -265,10 +269,18 @@ class MatchSyncCoordinator(
         payload: Any
     ) {
         try {
-            outboxFlusher?.enqueue(clientMatchUuid, type, serverMatchId, gson.toJson(payload))
+            outboxFlusher?.enqueue(clientMatchUuid, type, serverMatchId, payloadJson(payload))
         } catch (e: Exception) {
             logger.error("outboxEnqueue", "Failed to enqueue $type: ${e.message}")
         }
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private fun payloadJson(payload: Any): String {
+        if (payload is FinishMatchRequest) return gson.toJson(payload)
+        val serializer = apiJson.serializersModule.serializerOrNull(payload.javaClass) ?: return gson.toJson(payload)
+        @Suppress("UNCHECKED_CAST")
+        return apiJson.encodeToString(serializer as SerializationStrategy<Any>, payload)
     }
 
     private suspend fun enqueueIfRetryable(

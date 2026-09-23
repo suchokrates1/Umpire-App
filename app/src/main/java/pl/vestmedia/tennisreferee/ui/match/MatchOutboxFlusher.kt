@@ -2,9 +2,11 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
+import kotlinx.serialization.json.Json
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 import pl.vestmedia.tennisreferee.data.database.OutboxMutationEntity
 import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
 import retrofit2.Response
@@ -16,7 +18,8 @@ data class FlushResult(val flushed: Int, val failed: Int, val stoppedOnAuth: Boo
 class MatchOutboxFlusher(
     private val outboxStore: MatchOutboxStore,
     private val apiClient: MatchApiClient,
-    private val gson: Gson = Gson()
+    private val gson: Gson = Gson(),
+    private val json: Json = apiJson,
 ) {
 
     suspend fun flushPending(): FlushResult {
@@ -129,16 +132,12 @@ class MatchOutboxFlusher(
         resolvedIds: Map<String, Int>
     ): Response<*>? {
         return when (mutation.type) {
-            "CREATE" -> {
-                val dto = gson.fromJson(mutation.payloadJson, MatchDto::class.java)
-                apiClient.createMatch(dto)
-            }
+            "CREATE" -> apiClient.createMatch(json.decodeFromString<MatchDto>(mutation.payloadJson))
             "UPDATE" -> {
                 val serverId = mutation.serverMatchId
                     ?: resolvedIds[mutation.clientMatchUuid]
                     ?: return null
-                val dto = gson.fromJson(mutation.payloadJson, MatchDto::class.java)
-                apiClient.updateMatch(serverId, dto)
+                apiClient.updateMatch(serverId, json.decodeFromString<MatchDto>(mutation.payloadJson))
             }
             "FINISH" -> {
                 val serverId = mutation.serverMatchId
@@ -147,14 +146,8 @@ class MatchOutboxFlusher(
                 val request = gson.fromJson(mutation.payloadJson, FinishMatchRequest::class.java)
                 apiClient.finishMatch(serverId, request)
             }
-            "EVENT" -> {
-                val dto = gson.fromJson(mutation.payloadJson, MatchEventDto::class.java)
-                apiClient.logMatchEvent(dto)
-            }
-            "STATS" -> {
-                val dto = gson.fromJson(mutation.payloadJson, MatchStatisticsRequestDto::class.java)
-                apiClient.sendMatchStatistics(dto)
-            }
+            "EVENT" -> apiClient.logMatchEvent(json.decodeFromString<MatchEventDto>(mutation.payloadJson))
+            "STATS" -> apiClient.sendMatchStatistics(json.decodeFromString<MatchStatisticsRequestDto>(mutation.payloadJson))
             else -> null
         }
     }

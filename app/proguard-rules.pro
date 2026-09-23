@@ -60,11 +60,10 @@
 -keep class pl.vestmedia.tennisreferee.data.model.** { *; }
 -keepclassmembers class pl.vestmedia.tennisreferee.data.model.** { *; }
 
-# Gson reads these by reflection. After the DTO split they left data.model,
-# so Play/R8 builds crashed on TournamentSelectionActivity (first API call
-# after language). Keep the whole dto package, not only Retrofit return types.
--keep class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
--keepclassmembers class pl.vestmedia.tennisreferee.data.api.dto.** { *; }
+# API DTOs are kotlinx.serialization (@SerialName). The library rules keep the
+# generated serializers. Gson still reflects on the offline finish record.
+-keep class pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest { *; }
+-keep class pl.vestmedia.tennisreferee.domain.match.model.MatchFinishReason { *; }
 
 # ── Room database/entities ──
 -keep class pl.vestmedia.tennisreferee.data.database.** { *; }

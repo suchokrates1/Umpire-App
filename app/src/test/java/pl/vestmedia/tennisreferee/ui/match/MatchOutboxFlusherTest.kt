@@ -14,9 +14,12 @@ import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 import pl.vestmedia.tennisreferee.data.database.OutboxMutationEntity
+import pl.vestmedia.tennisreferee.data.model.MatchEventFactory
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
+import pl.vestmedia.tennisreferee.domain.match.model.MatchFinishReason
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import retrofit2.Response
 
@@ -298,6 +301,64 @@ class MatchOutboxFlusherTest {
         assertEquals(1, pending.size)
         assertEquals("UPDATE", pending.single().type)
         assertEquals(99, pending.single().serverMatchId)
+    }
+
+    @Test
+    fun gsonWrittenEventAndStatisticsStillFlush() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val state = matchState().apply {
+            matchId = 9
+            isMatchFinished = true
+            player1Sets = 1
+        }
+        val event = MatchEventFactory.create(state, "point", batteryLevel = 64, isCharging = true, timestamp = 1790000000000L)
+        val stats = MatchApiPayloadFactory.toStatisticsRequest(state)!!
+        val api = TestApiClient().apply {
+            eventResults += Response.success(MatchEventResponseDto(success = true))
+            statisticsResults += Response.success(Unit)
+        }
+        val flusher = MatchOutboxFlusher(store, api)
+        flusher.enqueue("uuid-1", "EVENT", 9, gson.toJson(event))
+        flusher.enqueue("uuid-1", "STATS", 9, gson.toJson(stats))
+
+        val result = flusher.flushPending()
+
+        assertEquals(2, result.flushed)
+        assertEquals(0, result.failed)
+        assertEquals(listOf("event:point", "statistics"), api.operations)
+    }
+
+    @Test
+    fun coordinatorStoresKotlinxMatchJsonAndGsonFinishJson() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient()
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
+        val coordinator = MatchSyncCoordinator(
+            apiClient = api,
+            matchHistorySaver = StubHistorySaver,
+            batteryInfoProvider = { MatchBatteryInfo(65, true) },
+            onSyncStatus = {},
+            onBracketWarning = { _, _ -> },
+            retryDelay = ImmediateRetryDelay,
+            logger = SilentLogger,
+            outboxFlusher = flusher
+        )
+        val creating = matchState()
+        coordinator.syncMatch(creating)
+        assertEquals(
+            apiJson.encodeToString(MatchDto.serializer(), MatchApiPayloadFactory.toMatch(creating)),
+            store.getPending().single().payloadJson,
+        )
+
+        val finishing = matchState().apply { matchId = 9 }
+        val finish = FinishMatchRequest(
+            finishReason = MatchFinishReason.RETIREMENT,
+            winnerName = "Jan Kowalski",
+        )
+        coordinator.finalizeMatch(finishing, finish)
+        val finishRow = store.getPending().single { it.type == "FINISH" }
+        assertEquals(gson.toJson(finish), finishRow.payloadJson)
+        assertTrue(finishRow.payloadJson.contains("\"finishReason\":\"RETIREMENT\""))
     }
 
     // ── Helpers ──
