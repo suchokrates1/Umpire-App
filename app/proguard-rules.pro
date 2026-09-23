@@ -61,9 +61,14 @@
 -keepclassmembers class pl.vestmedia.tennisreferee.data.model.** { *; }
 
 # API DTOs are kotlinx.serialization (@SerialName). The library rules keep the
-# generated serializers. Gson still reflects on the offline finish record.
--keep class pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest { *; }
--keep class pl.vestmedia.tennisreferee.domain.match.model.MatchFinishReason { *; }
+# generated serializers.
+#
+# Gson still reflects over the match model: the active match kept for a restart
+# (ActiveMatchStore) and the set history stored in Room are JSON whose keys are these
+# field names. Obfuscated names change between builds, so data written by one release
+# would be unreadable by the next.
+-keep class pl.vestmedia.tennisreferee.domain.match.model.** { *; }
+-keepclassmembers class pl.vestmedia.tennisreferee.domain.match.model.** { *; }
 
 # ── Room database/entities ──
 -keep class pl.vestmedia.tennisreferee.data.database.** { *; }

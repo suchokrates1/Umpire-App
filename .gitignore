@@ -21,3 +21,6 @@ keystore/
 
 # Kotlin 2 compiler caches
 .kotlin/
+
+# Python caches from helper scripts
+__pycache__/
