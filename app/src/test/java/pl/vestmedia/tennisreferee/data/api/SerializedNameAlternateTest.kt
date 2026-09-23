@@ -6,6 +6,7 @@ import org.junit.Test
 import pl.vestmedia.tennisreferee.data.api.dto.CourtAuthResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.PlayerDto
 import pl.vestmedia.tennisreferee.data.api.dto.PlayersResponseDto
+import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 
 /**
  * Gson still accepts the old field names. The written JSON keeps the primary name,
@@ -38,11 +39,11 @@ class SerializedNameAlternateTest {
 
     @Test
     fun playersResponseAcceptsTotalCount() {
-        val parsed = gson.fromJson(
-            """{"players":[{"id":1,"name":"Kowalski"}],"total_count":1}""",
-            PlayersResponseDto::class.java,
-        )
+        val json = """{"players":[{"id":1,"name":"Kowalski"}],"total_count":1}"""
+        val parsed = gson.fromJson(json, PlayersResponseDto::class.java)
+        val fromKotlinx = apiJson.decodeFromString(PlayersResponseDto.serializer(), json)
         assertEquals(1, parsed.totalCount)
+        assertEquals(parsed.totalCount, fromKotlinx.totalCount)
         assertEquals(
             """{"players":[{"id":1,"name":"Kowalski"}],"count":1}""",
             gson.toJson(parsed),
@@ -52,12 +53,13 @@ class SerializedNameAlternateTest {
     @Test
     fun courtAuthAcceptsKortIdAndExpiryAliases() {
         listOf("expires_at", "expiresAt", "expiry").forEach { expiryKey ->
-            val parsed = gson.fromJson(
-                """{"ok":true,"authorized":true,"kort_id":"t2-1","token":"abc","$expiryKey":"2030-01-01T00:00:00Z"}""",
-                CourtAuthResponseDto::class.java,
-            )
+            val json = """{"ok":true,"authorized":true,"kort_id":"t2-1","token":"abc","$expiryKey":"2030-01-01T00:00:00Z"}"""
+            val parsed = gson.fromJson(json, CourtAuthResponseDto::class.java)
+            val fromKotlinx = apiJson.decodeFromString(CourtAuthResponseDto.serializer(), json)
             assertEquals("t2-1", parsed.courtId)
             assertEquals("2030-01-01T00:00:00Z", parsed.expiresAt)
+            assertEquals(parsed.courtId, fromKotlinx.courtId)
+            assertEquals(parsed.expiresAt, fromKotlinx.expiresAt)
         }
         val canonical = gson.fromJson(
             """{"ok":true,"authorized":true,"court_id":"t2-1","token":"abc","expires_at":"2030-01-01T00:00:00Z"}""",
@@ -69,5 +71,22 @@ class SerializedNameAlternateTest {
         )
     }
 
-    private fun player(json: String): PlayerDto = gson.fromJson(json, PlayerDto::class.java)
+    private fun player(json: String): PlayerDto {
+        val fromGson = gson.fromJson(json, PlayerDto::class.java)
+        val fromKotlinx = apiJson.decodeFromString(PlayerDto.serializer(), json)
+        assertEquals(fromGson.name, fromKotlinx.name)
+        assertEquals(fromGson.flag, fromKotlinx.flag)
+        assertEquals(fromGson.flagUrl, fromKotlinx.flagUrl)
+        assertEquals(fromGson.group, fromKotlinx.group)
+        return fromGson
+    }
+
+    @Test
+    fun unknownKeysAreIgnored() {
+        val parsed = apiJson.decodeFromString(
+            PlayerDto.serializer(),
+            """{"id":1,"name":"Kowalski","not_a_field":true}""",
+        )
+        assertEquals("Kowalski", parsed.name)
+    }
 }
