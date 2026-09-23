@@ -20,20 +20,20 @@ class RetrofitClientStartupTest {
     fun tearDown() {
         server.shutdown()
         CourtSessionProvider.resetForTests()
-        RetrofitClient.overrideBaseUrl(null)
     }
 
     @Test
     fun loadingRetrofitClientDoesNotRequireSessionStoreYet() {
         CourtSessionProvider.resetForTests()
-        RetrofitClient.overrideBaseUrl("http://127.0.0.1:1/")
-        assertEquals("http://127.0.0.1:1/", RetrofitClient.BASE_URL)
+        val client = RetrofitClient({ CourtSessionProvider.get() }, "http://127.0.0.1:1/")
+        assertEquals("http://127.0.0.1:1/", client.baseUrl)
     }
 
     @Test
     fun apiServiceCanBeCreatedAfterSessionInitialize() {
         CourtSessionProvider.initializeForTests(InMemoryCourtSessionStore())
-        assertNotNull(RetrofitClient.apiService)
+        val client = RetrofitClient({ CourtSessionProvider.get() })
+        assertNotNull(client.apiService)
     }
 
     @Test

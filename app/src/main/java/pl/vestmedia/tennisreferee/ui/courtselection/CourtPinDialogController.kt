@@ -29,7 +29,7 @@ import pl.vestmedia.tennisreferee.utils.AppLogger
  */
 class CourtPinDialogController(
     private val activity: AppCompatActivity,
-    private val repository: TennisRepository = TennisRepository()
+    private val repository: TennisRepository,
 ) {
     fun show(
         court: Court,

@@ -2,8 +2,6 @@ package pl.vestmedia.tennisreferee
 
 import android.app.Application
 import pl.vestmedia.tennisreferee.BuildConfig
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
-import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.repository.MatchHistoryRepository
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -15,6 +13,9 @@ import pl.vestmedia.tennisreferee.utils.ThemeManager
  */
 open class TennisRefereeApp : Application() {
     
+    lateinit var container: AppContainer
+        private set
+
     val database by lazy { TennisDatabase.getDatabase(this) }
     val matchHistoryRepository by lazy { MatchHistoryRepository(database.matchDao()) }
     val themeManager by lazy { ThemeManager(this) }
@@ -22,10 +23,8 @@ open class TennisRefereeApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG) {
-            RetrofitClient.overrideBaseUrl("https://test.blindtennis.app/")
-        }
-        CourtSessionProvider.initialize(this)
+        val debugBackend = if (BuildConfig.DEBUG) "https://test.blindtennis.app/" else null
+        container = AppContainer(this, debugBackend)
         // Apply saved theme on app start
         themeManager.applyCurrentTheme()
         // Start health check heartbeat

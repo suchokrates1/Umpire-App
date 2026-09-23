@@ -31,7 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.e2e.overrideUmpireBackend
 import pl.vestmedia.tennisreferee.e2e.UmpireRobot
 import pl.vestmedia.tennisreferee.e2e.waitUntil
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
@@ -58,13 +58,13 @@ class TutorialWalkthroughTest {
             }
         }
         server.start()
-        RetrofitClient.overrideBaseUrl(server.url("/").toString())
+        overrideUmpireBackend(server.url("/").toString())
     }
 
     @After
     fun tearDown() {
         TutorialSession.stop(InstrumentationRegistry.getInstrumentation().targetContext)
-        RetrofitClient.overrideBaseUrl(null)
+        overrideUmpireBackend(null)
         if (::server.isInitialized) server.shutdown()
     }
 

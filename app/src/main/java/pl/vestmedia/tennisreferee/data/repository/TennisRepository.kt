@@ -1,12 +1,11 @@
 package pl.vestmedia.tennisreferee.data.repository
 
 import kotlinx.coroutines.delay
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.data.api.TennisApiService
 import pl.vestmedia.tennisreferee.data.api.dto.CourtPinRequestDto
 import pl.vestmedia.tennisreferee.data.api.dto.toDto
 import pl.vestmedia.tennisreferee.data.api.dto.toModel
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
-import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.model.Court
@@ -24,10 +23,9 @@ import java.util.concurrent.ConcurrentHashMap
  * Repository obsługujące operacje na kortach i meczach
  */
 class TennisRepository(
-    private val sessionStore: CourtSessionStore = CourtSessionProvider.get()
+    private val sessionStore: CourtSessionStore,
+    private val apiService: TennisApiService,
 ) {
-    
-    private val apiService = RetrofitClient.apiService
     private val playersCache = ConcurrentHashMap<String, List<Player>>()
     
     /**

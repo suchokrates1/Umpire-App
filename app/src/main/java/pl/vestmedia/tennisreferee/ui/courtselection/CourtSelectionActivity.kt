@@ -46,7 +46,7 @@ class CourtSelectionActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCourtSelectionBinding
     private val viewModel: CourtSelectionViewModel by viewModels()
     private lateinit var adapter: CourtAdapter
-    private val repository = TennisRepository()
+    private val repository by lazy { (application as TennisRefereeApp).container.repository() }
     private val pinDialogController by lazy { CourtPinDialogController(this, repository) }
     private var selectedTournamentId: Int? = null
     private var selectedTournamentName: String? = null

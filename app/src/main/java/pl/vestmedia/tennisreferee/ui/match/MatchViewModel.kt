@@ -13,10 +13,8 @@ import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
-import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.database.RoomMatchOutboxStore
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
@@ -88,7 +86,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         continueFromAnnouncement()
     }
     
-    private val outboxApiClient = RetrofitMatchApiClient(RetrofitClient.apiService)
+    private val outboxApiClient = RetrofitMatchApiClient(
+        getApplication<TennisRefereeApp>().container.apiService
+    )
     private val outboxStore = RoomMatchOutboxStore(
         TennisDatabase.getDatabase(application).outboxMutationDao()
     )
@@ -487,7 +487,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 getApplication<TennisRefereeApp>().healthCheckManager.matchId = state.matchId
                 getApplication<TennisRefereeApp>().healthCheckManager.clientMatchUuid = state.clientMatchUuid
                 try {
-                    val response = RetrofitClient.apiService.pollDirectorCommands(
+                    val response = getApplication<TennisRefereeApp>().container.apiService.pollDirectorCommands(
                         matchId = state.matchId,
                         clientMatchUuid = state.clientMatchUuid,
                         waitMs = 15_000,
@@ -518,7 +518,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         val next = DirectorCommandApplier.apply(current, command)
         command.courtToken?.takeIf { it.isNotBlank() }?.let { token ->
             val courtId = command.courtId ?: next.courtId
-            CourtSessionProvider.get().save(
+            getApplication<TennisRefereeApp>().container.sessionStore.save(
                 CourtSession(
                     courtId = courtId,
                     token = token,
@@ -536,7 +536,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { outboxStore.dropPendingUpdates(next.clientMatchUuid) }
             if (commandId.isNotEmpty()) {
-                runCatching { RetrofitClient.apiService.ackDirectorCommand(commandId) }
+                runCatching {
+                    getApplication<TennisRefereeApp>().container.apiService.ackDirectorCommand(commandId)
+                }
             }
         }
     }

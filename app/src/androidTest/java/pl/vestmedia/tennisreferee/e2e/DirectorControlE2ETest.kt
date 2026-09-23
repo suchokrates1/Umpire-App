@@ -26,7 +26,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.domain.match.model.StatsMode
@@ -46,7 +45,7 @@ class DirectorControlE2ETest {
 
     @Before
     fun setUp() {
-        RetrofitClient.overrideBaseUrl(backend.baseUrl)
+        overrideUmpireBackend(backend.baseUrl)
         val marker = "E2E-${System.currentTimeMillis()}-dir"
         backend.cleanup(marker)
         fixture = backend.createTournamentFixture(marker, publicOverlay = true)
@@ -69,7 +68,7 @@ class DirectorControlE2ETest {
                     .deleteAllMatches()
             }
         } finally {
-            RetrofitClient.overrideBaseUrl(null)
+            overrideUmpireBackend(null)
             backend.close()
         }
     }

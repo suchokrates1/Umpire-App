@@ -3,7 +3,8 @@ package pl.vestmedia.tennisreferee.e2e
 import androidx.test.platform.app.InstrumentationRegistry
 import okhttp3.MediaType.Companion.toMediaType
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
-import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
+import androidx.test.core.app.ApplicationProvider
+import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -66,6 +67,12 @@ class E2EBackendClient(
                 else -> error("Tournament create response missing id: $tournament")
             }
             val players = createPlayers(marker, tournamentId)
+            val doublesCategoryId = createCategory(tournamentId, "E2E Doubles")
+            val mixedCategoryId = createCategory(tournamentId, "E2E Mixed")
+            val regularPairA = createTeam(tournamentId, doublesCategoryId, players[0].id, players[1].id)
+            val regularPairB = createTeam(tournamentId, doublesCategoryId, players[2].id, players[3].id)
+            val mixedPairA = createTeam(tournamentId, mixedCategoryId, players[0].id, players[5].id)
+            val mixedPairB = createTeam(tournamentId, mixedCategoryId, players[2].id, players[7].id)
             putJson(
                 "/admin/api/tournaments/$tournamentId/bracket/groups",
                 JSONObject().put(
@@ -73,6 +80,20 @@ class E2EBackendClient(
                     JSONArray()
                         .put(JSONObject().put("name", "Group A").put("players", JSONArray(listOf(players[0].id, players[1].id, players[2].id, players[3].id))))
                         .put(JSONObject().put("name", "Group B").put("players", JSONArray(listOf(players[4].id, players[5].id, players[6].id, players[7].id))))
+                        .put(
+                            JSONObject()
+                                .put("name", "E2E Doubles — Grupa A")
+                                .put("tournament_category_id", doublesCategoryId)
+                                .put("play_format", "round_robin")
+                                .put("teams", JSONArray(listOf(regularPairA, regularPairB)))
+                        )
+                        .put(
+                            JSONObject()
+                                .put("name", "E2E Mixed — Grupa A")
+                                .put("tournament_category_id", mixedCategoryId)
+                                .put("play_format", "round_robin")
+                                .put("teams", JSONArray(listOf(mixedPairA, mixedPairB)))
+                        )
                 )
             )
             putJson(
@@ -167,6 +188,18 @@ class E2EBackendClient(
         )
     }
 
+    private fun createCategory(tournamentId: Int, label: String): Int {
+        val category = postJson(
+            "/admin/api/tournaments/$tournamentId/categories",
+            JSONObject().put("label", label).put("is_doubles", true)
+        )
+        return when {
+            category.has("id") -> category.getInt("id")
+            category.has("category") -> category.getJSONObject("category").getInt("id")
+            else -> error("Category create response missing id: $category")
+        }
+    }
+
     private fun createTeam(tournamentId: Int, categoryId: Int, player1Id: Int, player2Id: Int): Int {
         val response = postJson(
             "/admin/api/tournaments/$tournamentId/teams",
@@ -226,7 +259,9 @@ class E2EBackendClient(
     /** Court-auth grace ended; MatchActivity sync needs a bearer session. */
     fun seedAppCourtSession(courtId: String, pin: String = "4242") {
         setCourtPin(courtId, pin)
-        CourtSessionProvider.get().save(authorizeCourt(courtId, pin))
+        ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+            .container.sessionStore
+            .save(authorizeCourt(courtId, pin))
     }
 
     fun close() {

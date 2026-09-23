@@ -3,23 +3,25 @@ package pl.vestmedia.tennisreferee.data.api
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import pl.vestmedia.tennisreferee.BuildConfig
-import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
+import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 /**
- * Singleton Retrofit client.
- *
- * Production default is score.vestmedia.pl. Instrumentation / debug can point at
- * local Docker e2e via [overrideBaseUrl] (see androidTest e2e helpers).
+ * HTTP client for one [pl.vestmedia.tennisreferee.AppContainer].
+ * The session store is read on each request, not when this object is created.
  */
-object RetrofitClient {
-
-    const val DEFAULT_BASE_URL = "https://score.vestmedia.pl/"
+class RetrofitClient(
+    private val sessionStore: () -> CourtSessionStore,
+    initialBaseUrl: String? = null,
+) {
 
     @Volatile
-    private var baseUrlOverride: String? = null
+    private var baseUrlOverride: String? = initialBaseUrl
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { normalizeBaseUrl(it) }
 
     @Volatile
     private var cachedUrl: String? = null
@@ -33,7 +35,7 @@ object RetrofitClient {
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(ClientMetadataInterceptor())
-        .addInterceptor(BearerAuthInterceptor({ CourtSessionProvider.get() }))
+        .addInterceptor(BearerAuthInterceptor(sessionStore))
         .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -41,11 +43,11 @@ object RetrofitClient {
         .build()
 
     /** Effective backend base URL (always trailing slash). */
-    val BASE_URL: String
+    val baseUrl: String
         get() = normalizeBaseUrl(baseUrlOverride ?: DEFAULT_BASE_URL)
 
     /**
-     * Point the app API client at another host (E2E / staging).
+     * Point this client at another host (E2E / staging).
      * Pass null to restore [DEFAULT_BASE_URL].
      */
     @Synchronized
@@ -57,7 +59,7 @@ object RetrofitClient {
 
     val apiService: TennisApiService
         get() {
-            val url = BASE_URL
+            val url = baseUrl
             cachedService?.let { existing ->
                 if (cachedUrl == url) return existing
             }
@@ -80,5 +82,9 @@ object RetrofitClient {
     private fun normalizeBaseUrl(url: String): String {
         val trimmed = url.trim()
         return if (trimmed.endsWith("/")) trimmed else "$trimmed/"
+    }
+
+    companion object {
+        const val DEFAULT_BASE_URL = "https://score.vestmedia.pl/"
     }
 }

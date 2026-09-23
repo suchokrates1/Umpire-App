@@ -26,10 +26,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.model.TournamentOption
 import pl.vestmedia.tennisreferee.ui.courtselection.CourtSelectionActivity
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialPrefs
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
 
 /**
@@ -47,7 +47,7 @@ class CourtPinPathE2ETest {
 
     @Before
     fun setUp() {
-        RetrofitClient.overrideBaseUrl(backend.baseUrl)
+        overrideUmpireBackend(backend.baseUrl)
         val marker = "E2E-${System.currentTimeMillis()}-pin"
         backend.cleanup(marker)
         fixture = backend.createTournamentFixture(marker)
@@ -56,6 +56,7 @@ class CourtPinPathE2ETest {
 
         val ctx = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
         LanguageSelectionActivity.setLanguage(ctx, "en")
+        TutorialPrefs.markPrompted(ctx)
         TournamentSelectionStore.saveSelection(
             ctx,
             TournamentOption(
@@ -80,7 +81,7 @@ class CourtPinPathE2ETest {
                     .deleteAllMatches()
             }
         } finally {
-            RetrofitClient.overrideBaseUrl(null)
+            overrideUmpireBackend(null)
             backend.close()
         }
     }

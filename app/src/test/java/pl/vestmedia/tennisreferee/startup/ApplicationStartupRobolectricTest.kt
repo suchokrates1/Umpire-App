@@ -8,9 +8,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
-import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.auth.KeystoreCourtSessionStore
 import pl.vestmedia.tennisreferee.data.auth.SharedPreferencesCourtSessionStore
 
@@ -26,7 +24,7 @@ class ApplicationStartupRobolectricTest {
     @Test
     fun onCreateInitializesAWorkingSessionStoreWithoutCrashing() {
         val app = ApplicationProvider.getApplicationContext<StartupTestApp>()
-        val store = CourtSessionProvider.get()
+        val store = app.container.sessionStore
 
         store.clear()
         store.save(
@@ -52,7 +50,7 @@ class ApplicationStartupRobolectricTest {
 
     @Test
     fun retrofitClientIsUsableAfterApplicationOnCreate() {
-        ApplicationProvider.getApplicationContext<StartupTestApp>()
-        assertNotNull(RetrofitClient.apiService)
+        val app = ApplicationProvider.getApplicationContext<StartupTestApp>()
+        assertNotNull(app.container.apiService)
     }
 }

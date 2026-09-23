@@ -9,9 +9,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.vestmedia.tennisreferee.TennisRefereeApp
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
-import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.auth.KeystoreCourtSessionStore
 
 /**
@@ -23,8 +21,8 @@ class ApplicationStartupSmokeTest {
 
     @Test
     fun applicationOnCreateLeavesAWorkingCourtSessionStore() {
-        ApplicationProvider.getApplicationContext<TennisRefereeApp>()
-        val store = CourtSessionProvider.get()
+        val app = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        val store = app.container.sessionStore
         store.clear()
         try {
             store.save(
@@ -45,16 +43,16 @@ class ApplicationStartupSmokeTest {
 
     @Test
     fun retrofitClientCanBeResolvedAfterProcessStart() {
-        ApplicationProvider.getApplicationContext<TennisRefereeApp>()
-        assertNotNull(RetrofitClient.apiService)
+        val app = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        assertNotNull(app.container.apiService)
     }
 
     @Test
     fun deviceUsesTheKeystoreStore() {
-        ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+        val app = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
         assertTrue(
             "a real device must not fall back to plaintext preferences",
-            CourtSessionProvider.get() is KeystoreCourtSessionStore
+            app.container.sessionStore is KeystoreCourtSessionStore
         )
     }
 

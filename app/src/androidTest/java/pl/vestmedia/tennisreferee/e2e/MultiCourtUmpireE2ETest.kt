@@ -23,7 +23,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.domain.match.model.StatsMode
@@ -54,7 +53,7 @@ class MultiCourtUmpireE2ETest {
         require(courtIndex in 0..3) { "e2e.courtIndex must be 0..3, got $courtIndex" }
 
         // App sync (Retrofit) must hit the same host as the E2E admin client — not production.
-        RetrofitClient.overrideBaseUrl(backend.baseUrl)
+        overrideUmpireBackend(backend.baseUrl)
 
         val sharedMarker = E2EBackendClient.instrumentationArg("e2e.marker")
         val sharedTournamentId = E2EBackendClient.instrumentationArg("e2e.tournamentId")?.toIntOrNull()
@@ -88,7 +87,7 @@ class MultiCourtUmpireE2ETest {
                     .deleteAllMatches()
             }
         } finally {
-            RetrofitClient.overrideBaseUrl(null)
+            overrideUmpireBackend(null)
             backend.close()
         }
     }

@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import pl.vestmedia.tennisreferee.R
+import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.model.TournamentOption
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.databinding.ActivityTournamentSelectionBinding
@@ -41,7 +42,7 @@ class TournamentSelectionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTournamentSelectionBinding
     private lateinit var adapter: TournamentAdapter
-    private val repository by lazy { TennisRepository() }
+    private val repository by lazy { (application as TennisRefereeApp).container.repository() }
     private var tournaments: List<TournamentOption> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {

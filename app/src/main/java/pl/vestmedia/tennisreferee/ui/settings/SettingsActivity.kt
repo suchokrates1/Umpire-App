@@ -16,7 +16,6 @@ import java.util.Date
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.DeviceInfoProvider
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
 import pl.vestmedia.tennisreferee.databinding.ActivitySettingsBinding
 import pl.vestmedia.tennisreferee.ui.history.MatchHistoryActivity
 import pl.vestmedia.tennisreferee.ui.language.AvailableLanguages
@@ -145,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
 
         diagnosticsInfo = SettingsDiagnosticsInfo(
             appVersion = appVersion,
-            backendUrl = RetrofitClient.BASE_URL,
+            backendUrl = (application as TennisRefereeApp).container.baseUrl,
             device = metadata.device,
             locale = metadata.locale,
             timezone = metadata.timezone,
@@ -155,7 +154,7 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         binding.textDiagnosticsAppVersion.text = appVersion
-        binding.textDiagnosticsBackend.text = RetrofitClient.BASE_URL
+        binding.textDiagnosticsBackend.text = (application as TennisRefereeApp).container.baseUrl
         binding.textDiagnosticsDevice.text = metadata.device
         binding.textDiagnosticsLocale.text = metadata.locale
         binding.textDiagnosticsTimezone.text = metadata.timezone

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import kotlinx.coroutines.*
-import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorDeviceSnapshotDto
 import pl.vestmedia.tennisreferee.data.api.dto.HeartbeatRequestDto
 
@@ -73,7 +73,7 @@ class HealthCheckManager(private val app: Application) {
                 snapshot = snapshotProvider?.invoke()
             )
 
-            val response = RetrofitClient.apiService.sendHeartbeat(body)
+            val response = (app as TennisRefereeApp).container.apiService.sendHeartbeat(body)
             if (response.isSuccessful) {
                 // Director commands arrive on the match screen's long-poll, not here.
                 AppLogger.health("Heartbeat OK | court=$courtId battery=$battery% charging=$charging screen=$currentScreen")

@@ -1,10 +1,12 @@
 package pl.vestmedia.tennisreferee.ui.playerselection
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
@@ -13,9 +15,9 @@ import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
 /**
  * ViewModel zarządzający wyborem graczy
  */
-class PlayerSelectionViewModel : ViewModel() {
-    
-    private val repository = TennisRepository()
+class PlayerSelectionViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository = (application as TennisRefereeApp).container.repository()
     private var currentCourtId: String? = null
     
     private val _players = MutableLiveData<List<Player>>()
