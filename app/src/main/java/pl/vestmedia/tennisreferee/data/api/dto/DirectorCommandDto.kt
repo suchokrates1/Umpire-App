@@ -139,6 +139,10 @@ data class DirectorDeviceSnapshotDto(
     @SerialName("sets_to_win")
     val setsToWin: Int? = null,
 
+    @SerializedName("tiebreak_at_games")
+    @SerialName("tiebreak_at_games")
+    val tiebreakAtGames: Int? = null,
+
     @SerializedName("no_advantage")
     @SerialName("no_advantage")
     val noAdvantage: Boolean? = null,
@@ -278,6 +282,10 @@ data class MatchConfigDto(
     @SerializedName("super_tiebreak_points")
     @SerialName("super_tiebreak_points")
     val superTiebreakPoints: Int? = null,
+
+    @SerializedName("tiebreak_at_games")
+    @SerialName("tiebreak_at_games")
+    val tiebreakAtGames: Int? = null,
 
     @SerializedName("no_advantage")
     @SerialName("no_advantage")

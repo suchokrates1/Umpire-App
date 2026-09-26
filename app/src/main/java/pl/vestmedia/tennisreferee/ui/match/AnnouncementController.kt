@@ -38,7 +38,7 @@ class AnnouncementController(
                 context.getString(R.string.announce_tiebreak),
                 context.getString(
                     R.string.announce_tiebreak_msg,
-                    state.matchConfig.gamesPerSet,
+                    state.matchConfig.tiebreakAt,
                     state.matchConfig.tiebreakPoints
                 ),
                 "\uD83C\uDFBE"

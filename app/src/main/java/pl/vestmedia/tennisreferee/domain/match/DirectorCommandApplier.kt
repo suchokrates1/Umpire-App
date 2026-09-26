@@ -79,6 +79,7 @@ object DirectorCommandApplier {
             setsToWin = patch.setsToWin ?: current.setsToWin,
             tiebreakPoints = patch.tiebreakPoints ?: current.tiebreakPoints,
             superTiebreakPoints = patch.superTiebreakPoints ?: current.superTiebreakPoints,
+            tiebreakAtGames = patch.tiebreakAtGames ?: current.tiebreakAtGames,
             noAdvantage = patch.noAdvantage ?: current.noAdvantage,
             tiebreakOnly = patch.tiebreakOnly ?: current.tiebreakOnly,
             statsMode = patch.statsMode?.let { runCatching { StatsMode.valueOf(it.uppercase()) }.getOrNull() }

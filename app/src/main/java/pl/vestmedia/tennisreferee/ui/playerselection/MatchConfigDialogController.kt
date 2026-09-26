@@ -66,6 +66,10 @@ class MatchConfigDialogController(
 
         val toggleGamesPerSet =
             dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleGamesPerSet)
+        val toggleTiebreakAt =
+            dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleTiebreakAt)
+        val buttonTbAtEarly = dialogView.findViewById<MaterialButton>(R.id.btnTbAtEarly)
+        val buttonTbAtFull = dialogView.findViewById<MaterialButton>(R.id.btnTbAtFull)
         val toggleSetsToWin =
             dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleSetsToWin)
         val toggleTiebreakPoints =
@@ -138,11 +142,41 @@ class MatchConfigDialogController(
 
         updateManualStartTimeLabel()
 
+        fun checkedGamesPerSet(): Int = when (toggleGamesPerSet.checkedButtonId) {
+            R.id.btnGames3 -> 3
+            R.id.btnGames5 -> 5
+            R.id.btnGames6 -> 6
+            else -> 4
+        }
+
+        // The two triggers are relative to the set length, so relabel and reset them with it.
+        fun refreshTiebreakAtChoices() {
+            val gamesPerSet = checkedGamesPerSet()
+            val options = MatchConfig.tiebreakAtOptions(gamesPerSet)
+            val early = options.first()
+            val full = options.last()
+            buttonTbAtEarly.text = activity.getString(R.string.match_config_tiebreak_at_value, early, early)
+            buttonTbAtFull.text = activity.getString(R.string.match_config_tiebreak_at_value, full, full)
+            buttonTbAtEarly.visibility = if (early == full) View.GONE else View.VISIBLE
+            toggleTiebreakAt.check(
+                if (MatchConfig.defaultTiebreakAtGames(gamesPerSet) == early && early != full) {
+                    R.id.btnTbAtEarly
+                } else {
+                    R.id.btnTbAtFull
+                }
+            )
+        }
+
         toggleGamesPerSet.check(R.id.btnGames4)
         toggleSetsToWin.check(R.id.btnSets2)
         toggleTiebreakPoints.check(R.id.btnTB7)
         toggleSuperTiebreakPoints.check(R.id.btnSTB10)
         toggleTbOnlyPoints.check(R.id.btnTbOnly10)
+        refreshTiebreakAtChoices()
+
+        toggleGamesPerSet.addOnButtonCheckedListener { _, _, isChecked ->
+            if (isChecked) refreshTiebreakAtChoices()
+        }
 
         switchTiebreakOnly.setOnCheckedChangeListener { _, isChecked ->
             layoutMatchFormat.visibility = if (isChecked) View.GONE else View.VISIBLE
@@ -163,11 +197,12 @@ class MatchConfigDialogController(
                     tiebreakOnly = true
                 )
             }
-            val gamesPerSet = when (toggleGamesPerSet.checkedButtonId) {
-                R.id.btnGames3 -> 3
-                R.id.btnGames5 -> 5
-                R.id.btnGames6 -> 6
-                else -> 4
+            val gamesPerSet = checkedGamesPerSet()
+            val tiebreakAtOptions = MatchConfig.tiebreakAtOptions(gamesPerSet)
+            val tiebreakAtGames = if (toggleTiebreakAt.checkedButtonId == R.id.btnTbAtEarly) {
+                tiebreakAtOptions.first()
+            } else {
+                tiebreakAtOptions.last()
             }
             val setsToWin = when (toggleSetsToWin.checkedButtonId) {
                 R.id.btnSets1 -> 1
@@ -187,6 +222,7 @@ class MatchConfigDialogController(
                 setsToWin = setsToWin,
                 tiebreakPoints = tiebreakPoints,
                 superTiebreakPoints = superTiebreakPoints,
+                tiebreakAtGames = tiebreakAtGames,
                 statsMode = statsMode,
                 noAdvantage = switchNoAdvantage.isChecked
             )

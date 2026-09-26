@@ -33,6 +33,7 @@
         <string name="match_config_clear_datetime">Išvalyti</string>
     <string name="match_config_format_header">Mačo formatas</string>
     <string name="match_config_games_per_set">Geimų iki seto</string>
+    <string name="match_config_tiebreak_at">Taibreikas prie</string>
     <string name="match_config_sets_to_win">Setų iki pergalės</string>
     <string name="match_config_tiebreak_to">Taibreikas iki</string>
     <string name="match_config_super_tiebreak_to">Lemiamas TB iki</string>

@@ -250,26 +250,32 @@ data class MatchState(
      * Np. przy gamesPerSet=4: wygrana 4:0, 4:1, 4:2, 5:3
      * Np. przy gamesPerSet=3 (krótki set): wygrana 3:0, 3:1, 3:2 (po TB z 2:2)
      * Np. przy gamesPerSet=6: wygrana 6:0..6:4, 7:5
+     * Np. przy gamesPerSet=4 i TB przy 3:3: wygrana 4:0, 4:1, 4:2 (a 4:3 przychodzi z TB)
      */
     fun isSetWon(): Boolean {
         if (isTiebreak || isSuperTiebreak) {
             return false // W tiebreaku sprawdzamy isGameWon
         }
-        
+
         val gps = matchConfig.gamesPerSet
-        
-        // Krótkie sety (gps=3): set wygrywa ten kto pierwszy osiągnie gps gemów
-        // (bo TB startuje przy gps-1:gps-1, np. 2:2, i zwycięzca TB dostaje gem → 3:2)
-        if (gps <= 3) {
-            return player1Games >= gps || player2Games >= gps
-        }
-        
-        // Standardowe sety: wygrana z przewagą ≥2 gemów
+        val tbAt = matchConfig.tiebreakAt
+
+        // Wygrana z przewagą ≥2 gemów
         if ((player1Games >= gps && player1Games - player2Games >= 2) ||
             (player2Games >= gps && player2Games - player1Games >= 2)) {
             return true
         }
-        
+
+        // Krótkie sety (gps=3): zwycięzca TB z 2:2 dostaje gem i seta → 3:2
+        if (gps <= 3 && tbAt < gps && (player1Games >= gps || player2Games >= gps)) {
+            return true
+        }
+
+        // 5:3 i 7:5 istnieją tylko wtedy, gdy TB czeka na gps:gps
+        if (tbAt < gps) {
+            return false
+        }
+
         // Wygrana przy gamesPerSet+1 : gamesPerSet-1 (np. 5:3 przy gps=4, 7:5 przy gps=6)
         val gpsPlus1 = gps + 1
         val gpsMinus1 = gps - 1
@@ -277,18 +283,17 @@ data class MatchState(
             (player2Games == gpsPlus1 && player1Games == gpsMinus1)) {
             return true
         }
-        
+
         return false
     }
     
     /**
      * Sprawdza czy powinien zacząć się tiebreak.
-     * Krótkie sety (gamesPerSet=3): TB przy (gps-1):(gps-1) → 2:2
-     * Standardowe sety (gamesPerSet=4,6): TB przy gps:gps → 4:4, 6:6
+     * Domyślnie: krótkie sety (gps=3) → 2:2, standardowe (gps=4,6) → 4:4, 6:6.
+     * Format może wskazać własny próg (np. set do 4 z TB przy 3:3).
      */
     fun shouldStartTiebreak(): Boolean {
-        val gps = matchConfig.gamesPerSet
-        val tbTrigger = if (gps <= 3) gps - 1 else gps
+        val tbTrigger = matchConfig.tiebreakAt
         return player1Games == tbTrigger && player2Games == tbTrigger && !isTiebreak && !isSuperTiebreak
     }
     

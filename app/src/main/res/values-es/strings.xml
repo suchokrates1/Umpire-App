@@ -84,6 +84,7 @@
         <string name="match_config_clear_datetime">Borrar</string>
         <string name="match_config_format_header">Formato del partido</string>
         <string name="match_config_games_per_set">Juegos por set</string>
+        <string name="match_config_tiebreak_at">Tie-break en</string>
         <string name="match_config_sets_to_win">Sets para ganar</string>
         <string name="match_config_tiebreak_to">Tie-break a</string>
         <string name="match_config_super_tiebreak_to">Tie-break decisivo a</string>

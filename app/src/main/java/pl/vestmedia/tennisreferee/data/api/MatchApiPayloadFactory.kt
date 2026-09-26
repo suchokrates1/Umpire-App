@@ -46,6 +46,7 @@ object MatchApiPayloadFactory {
                 setsToWin = state.matchConfig.setsToWin,
                 tiebreakPoints = state.matchConfig.tiebreakPoints,
                 superTiebreakPoints = state.matchConfig.superTiebreakPoints,
+                tiebreakAtGames = state.matchConfig.tiebreakAt,
                 noAdvantage = state.matchConfig.noAdvantage || state.noAdvantage,
                 tiebreakOnly = state.matchConfig.tiebreakOnly,
                 statsMode = state.statsMode.name
@@ -77,6 +78,7 @@ object MatchApiPayloadFactory {
             matchDurationMs = state.matchDuration,
             gamesPerSet = match.matchConfig?.gamesPerSet,
             setsToWin = match.matchConfig?.setsToWin,
+            tiebreakAtGames = match.matchConfig?.tiebreakAtGames,
             noAdvantage = match.matchConfig?.noAdvantage,
             tiebreakOnly = match.matchConfig?.tiebreakOnly,
             statsMode = match.matchConfig?.statsMode

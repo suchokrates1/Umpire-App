@@ -56,6 +56,40 @@ class MatchStateTest {
     }
 
     @Test
+    fun fourGameSetCanStartTheTiebreakAtThreeAll() {
+        val config = MatchConfig(gamesPerSet = 4, tiebreakAtGames = 3)
+        assertEquals(3, config.tiebreakAt)
+
+        val state = matchState(matchConfig = config).apply {
+            player1Games = 3
+            player2Games = 3
+        }
+        assertTrue(state.shouldStartTiebreak())
+        assertFalse(state.isSetWon())
+
+        // 4:0, 4:1 and 4:2 still take the set outright.
+        listOf(0, 1, 2).forEach { games ->
+            state.player1Games = 4
+            state.player2Games = games
+            assertTrue(state.isSetWon())
+        }
+
+        // 4:3 only exists as the game won in the tiebreak, which the reducer awards itself.
+        state.player1Games = 4
+        state.player2Games = 3
+        assertFalse(state.isSetWon())
+    }
+
+    @Test
+    fun tiebreakAtGamesOutsideTheFormatFallsBackToTheDefault() {
+        assertEquals(4, MatchConfig(gamesPerSet = 4).tiebreakAt)
+        assertEquals(2, MatchConfig(gamesPerSet = 3).tiebreakAt)
+        assertEquals(6, MatchConfig(gamesPerSet = 6).tiebreakAt)
+        assertEquals(4, MatchConfig(gamesPerSet = 4, tiebreakAtGames = 9).tiebreakAt)
+        assertEquals(5, MatchConfig(gamesPerSet = 6, tiebreakAtGames = 5).tiebreakAt)
+    }
+
+    @Test
     fun noAdvantageGameEndsOnFourthPoint() {
         val state = matchState(noAdvantage = true).apply {
             player1Points = 4

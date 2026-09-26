@@ -84,6 +84,7 @@
         <string name="match_config_clear_datetime">Clear</string>
         <string name="match_config_format_header">Match Format</string>
         <string name="match_config_games_per_set">Games per set</string>
+        <string name="match_config_tiebreak_at">Tie-break at</string>
         <string name="match_config_sets_to_win">Sets to win</string>
         <string name="match_config_tiebreak_to">Tiebreak to</string>
         <string name="match_config_super_tiebreak_to">Match tiebreak to</string>

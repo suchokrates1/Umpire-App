@@ -131,6 +131,7 @@
         <string name="match_config_clear_datetime">Effacer</string>
         <string name="match_config_format_header">Format du match</string>
         <string name="match_config_games_per_set">Jeux par set</string>
+        <string name="match_config_tiebreak_at">Tie-break à</string>
         <string name="match_config_sets_to_win">Sets à gagner</string>
         <string name="match_config_tiebreak_to">Tie-break en</string>
         <string name="match_config_super_tiebreak_to">Tie-break décisif en</string>

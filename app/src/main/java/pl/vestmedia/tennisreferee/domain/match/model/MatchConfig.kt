@@ -27,10 +27,25 @@ data class MatchConfig(
     val noAdvantage: Boolean = false,
     
     // Tryb samego tiebreaka (bez setów/gemów, od razu super TB)
-    val tiebreakOnly: Boolean = false
+    val tiebreakOnly: Boolean = false,
+
+    // Przy ilu gemach startuje tiebreak (np. 3 = TB przy 3:3); null = domyślnie dla formatu
+    val tiebreakAtGames: Int? = null
 ) : Parcelable {
-    
+
+    /** Gemy, przy których obie strony wchodzą w tiebreak seta. */
+    val tiebreakAt: Int
+        get() = tiebreakAtGames?.coerceIn(1, gamesPerSet) ?: defaultTiebreakAtGames(gamesPerSet)
+
     companion object {
+        /** Krótkie sety otwierają TB o gem wcześniej (2:2 przy trzech), dłuższe na długości seta. */
+        fun defaultTiebreakAtGames(gamesPerSet: Int): Int =
+            if (gamesPerSet <= 3) gamesPerSet - 1 else gamesPerSet
+
+        /** Dwa progi TB, jakie format może zaoferować: gem wcześniej albo na długości seta. */
+        fun tiebreakAtOptions(gamesPerSet: Int): List<Int> =
+            if (gamesPerSet > 1) listOf(gamesPerSet - 1, gamesPerSet) else listOf(gamesPerSet)
+
         /** Tylko tiebreak (do 10 punktów) */
         fun tiebreakOnly(points: Int = 10) = MatchConfig(
             setsToWin = 1,

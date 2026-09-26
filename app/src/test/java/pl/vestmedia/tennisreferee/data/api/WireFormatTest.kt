@@ -62,8 +62,15 @@ class WireFormatTest {
         assertWire(
             MatchDto.serializer(),
             MatchApiPayloadFactory.toMatch(state()),
-            """{"id":9,"court_id":"1","player1_name":"Jan Kowalski","player2_name":"Adam Nowak","score":{"player1_sets":1,"player2_sets":0,"player1_games":4,"player2_games":3,"player1_points":2,"player2_points":1,"sets_history":[{"set_number":1,"player1_games":4,"player2_games":2,"tiebreak_loser_points":5,"is_super_tiebreak":false}]},"status":"in_progress","schedule_id":44,"client_match_uuid":"uuid-1","finish_reason":"normal","match_config":{"games_per_set":4,"sets_to_win":2,"tiebreak_points":7,"super_tiebreak_points":10,"no_advantage":false,"tiebreak_only":false,"stats_mode":"ADVANCED"},"match_start_time_ms":100,"serve":"A"}""",
+            """{"id":9,"court_id":"1","player1_name":"Jan Kowalski","player2_name":"Adam Nowak","score":{"player1_sets":1,"player2_sets":0,"player1_games":4,"player2_games":3,"player1_points":2,"player2_points":1,"sets_history":[{"set_number":1,"player1_games":4,"player2_games":2,"tiebreak_loser_points":5,"is_super_tiebreak":false}]},"status":"in_progress","schedule_id":44,"client_match_uuid":"uuid-1","finish_reason":"normal","match_config":{"games_per_set":4,"sets_to_win":2,"tiebreak_points":7,"super_tiebreak_points":10,"tiebreak_at_games":4,"no_advantage":false,"tiebreak_only":false,"stats_mode":"ADVANCED"},"match_start_time_ms":100,"serve":"A"}""",
         )
+    }
+
+    @Test
+    fun matchConfigCarriesAnEarlyTiebreak() {
+        val early = state().let { it.copy(matchConfig = it.matchConfig.copy(tiebreakAtGames = 3)) }
+        val body = gson.toJson(MatchApiPayloadFactory.toMatch(early))
+        assertEquals(true, body.contains(""""tiebreak_at_games":3"""))
     }
 
     @Test
@@ -107,7 +114,7 @@ class WireFormatTest {
         assertWire(
             DirectorDeviceSnapshotDto.serializer(),
             MatchApiPayloadFactory.toDirectorSnapshot(state()),
-            """{"court_id":"1","court_name":"Court 1","player1_name":"Jan Kowalski","player2_name":"Adam Nowak","is_doubles":false,"player1_sets":1,"player2_sets":0,"player1_games":4,"player2_games":3,"player1_points":2,"player2_points":1,"sets_history":[{"set_number":1,"player1_games":4,"player2_games":2,"tiebreak_loser_points":5,"is_super_tiebreak":false}],"is_player1_serving":true,"is_tiebreak":false,"is_super_tiebreak":false,"match_start_time_ms":100,"match_duration_ms":0,"games_per_set":4,"sets_to_win":2,"no_advantage":false,"tiebreak_only":false,"stats_mode":"ADVANCED"}""",
+            """{"court_id":"1","court_name":"Court 1","player1_name":"Jan Kowalski","player2_name":"Adam Nowak","is_doubles":false,"player1_sets":1,"player2_sets":0,"player1_games":4,"player2_games":3,"player1_points":2,"player2_points":1,"sets_history":[{"set_number":1,"player1_games":4,"player2_games":2,"tiebreak_loser_points":5,"is_super_tiebreak":false}],"is_player1_serving":true,"is_tiebreak":false,"is_super_tiebreak":false,"match_start_time_ms":100,"match_duration_ms":0,"games_per_set":4,"sets_to_win":2,"tiebreak_at_games":4,"no_advantage":false,"tiebreak_only":false,"stats_mode":"ADVANCED"}""",
         )
     }
 
