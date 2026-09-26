@@ -162,7 +162,13 @@ class MatchActivity : AppCompatActivity() {
                 if (isTutorial()) {
                     TutorialNavigator.exit(this)
                 } else {
-                    finishWithResult(action)
+                    // Wait for PUT+finish before leaving — otherwise viewModelScope
+                    // dies with the Activity and the match stays in_progress on the server.
+                    matchFinishedBinding.buttonNextMatchSameSetup.isEnabled = false
+                    matchFinishedBinding.buttonNextMatchNewSetup.isEnabled = false
+                    viewModel.ensureMatchFinalized {
+                        finishWithResult(action)
+                    }
                 }
             }
         )

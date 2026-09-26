@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
@@ -421,12 +422,15 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
+    /** In-flight finalize so "next match" can wait for the same job instead of cancelling it. */
+    private var finalizeJob: Job? = null
+
     /**
      * Sekwencyjne zakończenie meczu na serwerze.
      * Kolejność: sync → match_end event → finish → statistics → local save
      */
     private fun finalizeMatchOnServer(state: MatchState) {
-        viewModelScope.launch(Dispatchers.IO) {
+        finalizeJob = viewModelScope.launch(Dispatchers.IO) {
             matchSyncCoordinator.finalizeMatch(state)
         }
     }
@@ -437,10 +441,38 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             _matchState.value = state
             _currentView.value = MatchView.MATCH_FINISHED
             if (!tutorialMode) {
-                viewModelScope.launch(Dispatchers.IO) {
+                finalizeJob = viewModelScope.launch(Dispatchers.IO) {
                     matchSyncCoordinator.finalizeMatch(state, request)
                 }
             }
+        }
+    }
+
+    /**
+     * Ensures PUT+finish reached the server before leaving the finished screen.
+     * Both "next match" buttons call this so a quick tap cannot cancel finalize.
+     */
+    fun ensureMatchFinalized(onDone: () -> Unit) {
+        if (tutorialMode) {
+            onDone()
+            return
+        }
+        val state = _matchState.value
+        if (state == null || !state.isMatchFinished) {
+            onDone()
+            return
+        }
+        val running = finalizeJob
+        if (running != null && running.isActive) {
+            viewModelScope.launch {
+                running.join()
+                onDone()
+            }
+            return
+        }
+        finalizeJob = viewModelScope.launch(Dispatchers.IO) {
+            matchSyncCoordinator.finalizeMatch(state)
+            withContext(Dispatchers.Main) { onDone() }
         }
     }
 
