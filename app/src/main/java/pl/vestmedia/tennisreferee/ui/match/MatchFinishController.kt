@@ -1,7 +1,9 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import android.app.Activity
+import android.view.View
 import pl.vestmedia.tennisreferee.R
+import pl.vestmedia.tennisreferee.domain.match.MatchScoreSummary
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -19,8 +21,16 @@ class MatchFinishController(
         }
 
         binding.textWinner.text = activity.getString(R.string.winner_label, winner)
+        renderFinalScore(state)
         renderStatistics(state)
         bindNextMatchButtons(state)
+    }
+
+    private fun renderFinalScore(state: MatchState) {
+        binding.textFinalSets.text = MatchScoreSummary.sets(state)
+        val setBySet = MatchScoreSummary.setBySet(state)
+        binding.textFinalSetBySet.text = setBySet
+        binding.textFinalSetBySet.visibility = if (setBySet.isBlank()) View.GONE else View.VISIBLE
     }
 
     private fun renderStatistics(state: MatchState) {

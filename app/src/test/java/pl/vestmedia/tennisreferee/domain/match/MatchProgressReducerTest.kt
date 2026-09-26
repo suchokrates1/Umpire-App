@@ -39,6 +39,32 @@ class MatchProgressReducerTest {
     }
 
     @Test
+    fun matchWonInTheSuperTiebreakLeavesNoPointsToRenderAsAGame() {
+        val state = matchState(matchConfig = MatchConfig(gamesPerSet = 4, setsToWin = 2)).apply {
+            matchStartTime = 1_000L
+            player1Sets = 1
+            player2Sets = 1
+            isSuperTiebreak = true
+            player1Points = 10
+            player2Points = 8
+        }
+
+        val result = MatchProgressReducer.reduceAfterPoint(state, currentAnnouncementType = null, nowMs = 9_000L)
+
+        assertTrue(result.finalizeMatch)
+        assertTrue(state.isMatchFinished)
+        assertEquals(10, state.setsHistory.last().player1Games)
+        assertEquals(8, state.setsHistory.last().player2Games)
+        // Leftover tiebreak points with the flags cleared used to read as "ADV" / "40".
+        assertEquals(0, state.player1Points)
+        assertEquals(0, state.player2Points)
+        assertEquals("0", state.getPlayer1PointsDisplay())
+        assertEquals("0", state.getPlayer2PointsDisplay())
+        assertEquals("2 : 1", MatchScoreSummary.sets(state))
+        assertEquals("10:8", MatchScoreSummary.setBySet(state))
+    }
+
+    @Test
     fun noAdvantageDeuceShowsDecidingPointWithoutSync() {
         val state = matchState(noAdvantage = true).apply {
             player1Points = 3
