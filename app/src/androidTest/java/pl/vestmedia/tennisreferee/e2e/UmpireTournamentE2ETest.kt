@@ -98,6 +98,24 @@ class UmpireTournamentE2ETest {
                 expectedLastTiebreakLoserPoints = 5
             ),
             scenario(
+                name = "singles_set_to_4_with_tiebreak_at_3_3",
+                playerIndexes = listOf(0, 3),
+                config = MatchConfig(
+                    gamesPerSet = 4,
+                    setsToWin = 1,
+                    tiebreakPoints = 7,
+                    tiebreakAtGames = 3,
+                    statsMode = StatsMode.ADVANCED
+                ),
+                steps = listOf(
+                    Game(true), Game(false), Game(true), Game(false), Game(true), Game(false),
+                    Tiebreak(points = listOf(true, false, true, false, true, false, true, false, true, false, true, true))
+                ),
+                expectedSets = 1 to 0,
+                expectedSetScores = listOf(4 to 3),
+                expectedLastTiebreakLoserPoints = 5
+            ),
+            scenario(
                 name = "singles_super_tiebreak_10_8",
                 playerIndexes = listOf(6, 7),
                 config = MatchConfig(gamesPerSet = 3, setsToWin = 2, superTiebreakPoints = 10, statsMode = StatsMode.ADVANCED),
