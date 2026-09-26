@@ -116,6 +116,11 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun initializeMatch(matchState: MatchState) {
         _matchState.value = matchState
+        if (matchState.isMatchFinished) {
+            _currentView.value = MatchView.MATCH_FINISHED
+        } else if (matchState.matchStartTime > 0) {
+            _currentView.value = scoringViewFor(matchState)
+        }
         if (tutorialMode) return
         val app = getApplication<TennisRefereeApp>()
         app.healthCheckManager.matchId = matchState.matchId

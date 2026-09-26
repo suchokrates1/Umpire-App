@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import pl.vestmedia.tennisreferee.data.model.Player
+import pl.vestmedia.tennisreferee.domain.match.MatchResume
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.ui.match.ActiveMatchStore
@@ -62,6 +63,12 @@ class NextMatchController(
         val playerNames = selectedPlayers.joinToString(", ") { it.getDisplayName() }
         lastStartedMatchConfig = config
         val scheduleId = getSelectedScheduleId()
+        val resumed = activeMatchStore.getLast()
+        if (MatchResume.canResume(resumed, getCourtId(), scheduleId, selectedPlayers, isDoublesMatch)) {
+            AppLogger.navigate("PlayerSelection", "Match", "resume uuid=${resumed!!.clientMatchUuid}")
+            matchLauncher.launch(MatchActivity.createIntent(activity, resumed.clientMatchUuid, isDoublesMatch))
+            return
+        }
         AppLogger.navigate(
             "PlayerSelection",
             "Match",

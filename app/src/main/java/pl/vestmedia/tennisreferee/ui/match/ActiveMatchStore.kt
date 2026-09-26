@@ -16,6 +16,11 @@ class ActiveMatchStore(context: Context) {
             .apply()
     }
 
+    fun getLast(): MatchState? {
+        val matchUuid = prefs.getString(KEY_LAST_MATCH_UUID, null) ?: return null
+        return get(matchUuid)
+    }
+
     fun get(matchUuid: String): MatchState? {
         val payload = prefs.getString(keyFor(matchUuid), null) ?: return null
         return try {
