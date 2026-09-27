@@ -111,6 +111,34 @@ class MatchOutboxFlusherTest {
     }
 
     @Test
+    fun flushDrops403And404Permanently() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient().apply {
+            finishResults += httpError(403)
+            statisticsResults += httpError(404)
+        }
+        val flusher = MatchOutboxFlusher(store, api)
+        flusher.enqueue("uuid-old", "FINISH", 449, gson.toJson(FinishMatchRequest()))
+        flusher.enqueue("uuid-old", "STATS", 449, gson.toJson(
+            MatchApiPayloadFactory.toStatisticsRequest(
+                matchState().apply {
+                    matchId = 449
+                    isMatchFinished = true
+                    player1Sets = 2
+                }
+            )!!
+        ))
+
+        val result = flusher.flushPending()
+
+        assertEquals(0, result.flushed)
+        assertEquals(0, result.failed)
+        assertEquals(2, result.dropped)
+        assertTrue(store.getPending().isEmpty())
+        assertTrue(store.allEntries().none { it.status == "PENDING" })
+    }
+
+    @Test
     fun flushRetriesOnNetworkError() = runBlocking {
         val store = InMemoryOutboxStore()
         val api = TestApiClient().apply {

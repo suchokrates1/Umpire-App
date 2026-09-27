@@ -13,7 +13,12 @@ import retrofit2.Response
 import kotlin.math.min
 import kotlin.math.pow
 
-data class FlushResult(val flushed: Int, val failed: Int, val stoppedOnAuth: Boolean = false)
+data class FlushResult(
+    val flushed: Int,
+    val failed: Int,
+    val dropped: Int = 0,
+    val stoppedOnAuth: Boolean = false,
+)
 
 class MatchOutboxFlusher(
     private val outboxStore: MatchOutboxStore,
@@ -21,6 +26,10 @@ class MatchOutboxFlusher(
     private val gson: Gson = Gson(),
     private val json: Json = apiJson,
 ) {
+    companion object {
+        /** Permanent client/server mismatches — retrying forever blocks match finalize. */
+        private val PERMANENT_DROP_CODES = setOf(403, 404)
+    }
 
     suspend fun flushPending(): FlushResult {
         val pending = outboxStore.getPending()
@@ -34,6 +43,7 @@ class MatchOutboxFlusher(
         val resolvedIds = mutableMapOf<String, Int>()
         var flushed = 0
         var failed = 0
+        var dropped = 0
 
         for (original in sorted) {
             val resolved = original.serverMatchId ?: resolvedIds[original.clientMatchUuid]
@@ -73,7 +83,15 @@ class MatchOutboxFlusher(
                     ))
                     failed++
                     outboxStore.deleteDone()
-                    return FlushResult(flushed, failed, stoppedOnAuth = true)
+                    return FlushResult(flushed, failed, dropped, stoppedOnAuth = true)
+                } else if (result.code() in PERMANENT_DROP_CODES) {
+                    // Same as PWA outbox: 403/404 will never succeed (wrong court token,
+                    // already-finished foreign match). Keep retrying only blocks finalize.
+                    outboxStore.update(mutation.copy(
+                        status = "DONE",
+                        lastError = "HTTP ${result.code()} dropped"
+                    ))
+                    dropped++
                 } else {
                     outboxStore.update(mutation.copy(
                         status = "PENDING",
@@ -93,7 +111,7 @@ class MatchOutboxFlusher(
         }
 
         outboxStore.deleteDone()
-        return FlushResult(flushed, failed)
+        return FlushResult(flushed, failed, dropped)
     }
 
     suspend fun enqueue(
