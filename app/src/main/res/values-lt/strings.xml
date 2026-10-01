@@ -279,5 +279,14 @@
     <string name="tutorial_retirement_body">Choose Retirement, then the player who cannot continue. The other player is the winner. This tutorial does not send anything to the server.</string>
     <string name="tutorial_complete_title">That’s the flow</string>
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
+
+    <string name="panic_call">Kviesti režisūrą</string>
+    <string name="panic_title">Kviesti režisūrą?</string>
+    <string name="panic_message">Tai išsiųs WhatsApp žinutę turnyro režisūrai.</string>
+    <string name="panic_note">Nebūtina pastaba</string>
+    <string name="panic_send">Siųsti</string>
+    <string name="panic_sent">Einu.</string>
+    <string name="panic_failed">Kvietimas nepasiekė.</string>
+    <string name="panic_cooldown">Palaukite prieš kviesdami dar kartą.</string>
 </resources>
 
