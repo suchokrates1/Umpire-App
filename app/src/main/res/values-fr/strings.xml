@@ -276,5 +276,14 @@
     <string name="tutorial_retirement_body">Choose Retirement, then the player who cannot continue. The other player is the winner. This tutorial does not send anything to the server.</string>
     <string name="tutorial_complete_title">That’s the flow</string>
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
+
+    <string name="panic_call">Appeler la régie</string>
+    <string name="panic_title">Appeler la régie ?</string>
+    <string name="panic_message">Cela envoie un message WhatsApp à la régie du tournoi.</string>
+    <string name="panic_note">Note facultative</string>
+    <string name="panic_send">Envoyer</string>
+    <string name="panic_sent">J\'arrive.</string>
+    <string name="panic_failed">L\'appel n\'est pas passé.</string>
+    <string name="panic_cooldown">Attendez un instant avant de rappeler.</string>
 </resources>
 
