@@ -203,7 +203,7 @@
     <string name="panic_message">The desk gets a WhatsApp that you need help on this court.</string>
     <string name="panic_note">Optional note</string>
     <string name="panic_send">Send</string>
-    <string name="panic_sent">On my way.</string>
+    <string name="panic_sent">Technical support is on the way.</string>
     <string name="panic_failed">The call did not go through.</string>
     <string name="panic_cooldown">Wait a moment before calling again.</string>
     <string name="open_match_history">Open match history</string>

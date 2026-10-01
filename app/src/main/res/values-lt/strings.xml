@@ -285,7 +285,7 @@
     <string name="panic_message">Režisūra gaus WhatsApp, kad šiame korte reikia pagalbos.</string>
     <string name="panic_note">Nebūtina pastaba</string>
     <string name="panic_send">Siųsti</string>
-    <string name="panic_sent">Einu.</string>
+    <string name="panic_sent">Techninė pagalba jau pakeliui.</string>
     <string name="panic_failed">Kvietimas nepasiekė.</string>
     <string name="panic_cooldown">Palaukite prieš kviesdami dar kartą.</string>
 </resources>

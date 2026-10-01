@@ -282,7 +282,7 @@
     <string name="panic_message">La régie reçoit un WhatsApp : vous avez besoin d\'aide sur ce court.</string>
     <string name="panic_note">Note facultative</string>
     <string name="panic_send">Envoyer</string>
-    <string name="panic_sent">J\'arrive.</string>
+    <string name="panic_sent">L\'assistance technique est en route.</string>
     <string name="panic_failed">L\'appel n\'est pas passé.</string>
     <string name="panic_cooldown">Attendez un instant avant de rappeler.</string>
 </resources>

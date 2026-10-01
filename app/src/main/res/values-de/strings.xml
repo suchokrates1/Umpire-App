@@ -283,7 +283,7 @@
     <string name="panic_message">Die Regie bekommt eine WhatsApp, dass du auf diesem Platz Hilfe brauchst.</string>
     <string name="panic_note">Optionale Notiz</string>
     <string name="panic_send">Senden</string>
-    <string name="panic_sent">Ich komme.</string>
+    <string name="panic_sent">Der technische Dienst ist unterwegs.</string>
     <string name="panic_failed">Der Ruf ist nicht angekommen.</string>
     <string name="panic_cooldown">Warte einen Moment, bevor du erneut rufst.</string>
 </resources>

@@ -190,7 +190,7 @@
     <string name="panic_message">Reżyserka dostanie WhatsApp, że potrzebujesz pomocy na tym korcie.</string>
     <string name="panic_note">Opcjonalna notatka</string>
     <string name="panic_send">Wyślij</string>
-    <string name="panic_sent">Idę.</string>
+    <string name="panic_sent">Obsługa techniczna jest w drodze.</string>
     <string name="panic_failed">Wezwanie nie doszło.</string>
     <string name="panic_cooldown">Odczekaj chwilę przed kolejnym wezwaniem.</string>
     <string name="open_match_history">Otwórz historię meczów</string>

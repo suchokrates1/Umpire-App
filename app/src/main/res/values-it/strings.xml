@@ -282,7 +282,7 @@
     <string name="panic_message">La regia riceve un WhatsApp: serve aiuto su questo campo.</string>
     <string name="panic_note">Nota facoltativa</string>
     <string name="panic_send">Invia</string>
-    <string name="panic_sent">Arrivo.</string>
+    <string name="panic_sent">Il servizio tecnico è in arrivo.</string>
     <string name="panic_failed">La chiamata non è arrivata.</string>
     <string name="panic_cooldown">Attendi un momento prima di chiamare di nuovo.</string>
 </resources>

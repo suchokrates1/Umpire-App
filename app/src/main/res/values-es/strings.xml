@@ -282,7 +282,7 @@
     <string name="panic_message">La mesa recibe un WhatsApp de que necesitas ayuda en esta pista.</string>
     <string name="panic_note">Nota opcional</string>
     <string name="panic_send">Enviar</string>
-    <string name="panic_sent">Voy.</string>
+    <string name="panic_sent">El servicio técnico está en camino.</string>
     <string name="panic_failed">La llamada no llegó.</string>
     <string name="panic_cooldown">Espera un momento antes de llamar otra vez.</string>
 </resources>
