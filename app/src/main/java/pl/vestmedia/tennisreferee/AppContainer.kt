@@ -2,6 +2,7 @@ package pl.vestmedia.tennisreferee
 
 import android.content.Context
 import pl.vestmedia.tennisreferee.data.api.RetrofitClient
+import pl.vestmedia.tennisreferee.data.api.readAndroidId
 import pl.vestmedia.tennisreferee.data.api.TennisApiService
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
@@ -28,9 +29,11 @@ class AppContainer(
 
     init {
         CourtSessionProvider.initialize(context)
+        val appContext = context.applicationContext
         apiClient = RetrofitClient(
             sessionStore = { CourtSessionProvider.get() },
             initialBaseUrl = initialBaseUrl,
+            androidId = { readAndroidId(appContext) },
         )
     }
 

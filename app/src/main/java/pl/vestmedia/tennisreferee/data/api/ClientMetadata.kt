@@ -1,6 +1,8 @@
 package pl.vestmedia.tennisreferee.data.api
 
+import android.content.Context
 import android.os.Build
+import android.provider.Settings
 import okhttp3.Interceptor
 import okhttp3.Response
 import pl.vestmedia.tennisreferee.BuildConfig
@@ -36,10 +38,11 @@ data class ClientMetadata(
     val androidRelease: String,
     val locale: String,
     val country: String,
-    val timezone: String
+    val timezone: String,
+    val androidId: String = ""
 ) {
     fun toHeaders(): Map<String, String> {
-        return linkedMapOf(
+        val headers = linkedMapOf(
             "X-TennisReferee-Platform" to platform.limit(50),
             "X-TennisReferee-App-Version" to appVersion.limit(50),
             "X-TennisReferee-App-Code" to appVersionCode.limit(20),
@@ -52,15 +55,23 @@ data class ClientMetadata(
             "X-TennisReferee-Country" to country.limit(10),
             "X-TennisReferee-Timezone" to timezone.limit(80)
         )
+        val id = androidId.limit(32)
+        if (id.isNotEmpty()) headers["X-TennisReferee-Android-Id"] = id
+        return headers
     }
 
     private fun String.limit(maxLength: Int): String = take(maxLength)
+}
+
+fun readAndroidId(context: Context): String {
+    return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID).orEmpty().trim()
 }
 
 class DeviceInfoProvider(
     private val localeProvider: () -> Locale = { Locale.getDefault() },
     private val timeZoneProvider: () -> TimeZone = { TimeZone.getDefault() },
     private val buildInfoProvider: () -> AndroidBuildInfo = { AndroidBuildInfo.current() },
+    private val androidIdProvider: () -> String = { "" },
     private val appVersionName: String = BuildConfig.VERSION_NAME,
     private val appVersionCode: String = BuildConfig.VERSION_CODE.toString()
 ) {
@@ -82,7 +93,8 @@ class DeviceInfoProvider(
             androidRelease = buildInfo.release,
             locale = locale.toLanguageTag(),
             country = locale.country,
-            timezone = timeZoneProvider().id
+            timezone = timeZoneProvider().id,
+            androidId = androidIdProvider().trim()
         )
     }
 }

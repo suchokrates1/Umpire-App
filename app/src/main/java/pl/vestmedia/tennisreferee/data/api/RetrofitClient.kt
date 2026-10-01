@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit
 class RetrofitClient(
     private val sessionStore: () -> CourtSessionStore,
     initialBaseUrl: String? = null,
+    androidId: () -> String = { "" },
 ) {
 
     @Volatile
@@ -35,7 +36,9 @@ class RetrofitClient(
     }
 
     private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(ClientMetadataInterceptor())
+        .addInterceptor(ClientMetadataInterceptor {
+            DeviceInfoProvider(androidIdProvider = androidId).current()
+        })
         .addInterceptor(BearerAuthInterceptor(sessionStore))
         .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)

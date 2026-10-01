@@ -37,6 +37,18 @@ class ClientMetadataTest {
         assertEquals("pl-PL", headers["X-TennisReferee-Locale"])
         assertEquals("PL", headers["X-TennisReferee-Country"])
         assertEquals("Europe/Warsaw", headers["X-TennisReferee-Timezone"])
+        assertEquals(null, headers["X-TennisReferee-Android-Id"])
+    }
+
+    @Test
+    fun deviceInfoProviderSendsTheAndroidId() {
+        val provider = DeviceInfoProvider(
+            buildInfoProvider = {
+                AndroidBuildInfo(manufacturer = "Teclast", model = "P50Ai_ROW", sdkInt = 35, release = "15")
+            },
+            androidIdProvider = { "9774d56d682e549c" }
+        )
+        assertEquals("9774d56d682e549c", provider.current().toHeaders()["X-TennisReferee-Android-Id"])
     }
 
     @Test
