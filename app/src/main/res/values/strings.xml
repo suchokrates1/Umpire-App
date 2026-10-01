@@ -198,9 +198,9 @@
     
     <!-- Settings -->
     <string name="settings">Settings</string>
-    <string name="panic_call">Call the desk</string>
-    <string name="panic_title">Call the desk?</string>
-    <string name="panic_message">This sends a WhatsApp message to the tournament desk.</string>
+    <string name="panic_call">Ask for help</string>
+    <string name="panic_title">Send a request for help?</string>
+    <string name="panic_message">The desk gets a WhatsApp that you need help on this court.</string>
     <string name="panic_note">Optional note</string>
     <string name="panic_send">Send</string>
     <string name="panic_sent">On my way.</string>

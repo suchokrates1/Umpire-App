@@ -277,9 +277,9 @@
     <string name="tutorial_complete_title">That’s the flow</string>
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
 
-    <string name="panic_call">Llamar a la mesa</string>
-    <string name="panic_title">¿Llamar a la mesa?</string>
-    <string name="panic_message">Esto envía un mensaje de WhatsApp a la mesa del torneo.</string>
+    <string name="panic_call">Pedir ayuda</string>
+    <string name="panic_title">¿Enviar una solicitud de ayuda?</string>
+    <string name="panic_message">La mesa recibe un WhatsApp de que necesitas ayuda en esta pista.</string>
     <string name="panic_note">Nota opcional</string>
     <string name="panic_send">Enviar</string>
     <string name="panic_sent">Voy.</string>

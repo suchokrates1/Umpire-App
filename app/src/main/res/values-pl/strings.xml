@@ -185,9 +185,9 @@
     
     <!-- Settings -->
     <string name="settings">Ustawienia</string>
-    <string name="panic_call">Wezwij reżyserię</string>
-    <string name="panic_title">Wezwać reżyserię?</string>
-    <string name="panic_message">To wyśle wiadomość WhatsApp do reżyserki turnieju.</string>
+    <string name="panic_call">Poproś o pomoc</string>
+    <string name="panic_title">Czy wysłać prośbę o pomoc?</string>
+    <string name="panic_message">Reżyserka dostanie WhatsApp, że potrzebujesz pomocy na tym korcie.</string>
     <string name="panic_note">Opcjonalna notatka</string>
     <string name="panic_send">Wyślij</string>
     <string name="panic_sent">Idę.</string>

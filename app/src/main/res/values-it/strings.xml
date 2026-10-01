@@ -277,9 +277,9 @@
     <string name="tutorial_complete_title">That’s the flow</string>
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
 
-    <string name="panic_call">Chiama la regia</string>
-    <string name="panic_title">Chiamare la regia?</string>
-    <string name="panic_message">Questo invia un messaggio WhatsApp alla regia del torneo.</string>
+    <string name="panic_call">Chiedi aiuto</string>
+    <string name="panic_title">Inviare una richiesta di aiuto?</string>
+    <string name="panic_message">La regia riceve un WhatsApp: serve aiuto su questo campo.</string>
     <string name="panic_note">Nota facoltativa</string>
     <string name="panic_send">Invia</string>
     <string name="panic_sent">Arrivo.</string>

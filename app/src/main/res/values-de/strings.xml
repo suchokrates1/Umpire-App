@@ -278,9 +278,9 @@
     <string name="tutorial_complete_title">That’s the flow</string>
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
 
-    <string name="panic_call">Regie rufen</string>
-    <string name="panic_title">Regie rufen?</string>
-    <string name="panic_message">Das sendet eine WhatsApp-Nachricht an die Turnierregie.</string>
+    <string name="panic_call">Um Hilfe bitten</string>
+    <string name="panic_title">Hilferuf an die Regie senden?</string>
+    <string name="panic_message">Die Regie bekommt eine WhatsApp, dass du auf diesem Platz Hilfe brauchst.</string>
     <string name="panic_note">Optionale Notiz</string>
     <string name="panic_send">Senden</string>
     <string name="panic_sent">Ich komme.</string>

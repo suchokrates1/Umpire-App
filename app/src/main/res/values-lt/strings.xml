@@ -280,9 +280,9 @@
     <string name="tutorial_complete_title">That’s the flow</string>
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
 
-    <string name="panic_call">Kviesti režisūrą</string>
-    <string name="panic_title">Kviesti režisūrą?</string>
-    <string name="panic_message">Tai išsiųs WhatsApp žinutę turnyro režisūrai.</string>
+    <string name="panic_call">Prašyti pagalbos</string>
+    <string name="panic_title">Siųsti prašymą padėti?</string>
+    <string name="panic_message">Režisūra gaus WhatsApp, kad šiame korte reikia pagalbos.</string>
     <string name="panic_note">Nebūtina pastaba</string>
     <string name="panic_send">Siųsti</string>
     <string name="panic_sent">Einu.</string>
