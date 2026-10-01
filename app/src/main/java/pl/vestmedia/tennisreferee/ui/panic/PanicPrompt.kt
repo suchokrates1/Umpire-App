@@ -45,7 +45,8 @@ object PanicPrompt {
 
     private suspend fun send(activity: AppCompatActivity, note: String): String {
         val app = activity.application as TennisRefereeApp
-        val courtId = CourtSessionProvider.get().current()?.courtId
+        val courtId = CourtSessionProvider.get().current()?.courtId?.trim()?.takeIf { it.isNotEmpty() }
+            ?: app.healthCheckManager.courtId?.trim()?.takeIf { it.isNotEmpty() }
         return try {
             val response = app.container.apiService.sendPanic(
                 PanicRequestDto(courtId = courtId, note = note.trim().ifEmpty { null })
