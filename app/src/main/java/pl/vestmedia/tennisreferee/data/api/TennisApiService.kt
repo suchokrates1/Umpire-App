@@ -13,6 +13,7 @@ import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.PanicRequestDto
 import pl.vestmedia.tennisreferee.data.api.dto.PlayersResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.ScheduleSuggestionResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.TournamentOptionDto
@@ -122,6 +123,9 @@ interface TennisApiService {
         @Query("wait_ms") waitMs: Int? = null,
         @Query("court_id") courtId: String? = null
     ): Response<DirectorCommandsResponseDto>
+
+    @POST("api/umpire/panic")
+    suspend fun sendPanic(@Body body: PanicRequestDto): Response<Unit>
 
     @POST("api/umpire/commands/{command_id}/ack")
     suspend fun ackDirectorCommand(

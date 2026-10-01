@@ -171,4 +171,14 @@ class TournamentSelectionActivity : AppCompatActivity() {
         )
         finish()
     }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
+        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
+            || super.onOptionsItemSelected(item)
+    }
 }

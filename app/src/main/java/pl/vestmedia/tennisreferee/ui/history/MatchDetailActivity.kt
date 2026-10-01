@@ -1,6 +1,7 @@
 package pl.vestmedia.tennisreferee.ui.history
 
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -80,13 +81,19 @@ class MatchDetailActivity : AppCompatActivity() {
         }
     }
     
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 finish()
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
+                || super.onOptionsItemSelected(item)
         }
     }
 }

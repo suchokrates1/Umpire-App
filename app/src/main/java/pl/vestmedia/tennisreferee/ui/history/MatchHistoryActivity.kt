@@ -85,6 +85,7 @@ class MatchHistoryActivity : AppCompatActivity() {
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_match_history, menu)
+        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
         return true
     }
     
@@ -98,7 +99,8 @@ class MatchHistoryActivity : AppCompatActivity() {
                 showDeleteAllConfirmation()
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
+                || super.onOptionsItemSelected(item)
         }
     }
     

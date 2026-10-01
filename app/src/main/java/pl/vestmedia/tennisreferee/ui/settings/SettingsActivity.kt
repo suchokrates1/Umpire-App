@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -191,13 +192,19 @@ class SettingsActivity : AppCompatActivity() {
         return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM).format(Date(timestampMillis))
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 finish()
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
+                || super.onOptionsItemSelected(item)
         }
     }
 }

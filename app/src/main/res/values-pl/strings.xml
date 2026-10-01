@@ -185,6 +185,14 @@
     
     <!-- Settings -->
     <string name="settings">Ustawienia</string>
+    <string name="panic_call">Wezwij reżyserię</string>
+    <string name="panic_title">Wezwać reżyserię?</string>
+    <string name="panic_message">To wyśle wiadomość WhatsApp do reżyserki turnieju.</string>
+    <string name="panic_note">Opcjonalna notatka</string>
+    <string name="panic_send">Wyślij</string>
+    <string name="panic_sent">Reżyseria została wezwana.</string>
+    <string name="panic_failed">Wezwanie nie doszło.</string>
+    <string name="panic_cooldown">Odczekaj chwilę przed kolejnym wezwaniem.</string>
     <string name="open_match_history">Otwórz historię meczów</string>
     <string name="appearance">Wygląd</string>
     <string name="theme">Motyw</string>

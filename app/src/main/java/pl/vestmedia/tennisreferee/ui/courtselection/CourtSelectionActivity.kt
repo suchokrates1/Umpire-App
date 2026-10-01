@@ -249,6 +249,7 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_court_selection, menu)
+        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
         return true
     }
     
@@ -267,7 +268,8 @@ class CourtSelectionActivity : AppCompatActivity() {
                 startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
+                || super.onOptionsItemSelected(item)
         }
     }
 }
