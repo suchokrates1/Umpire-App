@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_panic"
+        android:icon="@drawable/ic_panic"
         android:title="@string/panic_call"
-        app:showAsAction="never" />
+        app:iconTint="@color/panic_icon"
+        app:showAsAction="always" />
 </menu>

@@ -193,6 +193,12 @@
     <string name="panic_sent">Obsługa techniczna jest w drodze.</string>
     <string name="panic_failed">Wezwanie nie doszło.</string>
     <string name="panic_cooldown">Odczekaj chwilę przed kolejnym wezwaniem.</string>
+    <string name="panic_waiting">Czekam na odpowiedź…</string>
+    <string name="panic_offline">Brak sieci. Połącz tablet z Wi-Fi i spróbuj ponownie.</string>
+    <string name="panic_wifi">Połącz z Wi-Fi</string>
+    <string name="panic_you">Ty</string>
+    <string name="panic_desk">Reżyserka</string>
+    <string name="panic_close">Zamknij</string>
     <string name="open_match_history">Otwórz historię meczów</string>
     <string name="appearance">Wygląd</string>
     <string name="theme">Motyw</string>

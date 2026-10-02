@@ -206,6 +206,12 @@
     <string name="panic_sent">Technical support is on the way.</string>
     <string name="panic_failed">The call did not go through.</string>
     <string name="panic_cooldown">Wait a moment before calling again.</string>
+    <string name="panic_waiting">Waiting for a reply…</string>
+    <string name="panic_offline">No network. Connect the tablet to Wi-Fi and try again.</string>
+    <string name="panic_wifi">Connect to Wi-Fi</string>
+    <string name="panic_you">You</string>
+    <string name="panic_desk">Desk</string>
+    <string name="panic_close">Close</string>
     <string name="open_match_history">Open match history</string>
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>

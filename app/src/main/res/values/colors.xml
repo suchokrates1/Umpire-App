@@ -34,6 +34,7 @@
     
     <!-- Button colors -->
     <color name="button_unforced_error">#F44336</color>
+    <color name="panic_icon">#FF5252</color>
     
     <!-- TB Only / Advanced mode accent -->
     <color name="tb_only_card_bg">#FFF8E1</color>

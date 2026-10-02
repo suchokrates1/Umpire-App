@@ -288,5 +288,11 @@
     <string name="panic_sent">Techninė pagalba jau pakeliui.</string>
     <string name="panic_failed">Kvietimas nepasiekė.</string>
     <string name="panic_cooldown">Palaukite prieš kviesdami dar kartą.</string>
+    <string name="panic_waiting">Laukiama atsakymo…</string>
+    <string name="panic_offline">Nėra tinklo. Prijunkite planšetę prie Wi-Fi ir bandykite dar kartą.</string>
+    <string name="panic_wifi">Prisijungti prie Wi-Fi</string>
+    <string name="panic_you">Jūs</string>
+    <string name="panic_desk">Režisūra</string>
+    <string name="panic_close">Uždaryti</string>
 </resources>
 

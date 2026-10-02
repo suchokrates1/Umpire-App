@@ -285,5 +285,11 @@
     <string name="panic_sent">L\'assistance technique est en route.</string>
     <string name="panic_failed">L\'appel n\'est pas passé.</string>
     <string name="panic_cooldown">Attendez un instant avant de rappeler.</string>
+    <string name="panic_waiting">En attente d\'une réponse…</string>
+    <string name="panic_offline">Pas de réseau. Connectez la tablette au Wi-Fi et réessayez.</string>
+    <string name="panic_wifi">Connecter au Wi-Fi</string>
+    <string name="panic_you">Vous</string>
+    <string name="panic_desk">Régie</string>
+    <string name="panic_close">Fermer</string>
 </resources>
 

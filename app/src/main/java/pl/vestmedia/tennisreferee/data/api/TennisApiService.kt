@@ -14,6 +14,8 @@ import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchStatisticsRequestDto
 import pl.vestmedia.tennisreferee.data.api.dto.PanicRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.PanicResponseDto
+import pl.vestmedia.tennisreferee.data.api.dto.PanicThreadDto
 import pl.vestmedia.tennisreferee.data.api.dto.PlayersResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.ScheduleSuggestionResponseDto
 import pl.vestmedia.tennisreferee.data.api.dto.TournamentOptionDto
@@ -125,7 +127,16 @@ interface TennisApiService {
     ): Response<DirectorCommandsResponseDto>
 
     @POST("api/umpire/panic")
-    suspend fun sendPanic(@Body body: PanicRequestDto): Response<Unit>
+    suspend fun sendPanic(@Body body: PanicRequestDto): Response<PanicResponseDto>
+
+    @GET("api/umpire/panic/{token}")
+    suspend fun getPanicThread(@Path("token") token: String): Response<PanicThreadDto>
+
+    @POST("api/umpire/panic/{token}")
+    suspend fun sendPanicFollowUp(
+        @Path("token") token: String,
+        @Body body: PanicRequestDto
+    ): Response<PanicThreadDto>
 
     @POST("api/umpire/commands/{command_id}/ack")
     suspend fun ackDirectorCommand(

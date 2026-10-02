@@ -285,5 +285,11 @@
     <string name="panic_sent">El servicio técnico está en camino.</string>
     <string name="panic_failed">La llamada no llegó.</string>
     <string name="panic_cooldown">Espera un momento antes de llamar otra vez.</string>
+    <string name="panic_waiting">Esperando una respuesta…</string>
+    <string name="panic_offline">Sin red. Conecta la tableta al Wi-Fi e inténtalo de nuevo.</string>
+    <string name="panic_wifi">Conectar al Wi-Fi</string>
+    <string name="panic_you">Tú</string>
+    <string name="panic_desk">Mesa</string>
+    <string name="panic_close">Cerrar</string>
 </resources>
 

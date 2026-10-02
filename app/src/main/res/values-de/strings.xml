@@ -286,5 +286,11 @@
     <string name="panic_sent">Der technische Dienst ist unterwegs.</string>
     <string name="panic_failed">Der Ruf ist nicht angekommen.</string>
     <string name="panic_cooldown">Warte einen Moment, bevor du erneut rufst.</string>
+    <string name="panic_waiting">Warte auf eine Antwort…</string>
+    <string name="panic_offline">Kein Netz. Verbinde das Tablet mit WLAN und versuche es erneut.</string>
+    <string name="panic_wifi">Mit WLAN verbinden</string>
+    <string name="panic_you">Du</string>
+    <string name="panic_desk">Regie</string>
+    <string name="panic_close">Schließen</string>
 </resources>
 
