@@ -3,6 +3,7 @@ package pl.vestmedia.tennisreferee.ui.playerselection
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -96,8 +97,12 @@ class PlayerSelectionActivity : AppCompatActivity() {
         selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this)
         
         // Sprawdź czy przekazano konfigurację z poprzedniego meczu
-        @Suppress("DEPRECATION")
-        savedMatchConfig = intent.getParcelableExtra(EXTRA_MATCH_CONFIG)
+        savedMatchConfig = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(EXTRA_MATCH_CONFIG, MatchConfig::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_MATCH_CONFIG)
+        }
         
         if (courtId.isEmpty()) {
             Toast.makeText(this, getString(R.string.error_no_court_data), Toast.LENGTH_LONG).show()
