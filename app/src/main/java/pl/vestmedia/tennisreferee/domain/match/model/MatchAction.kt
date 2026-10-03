@@ -1,11 +1,14 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
+import kotlinx.serialization.Serializable
+
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
  * Model reprezentujący pojedynczą akcję w meczu (do cofania)
  */
+@Serializable
 @Parcelize
 data class MatchAction(
     val timestamp: Long = System.currentTimeMillis(),
@@ -37,6 +40,7 @@ data class MatchAction(
     val description: String
 ) : Parcelable
 
+@Serializable
 enum class ActionType {
     ACE,
     FAULT,

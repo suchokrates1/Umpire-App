@@ -1,11 +1,14 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
+import kotlinx.serialization.Serializable
+
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
  * Konfiguracja formatu meczu — ilość gemów do seta, setów do meczu, opcje tiebreaka
  */
+@Serializable
 @Parcelize
 data class MatchConfig(
     // Ile gemów potrzeba by wygrać seta (np. 3, 4, 6)

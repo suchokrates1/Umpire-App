@@ -1,5 +1,7 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
+import kotlinx.serialization.Serializable
+
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import pl.vestmedia.tennisreferee.data.model.Player
@@ -8,6 +10,7 @@ import java.util.UUID
 /**
  * Model stanu meczu podczas rozgrywki
  */
+@Serializable
 @Parcelize
 data class MatchState(
     // Identyfikator meczu na serwerze

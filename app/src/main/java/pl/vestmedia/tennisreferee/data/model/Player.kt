@@ -1,11 +1,14 @@
 package pl.vestmedia.tennisreferee.data.model
 
+import kotlinx.serialization.Serializable
+
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
  * Model reprezentujący zawodnika tenisowego
  */
+@Serializable
 @Parcelize
 data class Player(
     val id: Int,  // API v1 zwraca Int

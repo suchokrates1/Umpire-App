@@ -1,8 +1,11 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
+import kotlinx.serialization.Serializable
+
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
+@Serializable
 @Parcelize
 data class SetScore(
     val setNumber: Int,

@@ -63,10 +63,12 @@
 # API DTOs are kotlinx.serialization (@SerialName). The library rules keep the
 # generated serializers.
 #
-# Gson still reflects over the match model: the active match kept for a restart
-# (ActiveMatchStore) and the set history stored in Room are JSON whose keys are these
-# field names. Obfuscated names change between builds, so data written by one release
-# would be unreadable by the next.
+# The match model is written to the tablet's own disk: the active match kept for a
+# restart (ActiveMatchStore) and the set history stored in Room. Since 1.0.0-dev.52
+# both are kotlinx, whose generated serializers carry the names themselves — but the
+# reader that opens data written by an older build is still Gson, reflecting over these
+# fields. Obfuscated names change between builds, so dropping these rules would make a
+# referee's unsynced match unreadable after an update.
 -keep class pl.vestmedia.tennisreferee.domain.match.model.** { *; }
 -keepclassmembers class pl.vestmedia.tennisreferee.domain.match.model.** { *; }
 

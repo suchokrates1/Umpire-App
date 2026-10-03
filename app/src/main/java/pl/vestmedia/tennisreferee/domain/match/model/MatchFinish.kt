@@ -1,5 +1,8 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class MatchFinishReason {
     NORMAL,
 
