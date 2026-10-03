@@ -46,10 +46,20 @@ class ActiveMatchStore(context: Context) {
         } catch (_: Exception) {
             // Written by a build that used Gson. Read it once; the next save is kotlinx.
             try {
-                Gson().fromJson(payload, MatchState::class.java)
+                Gson().fromJson(payload, MatchState::class.java)?.takeIf { it.isUsable() }
             } catch (_: JsonSyntaxException) {
                 null
             }
         }
+
+        /**
+         * Gson builds the object without running the constructor, so a payload that is
+         * not a match at all comes back with nulls in fields Kotlin says cannot be null.
+         * Such a match would crash the scoreboard on the first point, so it is not one.
+         */
+        @Suppress("SENSELESS_COMPARISON")
+        fun MatchState.isUsable(): Boolean =
+            clientMatchUuid != null && clientMatchUuid.isNotBlank() &&
+                player1 != null && player2 != null && courtId != null
     }
 }
