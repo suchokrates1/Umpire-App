@@ -76,6 +76,18 @@ android {
         }
     }
     
+    lint {
+        // Library freshness changes on its own whenever something ships upstream; it is
+        // reviewed by hand, so it must not turn a green build red overnight.
+        disable += ['GradleDependency', 'NewerVersionAvailable', 'AndroidGradlePluginVersion', 'OldTargetApi']
+        // Any other new warning fails the build. lint-baseline.xml lists what was accepted
+        // on 2026-10-04 (digits and symbols on buttons, number-to-text calls); regenerate it
+        // with `gradlew updateLintBaseline` only after reading what changed.
+        warningsAsErrors = true
+        abortOnError = true
+        baseline = file('lint-baseline.xml')
+    }
+
     buildFeatures {
         viewBinding = true
         buildConfig = true
