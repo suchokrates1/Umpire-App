@@ -51,7 +51,9 @@ class SuggestedMatchController(
             return
         }
 
-        binding.textSuggestedMatchPlayers.text = "${suggestion.player1Name} vs ${suggestion.player2Name}"
+        binding.textSuggestedMatchPlayers.text = binding.root.context.getString(
+            R.string.match_players_versus, suggestion.player1Name, suggestion.player2Name,
+        )
         binding.textSuggestedMatchMeta.text = listOf(
             suggestion.scheduledTime,
             suggestion.categoryName,

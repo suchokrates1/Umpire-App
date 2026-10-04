@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -21,8 +22,10 @@
         android:orientation="horizontal"
         android:gravity="center">
 
+        <!-- Labelled for TalkBack in CourtPinDialogController (pin_digit_label); lint cannot see that. -->
         <EditText
             android:id="@+id/pinDigit1"
+            tools:ignore="LabelFor"
             android:layout_width="56dp"
             android:layout_height="64dp"
             android:gravity="center"
@@ -35,6 +38,7 @@
 
         <EditText
             android:id="@+id/pinDigit2"
+            tools:ignore="LabelFor"
             android:layout_width="56dp"
             android:layout_height="64dp"
             android:gravity="center"
@@ -47,6 +51,7 @@
 
         <EditText
             android:id="@+id/pinDigit3"
+            tools:ignore="LabelFor"
             android:layout_width="56dp"
             android:layout_height="64dp"
             android:gravity="center"
@@ -59,6 +64,7 @@
 
         <EditText
             android:id="@+id/pinDigit4"
+            tools:ignore="LabelFor"
             android:layout_width="56dp"
             android:layout_height="64dp"
             android:gravity="center"

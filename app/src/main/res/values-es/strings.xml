@@ -18,6 +18,9 @@
     <string name="court_pin_title">Autorización de cancha</string>
     <string name="court_pin_message">Ingrese el PIN para la cancha: %1$s</string>
     <string name="pin_invalid">PIN inválido: %1$s</string>
+    <string name="pin_digit_label">Dígito %1$d de %2$d del PIN</string>
+    <string name="match_players_versus">%1$s vs. %2$s</string>
+    <string name="panic_transcript_line">%1$s: %2$s</string>
     
     <!-- Player Selection -->
     <string name="select_players">Seleccionar jugadores</string>

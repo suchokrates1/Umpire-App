@@ -11,6 +11,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +46,18 @@ class CourtPinDialogController(
         val digit3 = dialogView.findViewById<EditText>(R.id.pinDigit3)
         val digit4 = dialogView.findViewById<EditText>(R.id.pinDigit4)
         val progressBar = dialogView.findViewById<ProgressBar>(R.id.progressBar)
+
+        // A one-digit box has no room for a visible hint, so TalkBack gets the label on its
+        // own: "PIN digit 2 of 4" instead of four bare "edit box" announcements.
+        val digits = listOf(digit1, digit2, digit3, digit4)
+        digits.forEachIndexed { index, digit ->
+            ViewCompat.setAccessibilityDelegate(digit, object : AccessibilityDelegateCompat() {
+                override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    info.hintText = activity.getString(R.string.pin_digit_label, index + 1, digits.size)
+                }
+            })
+        }
 
         textMessage.text = if (TutorialSession.isActive) {
             TutorialSession.stringFor(activity, "tutorialPinBody")

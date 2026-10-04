@@ -43,9 +43,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- WIDOK: Rally (Winner/Forced/Unforced) -->
+    <!-- WIDOK: Rally (Winner/Forced/Unforced)
+         Serve, rally and basic scoring repeat ids like textPlayerLeftName; code always
+         reaches them through each include's own binding (CourtSideNamesRenderer). -->
     <include
         android:id="@+id/layoutRally"
+        tools:ignore="DuplicateIncludedIds"
         layout="@layout/layout_rally"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -58,6 +61,7 @@
     <!-- WIDOK: Basic scoring (uproszczony tryb) -->
     <include
         android:id="@+id/layoutBasicScoring"
+        tools:ignore="DuplicateIncludedIds"
         layout="@layout/layout_basic_scoring"
         android:layout_width="0dp"
         android:layout_height="0dp"

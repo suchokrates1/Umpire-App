@@ -53,6 +53,9 @@
     <string name="court_pin_title">Autoryzacja kortu</string>
     <string name="court_pin_message">Wprowadź PIN dla kortu: %1$s</string>
     <string name="pin_invalid">Nieprawidłowy PIN: %1$s</string>
+    <string name="pin_digit_label">Cyfra %1$d z %2$d kodu PIN</string>
+    <string name="match_players_versus">%1$s – %2$s</string>
+    <string name="panic_transcript_line">%1$s: %2$s</string>
     
     <!-- Player Selection -->
     <string name="select_players">Wybierz zawodników</string>

@@ -203,7 +203,7 @@ object PanicPrompt {
         for (line in messages) {
             val view = TextView(activity)
             val who = if (line.direction == "desk") R.string.panic_desk else R.string.panic_you
-            view.text = activity.getString(who) + ": " + line.text
+            view.text = activity.getString(R.string.panic_transcript_line, activity.getString(who), line.text)
             view.textSize = 16f
             val gap = (8 * activity.resources.displayMetrics.density).toInt()
             view.setPadding(0, gap, 0, gap)
