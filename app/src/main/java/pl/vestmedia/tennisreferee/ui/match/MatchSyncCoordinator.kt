@@ -1,6 +1,9 @@
 package pl.vestmedia.tennisreferee.ui.match
 
 import com.google.gson.Gson
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializerOrNull
@@ -55,6 +58,7 @@ class MatchSyncCoordinator(
                 isCharging = batteryInfo.isCharging
             )
         } catch (e: Exception) {
+            e.rethrowIfCancelled()
             logger.error("logMatchEvent", "$eventType: ${e.message}")
             return
         }
@@ -66,8 +70,9 @@ class MatchSyncCoordinator(
                 enqueueIfRetryable(response.code(), state.clientMatchUuid, "EVENT", state.matchId, event)
             }
         } catch (e: Exception) {
-            logger.error("logMatchEvent", "$eventType: ${e.message}")
+            if (e !is CancellationException) logger.error("logMatchEvent", "$eventType: ${e.message}")
             enqueueToOutbox(state.clientMatchUuid, "EVENT", state.matchId, event)
+            e.rethrowIfCancelled()
         }
     }
 
@@ -102,13 +107,14 @@ class MatchSyncCoordinator(
                 }
             }
         } catch (e: Exception) {
-            logger.error("syncMatchWithServer", e)
+            if (e !is CancellationException) logger.error("syncMatchWithServer", e)
             enqueueToOutbox(
                 state.clientMatchUuid,
                 if (state.matchId == null) "CREATE" else "UPDATE",
                 state.matchId,
                 payload
             )
+            e.rethrowIfCancelled()
         }
     }
 
@@ -139,13 +145,14 @@ class MatchSyncCoordinator(
                     }
                 }
             } catch (e: Exception) {
-                logger.error("finalizeMatch", "sync final state: ${e.message}")
+                if (e !is CancellationException) logger.error("finalizeMatch", "sync final state: ${e.message}")
                 enqueueToOutbox(
                     state.clientMatchUuid,
                     if (state.matchId == null) "CREATE" else "UPDATE",
                     state.matchId,
                     MatchApiPayloadFactory.toMatch(state)
                 )
+                e.rethrowIfCancelled()
             }
 
             if (state.matchId == null) {
@@ -165,6 +172,7 @@ class MatchSyncCoordinator(
                     enqueueIfRetryable(response.code(), state.clientMatchUuid, "EVENT", state.matchId, event)
                 }
             } catch (e: Exception) {
+                e.rethrowIfCancelled()
                 logger.error("finalizeMatch", "match_end event: ${e.message}")
             }
 
@@ -175,8 +183,9 @@ class MatchSyncCoordinator(
                         enqueueIfRetryable(response.code(), state.clientMatchUuid, "FINISH", matchId, finishRequest)
                     }
                 } catch (e: Exception) {
-                    logger.error("finalizeMatch", "finish: ${e.message}")
+                    if (e !is CancellationException) logger.error("finalizeMatch", "finish: ${e.message}")
                     enqueueToOutbox(state.clientMatchUuid, "FINISH", matchId, finishRequest)
+                    e.rethrowIfCancelled()
                 }
             }
 
@@ -187,11 +196,13 @@ class MatchSyncCoordinator(
                         enqueueIfRetryable(response.code(), state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
                     }
                 } catch (e: Exception) {
-                    logger.error("finalizeMatch", "statistics: ${e.message}")
+                    if (e !is CancellationException) logger.error("finalizeMatch", "statistics: ${e.message}")
                     enqueueToOutbox(state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
+                    e.rethrowIfCancelled()
                 }
             }
         } catch (e: Exception) {
+            e.rethrowIfCancelled()
             logger.error("finalizeMatch", "overall: ${e.message}")
         }
 
@@ -199,6 +210,7 @@ class MatchSyncCoordinator(
             try {
                 matchHistorySaver.saveMatch(state)
             } catch (e: Exception) {
+                e.rethrowIfCancelled()
                 logger.error("finalizeMatch", "local save: ${e.message}")
             }
         }
@@ -228,6 +240,7 @@ class MatchSyncCoordinator(
                 }
                 logger.api(operation, "retryable HTTP ${response.code()} attempt=${attempt + 1}")
             } catch (e: Exception) {
+                e.rethrowIfCancelled()
                 lastException = e
                 logger.error(operation, "attempt=${attempt + 1}: ${e.message}")
             }
@@ -250,6 +263,11 @@ class MatchSyncCoordinator(
         onSyncDiagnostics(status, errorMessage)
     }
 
+    /** Cancellation means the caller went away, not that the network failed: let it through. */
+    private fun Exception.rethrowIfCancelled() {
+        if (this is CancellationException) throw this
+    }
+
     private fun Response<*>.shouldRetry(): Boolean = isRetryable(code())
 
     private fun isRetryable(code: Int): Boolean = code in 500..599 || code == 408 || code == 429
@@ -258,6 +276,7 @@ class MatchSyncCoordinator(
         try {
             outboxFlusher?.flushPending()
         } catch (e: Exception) {
+            e.rethrowIfCancelled()
             logger.error("outboxFlush", e)
         }
     }
@@ -269,7 +288,10 @@ class MatchSyncCoordinator(
         payload: Any
     ) {
         try {
-            outboxFlusher?.enqueue(clientMatchUuid, type, serverMatchId, payloadJson(payload))
+            // A cancelled caller is exactly when this matters: what was in flight must land somewhere.
+            withContext(NonCancellable) {
+                outboxFlusher?.enqueue(clientMatchUuid, type, serverMatchId, payloadJson(payload))
+            }
         } catch (e: Exception) {
             logger.error("outboxEnqueue", "Failed to enqueue $type: ${e.message}")
         }

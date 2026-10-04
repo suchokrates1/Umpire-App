@@ -10,7 +10,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
@@ -426,11 +425,17 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private var finalizeJob: Job? = null
 
     /**
+     * Where a finished match is sent from. Not viewModelScope: leaving the screen while the
+     * finish is in flight would cancel it, and the result would never reach the server.
+     */
+    private val finalizeScope = (application as? TennisRefereeApp)?.backgroundScope ?: viewModelScope
+
+    /**
      * Sekwencyjne zakończenie meczu na serwerze.
      * Kolejność: sync → match_end event → finish → statistics → local save
      */
     private fun finalizeMatchOnServer(state: MatchState) {
-        finalizeJob = viewModelScope.launch(Dispatchers.IO) {
+        finalizeJob = finalizeScope.launch(Dispatchers.IO) {
             matchSyncCoordinator.finalizeMatch(state)
         }
     }
@@ -441,7 +446,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             _matchState.value = state
             _currentView.value = MatchView.MATCH_FINISHED
             if (!tutorialMode) {
-                finalizeJob = viewModelScope.launch(Dispatchers.IO) {
+                finalizeJob = finalizeScope.launch(Dispatchers.IO) {
                     matchSyncCoordinator.finalizeMatch(state, request)
                 }
             }
@@ -470,9 +475,14 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             }
             return
         }
-        finalizeJob = viewModelScope.launch(Dispatchers.IO) {
+        val finalize = finalizeScope.launch(Dispatchers.IO) {
             matchSyncCoordinator.finalizeMatch(state)
-            withContext(Dispatchers.Main) { onDone() }
+        }
+        finalizeJob = finalize
+        // Only the wait belongs to the screen: if it closes, the match is still sent.
+        viewModelScope.launch {
+            finalize.join()
+            onDone()
         }
     }
 

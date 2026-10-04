@@ -1,6 +1,9 @@
 package pl.vestmedia.tennisreferee
 
 import android.app.Application
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import pl.vestmedia.tennisreferee.BuildConfig
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.repository.MatchHistoryRepository
@@ -15,6 +18,12 @@ open class TennisRefereeApp : Application() {
     
     lateinit var container: AppContainer
         private set
+
+    /**
+     * Work that must outlive the screen that started it, such as sending a finished match:
+     * the umpire may leave the match screen before the server has answered.
+     */
+    val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val database by lazy { TennisDatabase.getDatabase(this) }
     val matchHistoryRepository by lazy { MatchHistoryRepository(database.matchDao()) }
