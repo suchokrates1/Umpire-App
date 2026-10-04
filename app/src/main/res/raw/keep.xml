@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The tutorial looks its texts up by a name built at run time from tutorial/script.json
+    (TutorialSession.stringFor -> getIdentifier). The release shrinker cannot see that, so
+    without this every tutorial text was dropped from the Play build and the tutorial
+    showed keys like "tutorialCourtTitle". TutorialAssetsFormatTest keeps the two in step.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/tutorial_*" />

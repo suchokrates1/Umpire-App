@@ -23,6 +23,19 @@ class TutorialAssetsFormatTest {
     }
 
     @Test
+    fun everyTextTheScriptNamesExistsAndSurvivesTheReleaseShrinker() {
+        val res = assets.parentFile!!.parentFile!!.resolve("res")
+        val strings = res.resolve("values/strings.xml").readText()
+        val keepRule = res.resolve("raw/keep.xml").readText()
+        val script = TutorialScript.parse(File(assets, "script.json").readText())
+        script.steps.flatMap { listOf(it.titleKey, it.bodyKey) }.map(TutorialScript::titleRes).forEach { name ->
+            assertTrue("strings.xml has $name", "name=\"$name\"" in strings)
+            assertTrue("$name is looked up by name, so keep.xml must keep it", name.startsWith("tutorial_"))
+        }
+        assertTrue("keep.xml keeps the tutorial texts", "@string/tutorial_*" in keepRule)
+    }
+
+    @Test
     fun everySnapshotHoldsAReadableMatch() {
         val files = File(assets, "snapshots").listFiles { file -> file.extension == "json" }.orEmpty()
         assertTrue(files.isNotEmpty())
