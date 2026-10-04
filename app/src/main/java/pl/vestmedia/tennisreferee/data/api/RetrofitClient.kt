@@ -6,7 +6,6 @@ import pl.vestmedia.tennisreferee.BuildConfig
 import pl.vestmedia.tennisreferee.data.api.dto.ApiJsonConverterFactory
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 /**
@@ -75,7 +74,6 @@ class RetrofitClient(
                     .baseUrl(url)
                     .client(okHttpClient)
                     .addConverterFactory(ApiJsonConverterFactory())
-                    .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 val created = retrofit.create(TennisApiService::class.java)
                 cachedService = created

@@ -1,6 +1,5 @@
 package pl.vestmedia.tennisreferee.ui.match
 
-import com.google.gson.Gson
 import java.io.IOException
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
@@ -24,7 +23,6 @@ import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import retrofit2.Response
 
 class MatchOutboxFlusherTest {
-    private val gson = Gson()
     private val playerOne = Player(id = 1, name = "Kowalski", firstName = "Jan", lastName = "Kowalski", flag = "PL")
     private val playerTwo = Player(id = 2, name = "Nowak", firstName = "Adam", lastName = "Nowak", flag = "DE")
 
@@ -49,7 +47,7 @@ class MatchOutboxFlusherTest {
             createResults += Response.success(apiMatch(id = 42))
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
+        flusher.enqueue("uuid-1", "CREATE", null, apiJson.encodeToString(apiMatch()))
 
         val result = flusher.flushPending()
 
@@ -66,8 +64,8 @@ class MatchOutboxFlusherTest {
             updateResults += Response.success(apiMatch(id = 42))
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
-        flusher.enqueue("uuid-1", "UPDATE", null, gson.toJson(apiMatch()))
+        flusher.enqueue("uuid-1", "CREATE", null, apiJson.encodeToString(apiMatch()))
+        flusher.enqueue("uuid-1", "UPDATE", null, apiJson.encodeToString(apiMatch()))
 
         val result = flusher.flushPending()
 
@@ -84,8 +82,8 @@ class MatchOutboxFlusherTest {
             updateResults += Response.success(apiMatch(id = 42))
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "UPDATE", null, gson.toJson(apiMatch()))
-        flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
+        flusher.enqueue("uuid-1", "UPDATE", null, apiJson.encodeToString(apiMatch()))
+        flusher.enqueue("uuid-1", "CREATE", null, apiJson.encodeToString(apiMatch()))
 
         val result = flusher.flushPending()
 
@@ -100,7 +98,7 @@ class MatchOutboxFlusherTest {
             createResults += httpError(401)
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
+        flusher.enqueue("uuid-1", "CREATE", null, apiJson.encodeToString(apiMatch()))
 
         val result = flusher.flushPending()
 
@@ -118,8 +116,8 @@ class MatchOutboxFlusherTest {
             statisticsResults += httpError(404)
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-old", "FINISH", 449, gson.toJson(FinishMatchRequest()))
-        flusher.enqueue("uuid-old", "STATS", 449, gson.toJson(
+        flusher.enqueue("uuid-old", "FINISH", 449, apiJson.encodeToString(FinishMatchRequest()))
+        flusher.enqueue("uuid-old", "STATS", 449, apiJson.encodeToString(
             MatchApiPayloadFactory.toStatisticsRequest(
                 matchState().apply {
                     matchId = 449
@@ -145,7 +143,7 @@ class MatchOutboxFlusherTest {
             createResults += null
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
+        flusher.enqueue("uuid-1", "CREATE", null, apiJson.encodeToString(apiMatch()))
 
         val result = flusher.flushPending()
 
@@ -161,7 +159,7 @@ class MatchOutboxFlusherTest {
         val store = InMemoryOutboxStore()
         val api = TestApiClient()
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "UPDATE", null, gson.toJson(apiMatch()))
+        flusher.enqueue("uuid-1", "UPDATE", null, apiJson.encodeToString(apiMatch()))
 
         val result = flusher.flushPending()
 
@@ -193,7 +191,7 @@ class MatchOutboxFlusherTest {
             createResults += Response.success(apiMatch(id = 42))
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
+        flusher.enqueue("uuid-1", "CREATE", null, apiJson.encodeToString(apiMatch()))
 
         flusher.flushPending()
         val result2 = flusher.flushPending()
@@ -210,8 +208,8 @@ class MatchOutboxFlusherTest {
             finishResults += httpError(500)
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "CREATE", null, gson.toJson(apiMatch()))
-        flusher.enqueue("uuid-1", "FINISH", null, gson.toJson(FinishMatchRequest()))
+        flusher.enqueue("uuid-1", "CREATE", null, apiJson.encodeToString(apiMatch()))
+        flusher.enqueue("uuid-1", "FINISH", null, apiJson.encodeToString(FinishMatchRequest()))
 
         flusher.flushPending()
 
@@ -346,8 +344,8 @@ class MatchOutboxFlusherTest {
             statisticsResults += Response.success(Unit)
         }
         val flusher = MatchOutboxFlusher(store, api)
-        flusher.enqueue("uuid-1", "EVENT", 9, gson.toJson(event))
-        flusher.enqueue("uuid-1", "STATS", 9, gson.toJson(stats))
+        flusher.enqueue("uuid-1", "EVENT", 9, apiJson.encodeToString(event))
+        flusher.enqueue("uuid-1", "STATS", 9, apiJson.encodeToString(stats))
 
         val result = flusher.flushPending()
 
@@ -385,7 +383,7 @@ class MatchOutboxFlusherTest {
         )
         coordinator.finalizeMatch(finishing, finish)
         val finishRow = store.getPending().single { it.type == "FINISH" }
-        assertEquals(gson.toJson(finish), finishRow.payloadJson)
+        assertEquals(apiJson.encodeToString(finish), finishRow.payloadJson)
         assertTrue(finishRow.payloadJson.contains("\"finishReason\":\"RETIREMENT\""))
     }
 

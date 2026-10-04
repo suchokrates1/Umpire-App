@@ -31,9 +31,12 @@ class ApiJsonConverterTest {
     }
 
     @Test
-    fun mapAndUnitAreLeftForGson() {
+    fun aStringMapBodyIsKotlinxAndUnitIsLeftToRetrofit() {
         val mapType: Type = object : TypeToken<Map<String, String>>() {}.type
-        assertNull(factory.requestBodyConverter(mapType, emptyAnnotations(), emptyAnnotations(), retrofit))
+        val converter = factory.requestBodyConverter(mapType, emptyAnnotations(), emptyAnnotations(), retrofit)
+        val body = (converter as retrofit2.Converter<Any, RequestBody>).convert(mapOf("status" to "applied"))!!
+        val buffer = Buffer().also { body.writeTo(it) }
+        assertEquals("""{"status":"applied"}""", buffer.readUtf8())
         assertNull(factory.responseBodyConverter(Unit::class.java, emptyAnnotations(), retrofit))
     }
 

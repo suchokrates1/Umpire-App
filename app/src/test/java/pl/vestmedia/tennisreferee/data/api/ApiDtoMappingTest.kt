@@ -1,6 +1,6 @@
 package pl.vestmedia.tennisreferee.data.api
 
-import com.google.gson.Gson
+import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -77,8 +77,7 @@ class ApiDtoMappingTest {
 
     @Test
     fun scheduleSuggestionJsonParsesIsDoublesAndPartner() {
-        val gson = Gson()
-        val dto = gson.fromJson(
+        val dto = apiJson.decodeFromString<ScheduleSuggestionDto>(
             """
             {
               "id": 123,
@@ -101,8 +100,7 @@ class ApiDtoMappingTest {
                 "partner": {"id": 4, "first_name": "Piotr", "last_name": "Wiśniewski", "name": "Piotr Wiśniewski"}
               }
             }
-            """.trimIndent(),
-            ScheduleSuggestionDto::class.java
+            """.trimIndent()
         )
 
         val suggestion = dto.toModel()
@@ -162,15 +160,12 @@ class ApiDtoMappingTest {
 
     @Test
     fun courtAuthResponseAcceptsCourtIdAndLegacyKortId() {
-        val gson = Gson()
 
-        val current = gson.fromJson(
-            """{"ok":true,"authorized":true,"court_id":"court-1"}""",
-            CourtAuthResponseDto::class.java
+        val current = apiJson.decodeFromString<CourtAuthResponseDto>(
+            """{"ok":true,"authorized":true,"court_id":"court-1"}"""
         )
-        val legacy = gson.fromJson(
-            """{"ok":true,"authorized":true,"kort_id":"court-2"}""",
-            CourtAuthResponseDto::class.java
+        val legacy = apiJson.decodeFromString<CourtAuthResponseDto>(
+            """{"ok":true,"authorized":true,"kort_id":"court-2"}"""
         )
 
         assertEquals("court-1", current.courtId)

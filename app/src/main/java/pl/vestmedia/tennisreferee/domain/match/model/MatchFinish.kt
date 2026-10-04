@@ -13,6 +13,7 @@ enum class MatchFinishReason {
     WALKOVER
 }
 
+@Serializable
 data class FinishMatchRequest(
     val finishReason: MatchFinishReason = MatchFinishReason.NORMAL,
 

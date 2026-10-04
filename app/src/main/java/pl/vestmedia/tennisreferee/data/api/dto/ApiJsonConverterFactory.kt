@@ -15,8 +15,8 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 
 /**
- * kotlinx for API DTOs and lists of them. Gson stays behind this factory for
- * [Map] bodies and empty [Unit] responses, which this factory does not claim.
+ * kotlinx for every API body: DTOs, lists of them and string maps. An empty [Unit]
+ * response is left to Retrofit's built-in converter.
  */
 @OptIn(ExperimentalSerializationApi::class)
 class ApiJsonConverterFactory(
@@ -51,7 +51,7 @@ class ApiJsonConverterFactory(
 
     private fun serializerOrSkip(type: Type): KSerializer<Any>? {
         val raw = rawClass(type) ?: return null
-        if (raw == Unit::class.java || Map::class.java.isAssignableFrom(raw)) return null
+        if (raw == Unit::class.java) return null
         return json.serializersModule.serializerOrNull(type)
     }
 

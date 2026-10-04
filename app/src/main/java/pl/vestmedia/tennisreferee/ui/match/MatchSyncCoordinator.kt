@@ -1,6 +1,5 @@
 package pl.vestmedia.tennisreferee.ui.match
 
-import com.google.gson.Gson
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -28,8 +27,6 @@ class MatchSyncCoordinator(
     private val onSyncDiagnostics: (SyncStatus, String?) -> Unit = { _, _ -> },
     private val outboxFlusher: MatchOutboxFlusher? = null
 ) {
-    private val gson = Gson()
-
     constructor(
         apiService: TennisApiService,
         matchHistoryRepository: MatchHistoryRepository,
@@ -299,8 +296,8 @@ class MatchSyncCoordinator(
 
     @OptIn(ExperimentalSerializationApi::class)
     private fun payloadJson(payload: Any): String {
-        if (payload is FinishMatchRequest) return gson.toJson(payload)
-        val serializer = apiJson.serializersModule.serializerOrNull(payload.javaClass) ?: return gson.toJson(payload)
+        val serializer = apiJson.serializersModule.serializerOrNull(payload.javaClass)
+            ?: error("${payload.javaClass.simpleName} is not @Serializable and cannot wait in the outbox")
         @Suppress("UNCHECKED_CAST")
         return apiJson.encodeToString(serializer as SerializationStrategy<Any>, payload)
     }

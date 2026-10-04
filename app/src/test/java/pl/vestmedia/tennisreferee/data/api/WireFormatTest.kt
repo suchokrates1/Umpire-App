@@ -1,6 +1,5 @@
 package pl.vestmedia.tennisreferee.data.api
 
-import com.google.gson.Gson
 import kotlinx.serialization.KSerializer
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -27,7 +26,6 @@ import pl.vestmedia.tennisreferee.domain.match.model.StatsMode
  */
 class WireFormatTest {
 
-    private val gson = Gson()
     private val playerOne = Player(id = 1, name = "Kowalski", firstName = "Jan", lastName = "Kowalski", flag = "PL")
     private val playerTwo = Player(id = 2, name = "Nowak", firstName = "Adam", lastName = "Nowak", flag = "DE")
 
@@ -69,7 +67,7 @@ class WireFormatTest {
     @Test
     fun matchConfigCarriesAnEarlyTiebreak() {
         val early = state().let { it.copy(matchConfig = it.matchConfig.copy(tiebreakAtGames = 3)) }
-        val body = gson.toJson(MatchApiPayloadFactory.toMatch(early))
+        val body = apiJson.encodeToString(MatchDto.serializer(), MatchApiPayloadFactory.toMatch(early))
         assertEquals(true, body.contains(""""tiebreak_at_games":3"""))
     }
 
@@ -119,7 +117,6 @@ class WireFormatTest {
     }
 
     private fun <T> assertWire(serializer: KSerializer<T>, value: T, golden: String) {
-        assertEquals(golden, gson.toJson(value))
         assertEquals(golden, apiJson.encodeToString(serializer, value))
         assertEquals(golden, apiJson.encodeToString(serializer, apiJson.decodeFromString(serializer, golden)))
     }

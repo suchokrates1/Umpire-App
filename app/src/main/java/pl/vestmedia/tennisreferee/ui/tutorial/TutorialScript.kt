@@ -1,9 +1,10 @@
 package pl.vestmedia.tennisreferee.ui.tutorial
 
 import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
+import pl.vestmedia.tennisreferee.data.localJson
 
+@Serializable
 data class TutorialStep(
     val id: String,
     val scene: String,
@@ -14,6 +15,7 @@ data class TutorialStep(
     val snapshot: String? = null,
 )
 
+@Serializable
 data class TutorialScriptFile(
     val version: Int = 1,
     val pin: String = TutorialCatalog.PIN,
@@ -21,17 +23,18 @@ data class TutorialScriptFile(
 )
 
 object TutorialScript {
-    private val gson = Gson()
     private var cached: TutorialScriptFile? = null
 
     fun load(context: Context): TutorialScriptFile {
         cached?.let { return it }
         val parsed = context.assets.open("tutorial/script.json").bufferedReader().use { reader ->
-            gson.fromJson(reader, TutorialScriptFile::class.java)
+            parse(reader.readText())
         }
         cached = parsed
         return parsed
     }
+
+    fun parse(raw: String): TutorialScriptFile = localJson.decodeFromString(raw)
 
     fun titleRes(key: String): String = camelToSnake(key)
 

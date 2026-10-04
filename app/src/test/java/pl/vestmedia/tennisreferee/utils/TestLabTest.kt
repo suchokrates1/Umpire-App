@@ -3,7 +3,7 @@ package pl.vestmedia.tennisreferee.utils
 import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
-import com.google.gson.Gson
+import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -25,7 +25,7 @@ class TestLabTest {
          {"id":26,"name":"App Review Access","city":"Review","is_public":0,"is_simulation":1}]
     """.trimIndent()
 
-    private val tournaments = Gson().fromJson(activeJson, Array<TournamentOptionDto>::class.java).map { it.toModel() }
+    private val tournaments = apiJson.decodeFromString<List<TournamentOptionDto>>(activeJson).map { it.toModel() }
 
     @Test
     fun theReviewSandboxIsTheOnlyTournamentInTestLab() {

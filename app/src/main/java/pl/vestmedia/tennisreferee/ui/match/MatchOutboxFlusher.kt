@@ -1,6 +1,5 @@
 package pl.vestmedia.tennisreferee.ui.match
 
-import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
@@ -23,7 +22,6 @@ data class FlushResult(
 class MatchOutboxFlusher(
     private val outboxStore: MatchOutboxStore,
     private val apiClient: MatchApiClient,
-    private val gson: Gson = Gson(),
     private val json: Json = apiJson,
 ) {
     companion object {
@@ -161,7 +159,7 @@ class MatchOutboxFlusher(
                 val serverId = mutation.serverMatchId
                     ?: resolvedIds[mutation.clientMatchUuid]
                     ?: return null
-                val request = gson.fromJson(mutation.payloadJson, FinishMatchRequest::class.java)
+                val request = json.decodeFromString<FinishMatchRequest>(mutation.payloadJson)
                 apiClient.finishMatch(serverId, request)
             }
             "EVENT" -> apiClient.logMatchEvent(json.decodeFromString<MatchEventDto>(mutation.payloadJson))
