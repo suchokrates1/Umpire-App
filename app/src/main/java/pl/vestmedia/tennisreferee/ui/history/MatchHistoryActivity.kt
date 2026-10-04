@@ -13,6 +13,7 @@ import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.database.MatchEntity
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchHistoryBinding
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Ekran historii rozegranych meczów
@@ -25,6 +26,7 @@ class MatchHistoryActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PanicPrompt.install(this)
         AppLogger.screen("MatchHistory")
         binding = ActivityMatchHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -85,7 +87,6 @@ class MatchHistoryActivity : AppCompatActivity() {
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_match_history, menu)
-        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
         return true
     }
     
@@ -99,8 +100,7 @@ class MatchHistoryActivity : AppCompatActivity() {
                 showDeleteAllConfirmation()
                 true
             }
-            else -> pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
-                || super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
     

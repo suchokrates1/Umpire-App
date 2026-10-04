@@ -8,12 +8,14 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.provider.Settings
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import java.io.IOException
 import kotlinx.coroutines.Job
@@ -28,14 +30,23 @@ import pl.vestmedia.tennisreferee.data.auth.CourtSessionProvider
 import pl.vestmedia.tennisreferee.databinding.DialogPanicBinding
 
 object PanicPrompt {
-    fun addTo(activity: AppCompatActivity, menu: Menu) {
-        activity.menuInflater.inflate(R.menu.menu_panic, menu)
-    }
+    /**
+     * Puts the SOS item in this screen's menu, after the screen's own items. Every screen
+     * an umpire can stand on calls this once in onCreate; the screen's own menu handling
+     * stays as it is.
+     */
+    fun install(activity: AppCompatActivity) {
+        activity.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_panic, menu)
+            }
 
-    fun handle(activity: AppCompatActivity, item: MenuItem): Boolean {
-        if (item.itemId != R.id.action_panic) return false
-        show(activity)
-        return true
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (menuItem.itemId != R.id.action_panic) return false
+                show(activity)
+                return true
+            }
+        })
     }
 
     fun show(activity: AppCompatActivity) {

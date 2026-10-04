@@ -16,6 +16,7 @@ import pl.vestmedia.tennisreferee.databinding.ActivityLanguageSelectionBinding
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Activity do wyboru języka aplikacji
@@ -52,6 +53,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PanicPrompt.install(this)
 
         val forceSelection = intent.getBooleanExtra(EXTRA_FORCE_SELECTION, false)
         if (!forceSelection && hasLanguageSelected(this)) {
@@ -101,13 +103,4 @@ class LanguageSelectionActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
-            || super.onOptionsItemSelected(item)
-    }
 }

@@ -29,6 +29,7 @@ import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Activity do wyboru kortu
@@ -64,6 +65,7 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PanicPrompt.install(this)
         
         val tutorial = intent.getBooleanExtra(TutorialNavigator.EXTRA_TUTORIAL, false)
             || TutorialSession.isActive
@@ -249,7 +251,6 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_court_selection, menu)
-        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
         return true
     }
     
@@ -268,8 +269,7 @@ class CourtSelectionActivity : AppCompatActivity() {
                 startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
-            else -> pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
-                || super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

@@ -1,7 +1,6 @@
 package pl.vestmedia.tennisreferee.ui.history
 
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +12,7 @@ import pl.vestmedia.tennisreferee.databinding.ActivityMatchDetailBinding
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import java.text.SimpleDateFormat
 import java.util.*
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Activity wyświetlające szczegóły zakończonego meczu
@@ -27,6 +27,7 @@ class MatchDetailActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PanicPrompt.install(this)
         AppLogger.screen("MatchDetail")
         binding = ActivityMatchDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -81,10 +82,6 @@ class MatchDetailActivity : AppCompatActivity() {
         }
     }
     
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
-        return true
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -92,8 +89,7 @@ class MatchDetailActivity : AppCompatActivity() {
                 finish()
                 true
             }
-            else -> pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
-                || super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

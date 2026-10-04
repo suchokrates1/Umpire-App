@@ -22,6 +22,7 @@ import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
 import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.utils.TestLab
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 class TournamentSelectionActivity : AppCompatActivity() {
 
@@ -47,6 +48,7 @@ class TournamentSelectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PanicPrompt.install(this)
 
         if (!LanguageSelectionActivity.hasLanguageSelected(this)) {
             startActivity(Intent(this, LanguageSelectionActivity::class.java))
@@ -172,13 +174,4 @@ class TournamentSelectionActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
-            || super.onOptionsItemSelected(item)
-    }
 }

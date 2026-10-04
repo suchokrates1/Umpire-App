@@ -25,6 +25,7 @@ import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshot
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Match activity that drives the live scoring flow.
@@ -106,6 +107,7 @@ class MatchActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PanicPrompt.install(this)
         binding = ActivityMatchBinding.inflate(layoutInflater)
         setContentView(binding.root)
         activeMatchStore = ActiveMatchStore(this)
@@ -435,15 +437,6 @@ class MatchActivity : AppCompatActivity() {
         matchTimerRenderer.clear()
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
-            || super.onOptionsItemSelected(item)
-    }
     
 
 }

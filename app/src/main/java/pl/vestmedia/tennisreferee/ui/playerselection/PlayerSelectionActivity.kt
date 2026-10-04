@@ -32,6 +32,7 @@ import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
 import pl.vestmedia.tennisreferee.utils.AppLogger
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Activity do wyboru zawodników (singiel lub debel)
@@ -76,6 +77,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PanicPrompt.install(this)
         binding = ActivityPlayerSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         activeMatchStore = ActiveMatchStore(this)
@@ -550,13 +552,4 @@ class PlayerSelectionActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.addTo(this, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return pl.vestmedia.tennisreferee.ui.panic.PanicPrompt.handle(this, item)
-            || super.onOptionsItemSelected(item)
-    }
 }
