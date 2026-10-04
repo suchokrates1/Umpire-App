@@ -12,8 +12,4 @@ object AvailableLanguages {
         Language("lt", "Lietuvių", "🇱🇹"),
         Language("pl", "Polski", "🇵🇱"),
     )
-
-    fun byCode(code: String): Language {
-        return all.firstOrNull { it.code == code } ?: all.first { it.code == "en" }
-    }
 }

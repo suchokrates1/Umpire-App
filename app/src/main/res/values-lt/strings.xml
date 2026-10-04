@@ -96,7 +96,6 @@
     <string name="forced_error">IŠPROVOKUOTA\nKLAIDA</string>
     <string name="unforced_error">NEIŠPROVOKUOTA\nKLAIDA</string>
     <string name="winner_label">Nugalėtojas: %1$s</string>
-    <string name="finish">Baigti</string>
     <string name="finish_match">Baigti mačą</string>
     <string name="finish_reason_prompt">Kodėl baigiate šį mačą?</string>
     <string name="finish_reason_normal">Įprasta pabaiga</string>
@@ -111,7 +110,6 @@
     <string name="scoreboard_points">Taškai</string>
     <string name="scoreboard_set1">1 setas</string>
     <string name="scoreboard_set2">2 setas</string>
-    <string name="tiebreak">Taibreikas (iki %1$d)</string>
     <string name="tiebreak_mode">Taibreikas (iki %1$d, pergalė 2 taškų skirtumu)</string>
     <string name="super_tiebreak_mode">Mačo taibreikas (iki %1$d, pergalė 2 taškų skirtumu)</string>
 
@@ -281,11 +279,9 @@
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
 
     <string name="panic_call">Prašyti pagalbos</string>
-    <string name="panic_title">Siųsti prašymą padėti?</string>
     <string name="panic_message">Režisūra gaus WhatsApp, kad šiame korte reikia pagalbos.</string>
     <string name="panic_note">Nebūtina pastaba</string>
     <string name="panic_send">Siųsti</string>
-    <string name="panic_sent">Techninė pagalba jau pakeliui.</string>
     <string name="panic_failed">Kvietimas nepasiekė.</string>
     <string name="panic_cooldown">Palaukite prieš kviesdami dar kartą.</string>
     <string name="panic_waiting">Laukiama atsakymo…</string>

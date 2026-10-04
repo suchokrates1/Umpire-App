@@ -41,10 +41,9 @@ Build / Play Store: zobacz `../DEPLOYMENT.md` (katalog Vest Tennis).
 
 | Plik | Temat |
 |------|--------|
-| [MATCH_LOGIC.md](MATCH_LOGIC.md) | Reguły punktacji |
+| `domain/match` + testy w `app/src/test/.../domain/match` | Reguły punktacji (formaty setów, tie-break, no-ad, undo) |
 | [DOUBLES_SUPPORT.md](DOUBLES_SUPPORT.md) | Debel / rotacja serwisu |
 | [DARK_MODE_GUIDE.md](DARK_MODE_GUIDE.md) | Motyw |
-| [API_EXAMPLES.md](API_EXAMPLES.md) | Przykłady API |
 
 ## Uprawnienia
 

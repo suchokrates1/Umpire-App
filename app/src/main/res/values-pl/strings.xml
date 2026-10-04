@@ -96,7 +96,6 @@
     <string name="forced_error">WYMUSZONY\nBŁĄD</string>
     <string name="unforced_error">NIEWYMUSZONY\nBŁĄD</string>
     <string name="winner_label">Zwycięzca: %1$s</string>
-    <string name="finish">Zakończ</string>
     <string name="finish_match">Zakończ mecz</string>
     <string name="finish_reason_prompt">Dlaczego kończysz ten mecz?</string>
     <string name="finish_reason_normal">Normalne zakończenie</string>
@@ -111,7 +110,6 @@
     <string name="scoreboard_points">Punkty</string>
     <string name="scoreboard_set1">Set 1</string>
     <string name="scoreboard_set2">Set 2</string>
-    <string name="tiebreak">Tie-break (do %1$d)</string>
     <string name="tiebreak_mode">Tie-break (do %1$d, wygrana różnicą 2)</string>
     <string name="super_tiebreak_mode">Match Tie-break (do %1$d, wygrana różnicą 2)</string>
 
@@ -186,11 +184,9 @@
     <!-- Settings -->
     <string name="settings">Ustawienia</string>
     <string name="panic_call">Poproś o pomoc</string>
-    <string name="panic_title">Czy wysłać prośbę o pomoc?</string>
     <string name="panic_message">Reżyserka dostanie WhatsApp, że potrzebujesz pomocy na tym korcie.</string>
     <string name="panic_note">Opcjonalna notatka</string>
     <string name="panic_send">Wyślij</string>
-    <string name="panic_sent">Obsługa techniczna jest w drodze.</string>
     <string name="panic_failed">Wezwanie nie doszło.</string>
     <string name="panic_cooldown">Odczekaj chwilę przed kolejnym wezwaniem.</string>
     <string name="panic_waiting">Czekam na odpowiedź…</string>

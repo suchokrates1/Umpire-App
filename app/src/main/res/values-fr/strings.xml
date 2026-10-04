@@ -61,7 +61,6 @@
     <string name="forced_error">ERREUR\nFORCÉE</string>
     <string name="unforced_error">FAUTE\nDIRECTE</string>
     <string name="winner_label">Gagnant: %1$s</string>
-    <string name="finish">Terminer</string>
     <string name="finish_match">Terminer le match</string>
     <string name="finish_reason_prompt">Pourquoi terminez-vous ce match ?</string>
     <string name="finish_reason_normal">Fin normale</string>
@@ -78,7 +77,6 @@
     <string name="scoreboard_points">Points</string>
     <string name="scoreboard_set1">Set 1</string>
     <string name="scoreboard_set2">Set 2</string>
-    <string name="tiebreak">Jeu décisif (à %1$d)</string>
     <string name="tiebreak_mode">Jeu décisif (à %1$d, victoire par 2)</string>
     <string name="super_tiebreak_mode">Jeu décisif du match (à %1$d, victoire par 2)</string>
 
@@ -278,11 +276,9 @@
     <string name="tutorial_complete_body">You can replay this tutorial anytime from Settings. For a real match, pick today’s tournament and your court.</string>
 
     <string name="panic_call">Demander de l\'aide</string>
-    <string name="panic_title">Envoyer une demande d\'aide ?</string>
     <string name="panic_message">La régie reçoit un WhatsApp : vous avez besoin d\'aide sur ce court.</string>
     <string name="panic_note">Note facultative</string>
     <string name="panic_send">Envoyer</string>
-    <string name="panic_sent">L\'assistance technique est en route.</string>
     <string name="panic_failed">L\'appel n\'est pas passé.</string>
     <string name="panic_cooldown">Attendez un instant avant de rappeler.</string>
     <string name="panic_waiting">En attente d\'une réponse…</string>

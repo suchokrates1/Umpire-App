@@ -8,10 +8,8 @@ import java.io.File
 class AvailableLanguagesTest {
     @Test
     fun includesLithuanian() {
-        val lithuanian = AvailableLanguages.byCode("lt")
-        assertEquals("lt", lithuanian.code)
+        val lithuanian = AvailableLanguages.all.single { it.code == "lt" }
         assertEquals("Lietuvių", lithuanian.name)
-        assertTrue(AvailableLanguages.all.any { it.code == "lt" })
     }
 
     @Test

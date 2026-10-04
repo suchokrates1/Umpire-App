@@ -65,12 +65,6 @@ interface TennisApiService {
     ): Response<CourtAuthResponseDto>
     
     /**
-     * Pobiera szczegóły meczu
-     */
-    @GET("api/matches/{matchId}")
-    suspend fun getMatch(@Path("matchId") matchId: Int): Response<MatchDto>
-    
-    /**
      * Tworzy nowy mecz
      */
     @POST("api/matches")

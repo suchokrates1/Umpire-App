@@ -45,7 +45,7 @@ Kompletny katalog funkcji i instrukcja użycia aplikacji Android dla sędziów t
 
 ## Poza tym vaultem
 
-- Logika punktacji (techniczna): plik `MATCH_LOGIC.md` w katalogu głównym repo aplikacji
+- Logika punktacji (techniczna): kod `domain/match` i jego testy (`MatchPointReducerTest`, `MatchProgressReducerTest` i reszta w `app/src/test/.../domain/match`)
 - Debel (technicznie): `DOUBLES_SUPPORT.md`
 - Deploy / Play Store: `DEPLOYMENT.md` w `Vest Tennis`
 
