@@ -135,6 +135,8 @@ class UmpireRobot(
 
         fun clickFirstDisplayed(vararg ids: Int) {
             waitUntil("one of ${ids.joinToString()} displayed", timeoutMs = 10_000) {
+                // a notice can come up between two points (e.g. "recorded as a friendly"): clear it
+                dismissDialogIfVisible()
                 ids.any { id ->
                     try {
                         onView(allOf(withId(id), isDisplayed())).perform(click())
