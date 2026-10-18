@@ -145,8 +145,9 @@ class E2EBackendClient(
     /**
      * Seeds a doubles category, two pairs, one RR slot on [courtId], and publishes it
      * so the umpire suggestion card can apply Debel without dropping scheduleId.
+     * Returns the slot's schedule id.
      */
-    fun seedDoublesSuggestedMatch(fixture: TournamentFixture, courtId: String) {
+    fun seedDoublesSuggestedMatch(fixture: TournamentFixture, courtId: String): Int {
         ensureAdminToken()
         val today = LocalDate.now().toString()
         val now = java.time.LocalTime.now().withSecond(0).withNano(0).toString().take(5)
@@ -186,6 +187,37 @@ class E2EBackendClient(
                 .put("court_id", courtId)
                 .put("status", "planned")
         )
+        return scheduleId
+    }
+
+    fun scheduleEntry(tournamentId: Int, scheduleId: Int): JSONObject? {
+        ensureAdminToken()
+        val entries = getJson("/admin/api/tournaments/$tournamentId/schedule").optJSONArray("schedule") ?: return null
+        for (index in 0 until entries.length()) {
+            val entry = entries.getJSONObject(index)
+            if (entry.optInt("id") == scheduleId) return entry
+        }
+        return null
+    }
+
+    /** Waits until the schedule slot satisfies [predicate]; the last state is in the failure message. */
+    fun waitForScheduleEntry(
+        tournamentId: Int,
+        scheduleId: Int,
+        description: String,
+        timeoutMs: Long = 30_000,
+        predicate: (JSONObject) -> Boolean
+    ): JSONObject {
+        var last: JSONObject? = null
+        try {
+            waitUntil(description, timeoutMs) {
+                last = scheduleEntry(tournamentId, scheduleId)
+                last != null && predicate(last!!)
+            }
+        } catch (error: AssertionError) {
+            throw AssertionError("$description last=${last ?: "null"}", error)
+        }
+        return requireNotNull(last)
     }
 
     private fun createCategory(tournamentId: Int, label: String): Int {
