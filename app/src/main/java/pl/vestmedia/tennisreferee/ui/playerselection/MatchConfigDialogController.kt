@@ -255,6 +255,14 @@ class MatchConfigDialogController(
             }
 
         dialog.setOnShowListener {
+            val maxHeight = (activity.resources.displayMetrics.heightPixels * 0.92f).toInt()
+            dialogView.layoutParams = dialogView.layoutParams?.apply {
+                height = maxHeight
+            } ?: android.widget.FrameLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                maxHeight
+            )
+            dialogView.requestLayout()
             ViewCompat.requestApplyInsets(dialogContent)
         }
 

@@ -11,7 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="32dp"
         android:gravity="center_horizontal">
 
         <TextView
@@ -21,7 +24,8 @@
             android:textSize="32sp"
             android:textStyle="bold"
             android:textColor="@color/primary"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/textWinner"
@@ -30,26 +34,8 @@
             android:text="@string/winner_label"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#FFD700"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/textFinalSets"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary"
-            android:layout_marginBottom="2dp"
-            tools:text="2 : 1"/>
-
-        <TextView
-            android:id="@+id/textFinalSetBySet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:layout_marginBottom="32dp"
-            tools:text="4:1, 1:4, 10:8"/>
+            android:textColor="?attr/colorOnSurface"
+            android:layout_marginBottom="24dp"/>
 
         <TextView
             android:layout_width="wrap_content"

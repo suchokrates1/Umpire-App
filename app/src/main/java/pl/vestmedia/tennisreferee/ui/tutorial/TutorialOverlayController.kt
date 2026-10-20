@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import pl.vestmedia.tennisreferee.R
 
 class TutorialOverlayController(
@@ -116,9 +118,11 @@ class TutorialOverlayController(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 Gravity.BOTTOM,
             ).apply {
+                val nav = ViewCompat.getRootWindowInsets(activity.window.decorView)
+                    ?.getInsets(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
                 leftMargin = 24
                 rightMargin = 24
-                bottomMargin = 24
+                bottomMargin = 24 + nav
             }
         }
     }

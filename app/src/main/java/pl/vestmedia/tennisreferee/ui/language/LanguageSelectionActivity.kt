@@ -6,8 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import java.util.Locale
 import pl.vestmedia.tennisreferee.R
@@ -67,13 +65,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
         binding = ActivityLanguageSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Podnieś listę nad pasek nawigacyjny
-        val rootPaddingBottom = binding.root.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
-            val navBar = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, rootPaddingBottom + navBar)
-            windowInsets
-        }
+        pl.vestmedia.tennisreferee.ui.SystemBarPadding.apply(this, binding.root, underWindowActionBar = true)
 
         supportActionBar?.title = getString(R.string.app_name)
         

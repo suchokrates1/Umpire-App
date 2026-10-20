@@ -12,8 +12,6 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
@@ -95,18 +93,7 @@ class CourtSelectionActivity : AppCompatActivity() {
         binding = ActivityCourtSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Podnieś zawartość nad pasek nawigacyjny
-        val rootPadding = binding.root.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
-            val navBar = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            view.setPadding(
-                view.paddingLeft,
-                view.paddingTop,
-                view.paddingRight,
-                rootPadding + navBar
-            )
-            windowInsets
-        }
+        pl.vestmedia.tennisreferee.ui.SystemBarPadding.apply(this, binding.root, underWindowActionBar = true)
 
         AppLogger.screen("CourtSelection")
         (application as TennisRefereeApp).healthCheckManager.currentScreen = "CourtSelection"

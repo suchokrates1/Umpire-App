@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="00:00"
             android:textSize="@dimen/scoreboard_timer_text"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="@color/score_header"
             android:gravity="center"
             android:textStyle="bold"
             android:visibility="gone"
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textSize="12sp"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="@color/score_header"
             android:gravity="center"
             android:visibility="gone"
             tools:visibility="visible"
@@ -71,7 +71,7 @@
                 android:layout_weight="1"
                 android:text="@string/scoreboard_player"
                 android:textSize="@dimen/scoreboard_header_text"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="@color/score_header"
                 android:gravity="start"/>
 
             <TextView
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/scoreboard_points"
                 android:textSize="@dimen/scoreboard_header_text"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="@color/score_header"
                 android:gravity="center"/>
 
             <TextView
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/scoreboard_set1"
                 android:textSize="@dimen/scoreboard_header_text"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="@color/score_header"
                 android:gravity="center"/>
 
             <TextView
@@ -97,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/scoreboard_set2"
                 android:textSize="@dimen/scoreboard_header_text"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="@color/score_header"
                 android:gravity="center"/>
 
         </LinearLayout>

@@ -44,6 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         themeManager = (application as TennisRefereeApp).themeManager
         syncDiagnosticsStore = SyncDiagnosticsStore(this)
 
+        pl.vestmedia.tennisreferee.ui.SystemBarPadding.apply(this, binding.root, underWindowActionBar = false)
         setupToolbar()
         setupLanguageSelection()
         setupThemeSelection()

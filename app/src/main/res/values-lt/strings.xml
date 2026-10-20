@@ -82,17 +82,17 @@
 
     <!-- Match -->
     <string name="undo">Atšaukti</string>
-    <string name="undo_with_icon">↶ Atšaukti</string>
+    <string name="undo_with_icon">Atšaukti</string>
     <string name="confirm_undo">Atšaukti paskutinį veiksmą?</string>
     <string name="who_serves_first">Kas paduoda pirmas?</string>
-    <string name="swap_sides">⇄ Sukeisti puses</string>
+    <string name="swap_sides">Sukeisti puses</string>
     <string name="player_serves">%1$s\nPaduoda</string>
     <string name="first_serve">1-as padavimas</string>
     <string name="second_serve">1-as padavimas  >  2-as padavimas</string>
     <string name="ace">ESAS</string>
     <string name="fault">KLAIDA</string>
     <string name="second_serve_button">2. PADAVIMAS</string>
-    <string name="double_fault_button">DVIGUBA KLAIDA</string>
+    <string name="double_fault_button">DVIGUBA\nKLAIDA</string>
     <string name="ball_in_play">KAMUOLYS ŽAIDIME</string>
     <string name="foot_fault">KOJOS KLAIDA</string>
     <string name="winner">VINNERIS</string>

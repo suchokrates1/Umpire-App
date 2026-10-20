@@ -98,7 +98,7 @@ class ScoreboardRenderer(
             )
         }
 
-        if (state.setsHistory.size == 1) {
+        if (state.setsHistory.size == 1 && !state.isMatchFinished) {
             binding.textPlayer1Set2.text = state.player1Games.toString()
             binding.textPlayer2Set2.text = state.player2Games.toString()
         } else if (state.setsHistory.size > 1) {
@@ -118,7 +118,8 @@ class ScoreboardRenderer(
             binding.textPlayer2Set2.text = context.getString(R.string.zero_score)
         }
 
-        highlightActiveSet(currentSetIndex)
+        val activeSet = if (state.isMatchFinished) -1 else currentSetIndex.coerceAtMost(1)
+        highlightActiveSet(activeSet)
     }
 
     private fun renderGameMode(state: MatchState) {

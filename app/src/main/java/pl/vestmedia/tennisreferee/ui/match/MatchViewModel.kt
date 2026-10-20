@@ -141,8 +141,19 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         tutorialMode = true
         pendingAnnouncementType = pending
         _canUndo.value = canUndo
+        rebaseStaleTutorialClock(matchState)
         _matchState.value = matchState
         _currentView.value = view
+    }
+
+    /** Tutorial snapshots store a fixed start instant, which otherwise reads as tens of thousands of hours. */
+    private fun rebaseStaleTutorialClock(state: MatchState) {
+        val start = state.matchStartTime
+        if (start <= 0L) return
+        val elapsed = System.currentTimeMillis() - start
+        if (elapsed > 12 * 60 * 60 * 1000L) {
+            state.matchStartTime = System.currentTimeMillis() - state.matchDuration.coerceAtLeast(0L)
+        }
     }
     
     /**

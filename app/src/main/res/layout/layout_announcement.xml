@@ -11,14 +11,15 @@
         android:id="@+id/textAnnouncementIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="64sp"
+        android:textSize="48sp"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/textAnnouncementTitle"
         app:layout_constraintVertical_chainStyle="packed"
-        android:layout_marginBottom="16dp"/>
+        app:layout_constraintVertical_bias="0"
+        android:layout_marginBottom="8dp"/>
 
     <TextView
         android:id="@+id/textAnnouncementTitle"
@@ -32,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/textAnnouncementMessage"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="8dp"/>
 
     <TextView
         android:id="@+id/textAnnouncementMessage"
@@ -44,8 +45,8 @@
         app:layout_constraintTop_toBottomOf="@id/textAnnouncementTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/buttonAnnouncementContinue"
-        android:layout_marginBottom="32dp"/>
+        app:layout_constraintBottom_toTopOf="@id/buttonAnnouncementSkipSideChange"
+        android:layout_marginBottom="8dp"/>
 
     <!-- "Don't change sides" button – visible only for side_change announcements -->
     <com.google.android.material.button.MaterialButton
@@ -61,6 +62,7 @@
         app:strokeColor="#4CAF50"
         app:strokeWidth="2dp"
         app:cornerRadius="16dp"
+        app:layout_constraintTop_toBottomOf="@id/textAnnouncementMessage"
         app:layout_constraintBottom_toTopOf="@id/buttonAnnouncementContinue"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +74,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonAnnouncementContinue"
         android:layout_width="0dp"
-        android:layout_height="72dp"
+        android:layout_height="56dp"
         android:text="@string/continue_btn"
         android:textSize="22sp"
         android:textStyle="bold"
@@ -80,6 +82,7 @@
         style="@style/Widget.MaterialComponents.Button"
         android:backgroundTint="#4CAF50"
         app:cornerRadius="16dp"
+        app:layout_constraintTop_toBottomOf="@id/buttonAnnouncementSkipSideChange"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

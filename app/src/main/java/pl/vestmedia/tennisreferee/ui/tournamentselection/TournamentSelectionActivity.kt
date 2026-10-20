@@ -7,8 +7,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
@@ -61,12 +59,7 @@ class TournamentSelectionActivity : AppCompatActivity() {
         binding = ActivityTournamentSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val rootPaddingBottom = binding.root.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
-            val navBar = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, rootPaddingBottom + navBar)
-            windowInsets
-        }
+        pl.vestmedia.tennisreferee.ui.SystemBarPadding.apply(this, binding.root, underWindowActionBar = true)
 
         AppLogger.screen("TournamentSelection")
         supportActionBar?.title = getString(R.string.select_tournament)

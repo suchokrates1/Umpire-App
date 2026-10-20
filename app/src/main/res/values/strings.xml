@@ -47,23 +47,24 @@
     
     <!-- Match -->
     <string name="undo">Undo</string>
-    <string name="undo_with_icon">↶ Undo</string>
+    <string name="undo_with_icon">Undo</string>
     <string name="confirm_undo">Undo last action?</string>
     <string name="who_serves_first">Who serves first?</string>
-    <string name="swap_sides">⇄ Swap Sides</string>
+    <string name="swap_sides">Swap Sides</string>
     <string name="player_serves">%1$s\nServes</string>
     <string name="first_serve">1st Serve</string>
     <string name="second_serve">1st serve  >  2nd serve</string>
     <string name="ace">ACE</string>
     <string name="fault">FAULT</string>
     <string name="second_serve_button">2nd SERVE</string>
-    <string name="double_fault_button">DOUBLE FAULT</string>
+    <string name="double_fault_button">DOUBLE\nFAULT</string>
     <string name="ball_in_play">BALL IN PLAY</string>
     <string name="foot_fault">FOOT FAULT</string>
     <string name="winner">WINNER</string>
     <string name="forced_error">FORCED ERROR</string>
     <string name="unforced_error">UNFORCED ERROR</string>
     <string name="winner_label">Winner: %1$s</string>
+    <string name="winner_label_female">Winner: %1$s</string>
     <string name="finish_match">Finish Match</string>
     <string name="finish_reason_prompt">Why are you ending this match?</string>
     <string name="finish_reason_normal">Normal finish</string>

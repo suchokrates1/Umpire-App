@@ -32,6 +32,7 @@ class MatchDetailActivity : AppCompatActivity() {
         binding = ActivityMatchDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+        pl.vestmedia.tennisreferee.ui.SystemBarPadding.apply(this, binding.root, underWindowActionBar = true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.match_details)
         

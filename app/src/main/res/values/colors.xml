@@ -23,6 +23,9 @@
     <!-- Score colors -->
     <color name="score_background">#212121</color>
     <color name="score_text">#FFFFFF</color>
+    <!-- Column labels sit on the dark board in both themes. Theme secondary text is near-black in light mode. -->
+    <color name="score_header">#E0E0E0</color>
+    <color name="player_serve_button_text">#1A1A1A</color>
     
     <!-- Light theme specific colors -->
     <color name="background">#FAFAFA</color>

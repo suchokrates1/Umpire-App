@@ -137,6 +137,10 @@ object MatchProgressReducer {
             events.add(MatchProgressEvent.Set)
 
             if (state.shouldEndMatch()) {
+                // The finished set is already in setsHistory. Leaving the games in place
+                // paints them again in the next set column.
+                state.player1Games = 0
+                state.player2Games = 0
                 state.isMatchFinished = true
                 state.matchDuration = nowMs - state.matchStartTime
                 return MatchProgressResult(

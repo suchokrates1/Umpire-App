@@ -82,23 +82,24 @@
     
     <!-- Match -->
     <string name="undo">Cofnij</string>
-    <string name="undo_with_icon">↶ Cofnij</string>
+    <string name="undo_with_icon">Cofnij</string>
     <string name="confirm_undo">Cofnąć ostatnią akcję?</string>
     <string name="who_serves_first">Kto serwuje pierwszy?</string>
-    <string name="swap_sides">⇄ Zamień strony</string>
+    <string name="swap_sides">Zamień strony</string>
     <string name="player_serves">%1$s\nSerwuje</string>
     <string name="first_serve">1. Serwis</string>
     <string name="second_serve">1. serwis  >  2. serwis</string>
     <string name="ace">AS</string>
     <string name="fault">BŁĄD</string>
     <string name="second_serve_button">2. SERWIS</string>
-    <string name="double_fault_button">PODWÓJNY BŁĄD</string>
+    <string name="double_fault_button">PODWÓJNY\nBŁĄD</string>
     <string name="ball_in_play">PIŁKA W GRZE</string>
     <string name="foot_fault">BŁĄD STOPY</string>
     <string name="winner">WYGRANY</string>
     <string name="forced_error">WYMUSZONY\nBŁĄD</string>
     <string name="unforced_error">NIEWYMUSZONY\nBŁĄD</string>
-    <string name="winner_label">Zwycięzca: %1$s</string>
+    <string name="winner_label">Wygrał %1$s</string>
+    <string name="winner_label_female">Wygrała %1$s</string>
     <string name="finish_match">Zakończ mecz</string>
     <string name="finish_reason_prompt">Dlaczego kończysz ten mecz?</string>
     <string name="finish_reason_normal">Normalne zakończenie</string>

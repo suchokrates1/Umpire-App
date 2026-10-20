@@ -47,17 +47,17 @@
     
     <!-- Match -->
     <string name="undo">Annuler</string>
-    <string name="undo_with_icon">↶ Annuler</string>
+    <string name="undo_with_icon">Annuler</string>
     <string name="confirm_undo">Annuler la dernière action?</string>
     <string name="who_serves_first">Qui sert en premier?</string>
-    <string name="swap_sides">⇄ Changer de côtés</string>
+    <string name="swap_sides">Changer de côtés</string>
     <string name="player_serves">%1$s\nSert</string>
     <string name="first_serve">1er Service</string>
     <string name="second_serve">1er service  >  2ème service</string>
     <string name="ace">ACE</string>
     <string name="fault">FAUTE</string>
     <string name="second_serve_button">2ème SERVICE</string>
-    <string name="double_fault_button">DOUBLE FAUTE</string>
+    <string name="double_fault_button">DOUBLE\nFAUTE</string>
     <string name="ball_in_play">BALLE EN JEU</string>
     <string name="foot_fault">FAUTE DE PIED</string>
     <string name="winner">GAGNANT</string>

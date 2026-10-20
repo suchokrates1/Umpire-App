@@ -31,6 +31,7 @@ class MatchHistoryActivity : AppCompatActivity() {
         binding = ActivityMatchHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+        pl.vestmedia.tennisreferee.ui.SystemBarPadding.apply(this, binding.root, underWindowActionBar = false)
         setupToolbar()
         setupRecyclerView()
         observeMatches()

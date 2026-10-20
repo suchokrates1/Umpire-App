@@ -47,17 +47,17 @@
     
     <!-- Match -->
     <string name="undo">Rückgängig</string>
-    <string name="undo_with_icon">↶ Rückgängig</string>
+    <string name="undo_with_icon">Rückgängig</string>
     <string name="confirm_undo">Letzte Aktion rückgängig machen?</string>
     <string name="who_serves_first">Wer schlägt zuerst auf?</string>
-    <string name="swap_sides">⇄ Seiten wechseln</string>
+    <string name="swap_sides">Seiten wechseln</string>
     <string name="player_serves">%1$s\nSchlägt auf</string>
     <string name="first_serve">1. Aufschlag</string>
     <string name="second_serve">1. Aufschlag  >  2. Aufschlag</string>
     <string name="ace">ASS</string>
     <string name="fault">FEHLER</string>
     <string name="second_serve_button">2. AUFSCHLAG</string>
-    <string name="double_fault_button">DOPPELFEHLER</string>
+    <string name="double_fault_button">DOPPEL\nFEHLER</string>
     <string name="ball_in_play">BALL IM SPIEL</string>
     <string name="foot_fault">FUSSFEHLER</string>
     <string name="winner">WINNER</string>

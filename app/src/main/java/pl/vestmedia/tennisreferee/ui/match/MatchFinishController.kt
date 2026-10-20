@@ -3,7 +3,6 @@ package pl.vestmedia.tennisreferee.ui.match
 import android.app.Activity
 import android.view.View
 import pl.vestmedia.tennisreferee.R
-import pl.vestmedia.tennisreferee.domain.match.MatchScoreSummary
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.databinding.LayoutMatchFinishedBinding
 import pl.vestmedia.tennisreferee.utils.AppLogger
@@ -14,23 +13,32 @@ class MatchFinishController(
     private val onNextMatch: (String) -> Unit
 ) {
     fun render(state: MatchState) {
-        val winner = if (state.player1Sets > state.player2Sets) {
-            state.player1.getDisplayName()
-        } else {
-            state.player2.getDisplayName()
-        }
+        val winner = state.finishWinnerName?.takeIf { it.isNotBlank() }
+            ?: when {
+                state.player1Sets > state.player2Sets -> state.player1.getDisplayName()
+                state.player2Sets > state.player1Sets -> state.player2.getDisplayName()
+                else -> null
+            }
 
-        binding.textWinner.text = activity.getString(R.string.winner_label, winner)
-        renderFinalScore(state)
+        if (winner.isNullOrBlank()) {
+            binding.textWinner.visibility = View.GONE
+        } else {
+            binding.textWinner.visibility = View.VISIBLE
+            binding.textWinner.text = activity.getString(winnerLabel(state, winner), winner)
+        }
         renderStatistics(state)
         bindNextMatchButtons(state)
     }
 
-    private fun renderFinalScore(state: MatchState) {
-        binding.textFinalSets.text = MatchScoreSummary.sets(state)
-        val setBySet = MatchScoreSummary.setBySet(state)
-        binding.textFinalSetBySet.text = setBySet
-        binding.textFinalSetBySet.visibility = if (setBySet.isBlank()) View.GONE else View.VISIBLE
+    private fun winnerLabel(state: MatchState, winner: String): Int {
+        val players = listOfNotNull(state.player1, state.player2, state.player3, state.player4)
+        val matched = players.filter {
+            it.getDisplayName() == winner || it.getFullName() == winner || it.name == winner
+        }
+        val female = matched.isNotEmpty() && matched.all {
+            it.gender?.trim()?.equals("F", ignoreCase = true) == true
+        }
+        return if (female) R.string.winner_label_female else R.string.winner_label
     }
 
     private fun renderStatistics(state: MatchState) {

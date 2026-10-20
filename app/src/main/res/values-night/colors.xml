@@ -23,6 +23,8 @@
     <!-- Score colors for dark mode -->
     <color name="score_background">#1E1E1E</color>
     <color name="score_text">#FFFFFF</color>
+    <color name="score_header">#E0E0E0</color>
+    <color name="player_serve_button_text">#FFFFFF</color>
     
     <!-- TB Only / Advanced mode accent -->
     <color name="tb_only_card_bg">#3E2723</color>

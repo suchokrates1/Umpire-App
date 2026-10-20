@@ -183,7 +183,7 @@
                 android:id="@+id/switchTiebreakOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:trackTintMode="src_in"/>
+                />
 
         </LinearLayout>
 
@@ -622,7 +622,7 @@
             android:id="@+id/switchNoAdvantage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:trackTintMode="src_in"/>
+            />
 
     </LinearLayout>
 

@@ -105,6 +105,27 @@ class MatchProgressReducerTest {
     }
 
     @Test
+    fun matchWonOnSetClearsGamesSoTheNextColumnStaysEmpty() {
+        val state = matchState(matchConfig = MatchConfig(gamesPerSet = 4, setsToWin = 1)).apply {
+            matchStartTime = 1_000L
+            player1Games = 3
+            player2Games = 0
+            player1Points = 4
+            player2Points = 0
+        }
+
+        val result = MatchProgressReducer.reduceAfterPoint(state, currentAnnouncementType = null, nowMs = 9_000L)
+
+        assertTrue(result.finalizeMatch)
+        assertTrue(state.isMatchFinished)
+        assertEquals(1, state.player1Sets)
+        assertEquals(0, state.player1Games)
+        assertEquals(0, state.player2Games)
+        assertEquals(4, state.setsHistory.single().player1Games)
+        assertEquals(0, state.setsHistory.single().player2Games)
+    }
+
+    @Test
     fun gameAtTiebreakBoundaryStartsTiebreakAnnouncement() {
         val state = matchState(matchConfig = MatchConfig(gamesPerSet = 6, setsToWin = 2)).apply {
             player1Games = 5
@@ -163,8 +184,10 @@ class MatchProgressReducerTest {
         assertTrue(state.isMatchFinished)
         assertEquals(8_000L, state.matchDuration)
         assertEquals(2, state.player1Sets)
-        assertEquals(6, state.player1Games)
-        assertEquals(4, state.player2Games)
+        assertEquals(0, state.player1Games)
+        assertEquals(0, state.player2Games)
+        assertEquals(6, state.setsHistory.last().player1Games)
+        assertEquals(4, state.setsHistory.last().player2Games)
         assertEquals(MatchProgressScreen.MatchFinished, result.nextScreen)
         assertEquals(listOf(MatchProgressEvent.Game, MatchProgressEvent.Set), result.events)
         assertTrue(result.publishState)

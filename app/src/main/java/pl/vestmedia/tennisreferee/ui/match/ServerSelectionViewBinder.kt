@@ -69,7 +69,7 @@ class ServerSelectionViewBinder(
         }
 
         button.setBackgroundColor(ContextCompat.getColor(context, colorRes))
-        textColorRes?.let { button.setTextColor(ContextCompat.getColor(context, it)) }
+        button.setTextColor(ContextCompat.getColor(context, textColorRes ?: R.color.player_serve_button_text))
         button.strokeWidth = if (buttonState.selected) 3 else 1
         button.strokeColor = ColorStateList.valueOf(
             ColorUtils.setAlphaComponent(Color.WHITE, if (buttonState.selected) 224 else 104)
