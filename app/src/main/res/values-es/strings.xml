@@ -9,14 +9,14 @@
     <string name="select_tournament">Seleccionar torneo</string>
     <string name="no_tournaments_available">No hay torneos activos disponibles</string>
     <string name="error_loading_tournaments">Error al cargar torneos</string>
-    <string name="select_court">Seleccionar cancha</string>
+    <string name="select_court">Seleccionar pista</string>
     <string name="refresh">Actualizar</string>
-    <string name="no_courts_available">No hay canchas disponibles</string>
-    <string name="court_name">Cancha %1$s</string>
+    <string name="no_courts_available">No hay pistas disponibles</string>
+    <string name="court_name">Pista %1$s</string>
     <string name="court_available">Disponible</string>
     <string name="court_occupied">Ocupada</string>
-    <string name="court_pin_title">Autorización de cancha</string>
-    <string name="court_pin_message">Ingrese el PIN para la cancha: %1$s</string>
+    <string name="court_pin_title">Autorización de pista</string>
+    <string name="court_pin_message">Introduce el PIN de la pista: %1$s</string>
     <string name="pin_invalid">PIN inválido: %1$s</string>
     <string name="pin_digit_label">Dígito %1$d de %2$d del PIN</string>
     <string name="match_players_versus">%1$s vs. %2$s</string>
@@ -28,7 +28,7 @@
     <string name="suggested_match_use">Usar partido</string>
     <string name="suggested_match_manual">Elegir manualmente</string>
     <string name="suggested_match_applied">Partido sugerido seleccionado</string>
-    <string name="court_label">Cancha: %1$s</string>
+    <string name="court_label">Pista: %1$s</string>
     <string name="doubles_checkbox">Dobles</string>
     <string name="game_type_singles">Individual (2 jugadores)</string>
     <string name="game_type_doubles">Dobles (4 jugadores)</string>
@@ -52,11 +52,11 @@
     <string name="who_serves_first">¿Quién saca primero?</string>
     <string name="swap_sides">Cambiar lados</string>
     <string name="player_serves">%1$s\nSaca</string>
-    <string name="first_serve">1er Saque</string>
-    <string name="second_serve">1er saque  >  2do saque</string>
-    <string name="ace">ACE</string>
+    <string name="first_serve">1.er servicio</string>
+    <string name="second_serve">1.er servicio  >  2.º servicio</string>
+    <string name="ace">SAQUE\nDIRECTO</string>
     <string name="fault">FALTA</string>
-    <string name="second_serve_button">2DO SAQUE</string>
+    <string name="second_serve_button">2.º SERVICIO</string>
     <string name="double_fault_button">DOBLE\nFALTA</string>
     <string name="ball_in_play">PELOTA EN JUEGO</string>
     <string name="foot_fault">FALTA DE PIE</string>
@@ -100,7 +100,7 @@
     <string name="stats_mode_basic">Básico</string>
     <string name="stats_mode_basic_short">WIN + FALTA\nRápido y simple</string>
     <string name="stats_mode_advanced">Avanzado</string>
-    <string name="stats_mode_advanced_short">Ace, Ganador, Errores…\nEstadísticas completas</string>
+    <string name="stats_mode_advanced_short">Saques directos, golpes ganadores, errores…\nEstadísticas completas</string>
     <string name="win_point">WIN</string>
     <string name="no_advantage_mode">Sin ventaja (Punto decisivo)</string>
     <string name="no_advantage_desc">En deuce (40–40), el siguiente punto gana el game. El restador elige el lado de devolución.</string>
@@ -118,7 +118,7 @@
 
     <!-- Match announcements -->
     <string name="announce_side_change">¡Cambio de lado!</string>
-    <string name="announce_side_change_msg">Los jugadores cambian de lado de la cancha.</string>
+    <string name="announce_side_change_msg">Los jugadores cambian de lado de la pista.</string>
     <string name="announce_tiebreak">¡Tie-break!</string>
     <string name="announce_tiebreak_msg">Marcador %1$d–%1$d. Comienza el tie-break (primero a %2$d, ganar por 2).</string>
     <string name="announce_super_tiebreak">¡Match Tie-break!</string>
@@ -127,11 +127,11 @@
     <string name="dont_change_sides">No cambiar de lado</string>
     <string name="match_finished_title">¡Partido finalizado!</string>
     <string name="statistics">Estadísticas</string>
-    <string name="aces">Aces</string>
+    <string name="aces">Saques directos</string>
     <string name="double_faults">Dobles faltas</string>
     <string name="winners_stat">Ganadores</string>
     <string name="unforced_errors_stat">Errores no forzados</string>
-    <string name="first_serve_pct">1er saque %</string>
+    <string name="first_serve_pct">1.er servicio %</string>
     <string name="player_serves_short">Saca</string>
     <string name="match_metadata_umpire">Árbitro: %1$s</string>
     <string name="match_type_mixed">Mixto</string>
@@ -144,18 +144,18 @@
     <string name="sync_status_idle">Aún no sincronizado</string>
     
     <!-- Errors -->
-    <string name="error_no_court_data">Error: Faltan datos de la cancha</string>
+    <string name="error_no_court_data">Error: Faltan datos de la pista</string>
     <string name="error_select_correct_players">Seleccione el número correcto de jugadores</string>
-    <string name="error_enter_first_name">Ingrese el nombre del jugador</string>
-    <string name="error_enter_last_name">Ingrese el apellido del jugador</string>
+    <string name="error_enter_first_name">Introduce el nombre del jugador</string>
+    <string name="error_enter_last_name">Introduce el apellido del jugador</string>
     <string name="no_actions_to_undo">No hay acciones para deshacer</string>
     <string name="undo_action_format">Deshecho: %1$s</string>
 
     <!-- Undo descriptions -->
-    <string name="undo_ace">ACE - %1$s</string>
-    <string name="undo_fault_first">Falta - Primer saque</string>
+    <string name="undo_ace">Saque directo - %1$s</string>
+    <string name="undo_fault_first">Falta - Primer servicio</string>
     <string name="undo_double_fault">Doble falta - %1$s</string>
-    <string name="undo_foot_fault_first">Falta de pie - Primer saque</string>
+    <string name="undo_foot_fault_first">Falta de pie - Primer servicio</string>
     <string name="undo_foot_fault_double">Falta de pie (doble) - %1$s</string>
     <string name="undo_winner">Ganador - %1$s</string>
     <string name="undo_forced_error">Error forzado - %1$s</string>
@@ -183,7 +183,7 @@
     <string name="match_details">Detalles del partido</string>
     <string name="match_details_placeholder">Los detalles del partido se mostrarán aquí</string>
     <string name="match_details_not_found">No se encontraron detalles del partido</string>
-    <string name="match_details_court">Cancha: %1$s</string>
+    <string name="match_details_court">Pista: %1$s</string>
     <string name="match_details_started">Inicio: %1$s</string>
     <string name="match_details_duration">Duración: %1$s</string>
     <string name="match_details_umpire">Árbitro: %1$s</string>
