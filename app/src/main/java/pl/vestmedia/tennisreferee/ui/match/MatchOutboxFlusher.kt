@@ -1,6 +1,8 @@
 package pl.vestmedia.tennisreferee.ui.match
 
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchEventDto
@@ -9,8 +11,6 @@ import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 import pl.vestmedia.tennisreferee.data.database.OutboxMutationEntity
 import pl.vestmedia.tennisreferee.domain.match.model.FinishMatchRequest
 import retrofit2.Response
-import kotlin.math.min
-import kotlin.math.pow
 
 data class FlushResult(
     val flushed: Int,
@@ -27,6 +27,14 @@ class MatchOutboxFlusher(
     companion object {
         /** Permanent client/server mismatches — retrying forever blocks match finalize. */
         private val PERMANENT_DROP_CODES = setOf(403, 404)
+
+        /** How many times a request the server answers with a plain refusal (a 400) is tried. */
+        const val MAX_REFUSED_ATTEMPTS = 5
+
+        /** Refused for good: kept in the table for diagnosis, never sent again. */
+        const val STATUS_FAILED = "FAILED"
+
+        private fun isRetryable(code: Int): Boolean = code in 500..599 || code == 408 || code == 429
     }
 
     suspend fun flushPending(): FlushResult {
@@ -47,12 +55,8 @@ class MatchOutboxFlusher(
             val resolved = original.serverMatchId ?: resolvedIds[original.clientMatchUuid]
             val mutation = if (resolved != null) original.copy(serverMatchId = resolved) else original
 
-            // Exponential backoff before retrying previously failed mutations.
-            if (mutation.attempts > 0) {
-                val backoffMs = min(30_000L, (500L * 2.0.pow(min(mutation.attempts, 6))).toLong())
-                delay(backoffMs)
-            }
-
+            // No waiting between rows: a flush runs in front of the next point, and every
+            // flush is started by something the umpire did, never by a timer.
             outboxStore.update(mutation.copy(
                 status = "IN_FLIGHT",
                 attempts = mutation.attempts + 1
@@ -62,9 +66,9 @@ class MatchOutboxFlusher(
                 val result = executeMutation(mutation, resolvedIds)
 
                 if (result == null) {
+                    // Not sent at all (its CREATE has not gone through yet): not an attempt.
                     outboxStore.update(mutation.copy(
                         status = "PENDING",
-                        attempts = mutation.attempts + 1,
                         lastError = "no server match id"
                     ))
                     failed++
@@ -91,20 +95,33 @@ class MatchOutboxFlusher(
                     ))
                     dropped++
                 } else {
+                    val attempts = mutation.attempts + 1
+                    // The server refuses this request itself (a 400): the same answer would
+                    // come every time, so it stops after a few tries instead of staying forever.
+                    val givenUp = !isRetryable(result.code()) && attempts >= MAX_REFUSED_ATTEMPTS
                     outboxStore.update(mutation.copy(
-                        status = "PENDING",
-                        attempts = mutation.attempts + 1,
+                        status = if (givenUp) STATUS_FAILED else "PENDING",
+                        attempts = attempts,
                         lastError = "HTTP ${result.code()}"
                     ))
                     failed++
                 }
+            } catch (e: CancellationException) {
+                // the caller went away mid-request: the row must not stay IN_FLIGHT unnoticed
+                withContext(NonCancellable) {
+                    outboxStore.update(mutation.copy(status = "PENDING", lastError = "cancelled"))
+                }
+                throw e
             } catch (e: Exception) {
                 outboxStore.update(mutation.copy(
                     status = "PENDING",
                     attempts = mutation.attempts + 1,
                     lastError = e.message ?: "unknown"
                 ))
-                failed++
+                // No answer at all means no network: the rows behind this one would each wait
+                // for the same timeout. They go out with the next flush.
+                failed += sorted.size - sorted.indexOf(original)
+                break
             }
         }
 

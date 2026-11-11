@@ -140,7 +140,9 @@ class TennisRepository(
                 playerRequest["pin"] = legacyPin
             }
             
-            request { apiService.addPlayer(playerRequest) }
+            // One attempt only: a 5xx may arrive after the server already saved the player,
+            // and repeating the POST would add the same person twice.
+            request(maxAttempts = 1) { apiService.addPlayer(playerRequest) }
                 .map { it.toModel() }
                 .fold(
                 onSuccess = { addPlayerResponse ->

@@ -435,6 +435,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     /** In-flight finalize so "next match" can wait for the same job instead of cancelling it. */
     private var finalizeJob: Job? = null
 
+    /** The match [finalizeJob] was started for; a finalize is sent once per match. */
+    private var finalizedMatchUuid: String? = null
+
     /**
      * Where a finished match is sent from. Not viewModelScope: leaving the screen while the
      * finish is in flight would cancel it, and the result would never reach the server.
@@ -446,6 +449,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
      * Kolejność: sync → match_end event → finish → statistics → local save
      */
     private fun finalizeMatchOnServer(state: MatchState) {
+        finalizedMatchUuid = state.clientMatchUuid
         finalizeJob = finalizeScope.launch(Dispatchers.IO) {
             matchSyncCoordinator.finalizeMatch(state)
         }
@@ -457,6 +461,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             _matchState.value = state
             _currentView.value = MatchView.MATCH_FINISHED
             if (!tutorialMode) {
+                finalizedMatchUuid = state.clientMatchUuid
                 finalizeJob = finalizeScope.launch(Dispatchers.IO) {
                     matchSyncCoordinator.finalizeMatch(state, request)
                 }
@@ -479,13 +484,21 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         val running = finalizeJob
-        if (running != null && running.isActive) {
-            viewModelScope.launch {
+        if (running != null && !running.isCancelled && finalizedMatchUuid == state.clientMatchUuid) {
+            // Already finalized, or still at it. Whatever could not be delivered then is in
+            // the outbox; finalizing again would write a second history row and send a late
+            // match_end that repaints a court the server has already cleared.
+            val resend = finalizeScope.launch(Dispatchers.IO) {
                 running.join()
+                matchSyncCoordinator.flushOutbox()
+            }
+            viewModelScope.launch {
+                resend.join()
                 onDone()
             }
             return
         }
+        finalizedMatchUuid = state.clientMatchUuid
         val finalize = finalizeScope.launch(Dispatchers.IO) {
             matchSyncCoordinator.finalizeMatch(state)
         }

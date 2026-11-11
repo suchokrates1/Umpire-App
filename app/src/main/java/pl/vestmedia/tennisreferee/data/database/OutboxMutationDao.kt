@@ -5,7 +5,15 @@ import androidx.room.*
 @Dao
 interface OutboxMutationDao {
 
-    @Query("SELECT * FROM outbox_mutations WHERE status = 'PENDING' ORDER BY createdAt ASC")
+    /**
+     * Everything still owed to the server. IN_FLIGHT is a request the app died in the
+     * middle of; FAILED_AUTH waits for a new court session. Reading only PENDING left
+     * both in the table for good.
+     */
+    @Query(
+        "SELECT * FROM outbox_mutations " +
+        "WHERE status IN ('PENDING', 'IN_FLIGHT', 'FAILED_AUTH') ORDER BY createdAt ASC"
+    )
     suspend fun getPending(): List<OutboxMutationEntity>
 
     @Insert
@@ -25,16 +33,16 @@ interface OutboxMutationDao {
 
     @Query(
         "UPDATE outbox_mutations SET serverMatchId = :serverMatchId " +
-        "WHERE clientMatchUuid = :uuid AND status IN ('PENDING', 'IN_FLIGHT') AND serverMatchId IS NULL"
+        "WHERE clientMatchUuid = :uuid AND status IN ('PENDING', 'IN_FLIGHT', 'FAILED_AUTH') AND serverMatchId IS NULL"
     )
     suspend fun propagateServerMatchId(uuid: String, serverMatchId: Int)
 
-    @Query("SELECT COUNT(*) FROM outbox_mutations WHERE status IN ('PENDING', 'IN_FLIGHT')")
+    @Query("SELECT COUNT(*) FROM outbox_mutations WHERE status IN ('PENDING', 'IN_FLIGHT', 'FAILED_AUTH')")
     suspend fun countPendingOrInFlight(): Int
 
     @Query(
         "DELETE FROM outbox_mutations " +
-        "WHERE clientMatchUuid = :uuid AND type IN ('UPDATE', 'EVENT') AND status IN ('PENDING', 'IN_FLIGHT')"
+        "WHERE clientMatchUuid = :uuid AND type IN ('UPDATE', 'EVENT') AND status IN ('PENDING', 'IN_FLIGHT', 'FAILED_AUTH')"
     )
     suspend fun dropPendingUpdates(uuid: String)
 }

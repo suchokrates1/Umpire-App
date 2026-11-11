@@ -64,6 +64,7 @@
     <string name="forced_error">FORCED ERROR</string>
     <string name="unforced_error">UNFORCED ERROR</string>
     <string name="winner_label">Winner: %1$s</string>
+    <string name="winner_label_female">Winner: %1$s</string>
     <string name="finish_match">Finish Match</string>
     <string name="finish_reason_prompt">Why are you ending this match?</string>
     <string name="finish_reason_normal">Normal finish</string>

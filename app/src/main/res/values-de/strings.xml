@@ -64,6 +64,7 @@
     <string name="forced_error">ERZWUNGENER\nFEHLER</string>
     <string name="unforced_error">UNERZWUNGENER\nFEHLER</string>
     <string name="winner_label">Gewinner: %1$s</string>
+    <string name="winner_label_female">Gewinnerin: %1$s</string>
     <string name="finish_match">Spiel beenden</string>
     <string name="finish_reason_prompt">Warum wird dieses Match beendet?</string>
     <string name="finish_reason_normal">Reguläres Ende</string>

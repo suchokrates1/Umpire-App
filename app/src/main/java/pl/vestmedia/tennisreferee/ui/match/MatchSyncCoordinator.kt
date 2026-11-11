@@ -269,6 +269,9 @@ class MatchSyncCoordinator(
 
     private fun isRetryable(code: Int): Boolean = code in 500..599 || code == 408 || code == 429
 
+    /** Sends what is waiting in the outbox; safe to call when there is nothing. */
+    suspend fun flushOutbox() = tryFlushOutbox()
+
     private suspend fun tryFlushOutbox() {
         try {
             outboxFlusher?.flushPending()
@@ -309,8 +312,16 @@ class MatchSyncCoordinator(
         serverMatchId: Int?,
         payload: Any
     ) {
-        if (isRetryable(code)) {
+        if (isRetryable(code) || waitsForCourtSession(code, type)) {
             enqueueToOutbox(clientMatchUuid, type, serverMatchId, payload)
         }
     }
+
+    /**
+     * A 401 means the court session ran out, not that the request is wrong: the score,
+     * the finish and the statistics wait in the outbox for the next PIN. Point events
+     * are left out, they only repaint the live view and the queued score supersedes them.
+     */
+    private fun waitsForCourtSession(code: Int, type: String): Boolean =
+        code == 401 && type != "EVENT"
 }

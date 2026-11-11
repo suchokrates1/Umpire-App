@@ -109,6 +109,42 @@ class MatchOutboxFlusherTest {
     }
 
     @Test
+    fun aFinishRefusedWith401GoesOutWithTheNextFlush() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient().apply {
+            finishResults += httpError(401)
+            finishResults += Response.success(apiMatch(id = 7))
+        }
+        val flusher = MatchOutboxFlusher(store, api)
+        flusher.enqueue("uuid-1", "FINISH", 7, apiJson.encodeToString(FinishMatchRequest()))
+
+        assertTrue(flusher.flushPending().stoppedOnAuth)
+        assertTrue(store.hasPending())
+        // the umpire entered the PIN again; nothing else re-queues this row
+        val afterPin = flusher.flushPending()
+
+        assertEquals(1, afterPin.flushed)
+        assertEquals(listOf("finish:7", "finish:7"), api.operations)
+        assertTrue(store.allEntries().isEmpty())
+    }
+
+    @Test
+    fun aRequestTheAppDiedInTheMiddleOfIsSentAgain() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient().apply {
+            finishResults += Response.success(apiMatch(id = 7))
+        }
+        val flusher = MatchOutboxFlusher(store, api)
+        val id = flusher.enqueue("uuid-1", "FINISH", 7, apiJson.encodeToString(FinishMatchRequest()))
+        store.update(store.allEntries().single { it.id == id }.copy(status = "IN_FLIGHT"))
+
+        val result = flusher.flushPending()
+
+        assertEquals(1, result.flushed)
+        assertEquals(listOf("finish:7"), api.operations)
+    }
+
+    @Test
     fun flushDrops403And404Permanently() = runBlocking {
         val store = InMemoryOutboxStore()
         val api = TestApiClient().apply {
@@ -301,6 +337,97 @@ class MatchOutboxFlusherTest {
     }
 
     @Test
+    fun coordinatorKeepsTheFinishAndTheScoreWhenTheCourtSessionHasExpired() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient().apply {
+            updateResults += httpError(401)
+            eventResults += httpError(401)
+            finishResults += httpError(401)
+            statisticsResults += httpError(401)
+        }
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
+        val coordinator = MatchSyncCoordinator(
+            apiClient = api,
+            matchHistorySaver = StubHistorySaver,
+            batteryInfoProvider = { MatchBatteryInfo(65, true) },
+            onSyncStatus = {},
+            onBracketWarning = { _, _ -> },
+            retryDelay = ImmediateRetryDelay,
+            logger = SilentLogger,
+            outboxFlusher = flusher
+        )
+        val state = matchState().apply { matchId = 99 }
+
+        coordinator.finalizeMatch(state)
+
+        val queued = store.getPending().map { it.type }
+        assertTrue("queued: $queued", queued.containsAll(listOf("UPDATE", "FINISH")))
+        // a point event only repaints the live view; the queued score replaces it
+        assertFalse(queued.contains("EVENT"))
+    }
+
+    @Test
+    fun aRequestTheServerKeepsRefusingIsGivenUpAfterFiveTries() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient().apply {
+            repeat(8) { finishResults += httpError(400) }
+        }
+        val flusher = MatchOutboxFlusher(store, api)
+        flusher.enqueue("uuid-1", "FINISH", 7, apiJson.encodeToString(FinishMatchRequest()))
+
+        repeat(8) { flusher.flushPending() }
+
+        assertEquals(MatchOutboxFlusher.MAX_REFUSED_ATTEMPTS, api.operations.size)
+        assertFalse(store.hasPending())
+        assertEquals(MatchOutboxFlusher.STATUS_FAILED, store.allEntries().single().status)
+    }
+
+    @Test
+    fun aServerErrorIsNeverGivenUp() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient().apply {
+            repeat(8) { finishResults += httpError(503) }
+        }
+        val flusher = MatchOutboxFlusher(store, api)
+        flusher.enqueue("uuid-1", "FINISH", 7, apiJson.encodeToString(FinishMatchRequest()))
+
+        repeat(8) { flusher.flushPending() }
+
+        assertEquals(8, api.operations.size)
+        assertTrue(store.hasPending())
+    }
+
+    @Test
+    fun withoutANetworkTheFlushStopsAtTheFirstRow() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val api = TestApiClient().apply {
+            finishResults += null
+        }
+        val flusher = MatchOutboxFlusher(store, api)
+        flusher.enqueue("uuid-1", "FINISH", 7, apiJson.encodeToString(FinishMatchRequest()))
+        flusher.enqueue("uuid-2", "FINISH", 8, apiJson.encodeToString(FinishMatchRequest()))
+        flusher.enqueue("uuid-3", "FINISH", 9, apiJson.encodeToString(FinishMatchRequest()))
+
+        val result = flusher.flushPending()
+
+        assertEquals(listOf("finish:7"), api.operations)
+        assertEquals(3, result.failed)
+        assertEquals(3, store.getPending().size)
+    }
+
+    @Test
+    fun aRowWaitingForItsServerIdIsNotCountedAsAnAttempt() = runBlocking {
+        val store = InMemoryOutboxStore()
+        val flusher = MatchOutboxFlusher(store, TestApiClient())
+        flusher.enqueue("uuid-1", "UPDATE", null, apiJson.encodeToString(apiMatch()))
+
+        repeat(8) { flusher.flushPending() }
+
+        assertEquals(0, store.allEntries().single().attempts)
+        assertTrue(store.hasPending())
+    }
+
+    @Test
     fun coordinatorEnqueuesUpdateWhenMatchIdExists() = runBlocking {
         val store = InMemoryOutboxStore()
         val api = TestApiClient().apply {
@@ -405,6 +532,9 @@ class MatchOutboxFlusherTest {
 
 // ── Test doubles ──
 
+/** The statuses OutboxMutationDao treats as still owed to the server. */
+private val WAITING = listOf("PENDING", "IN_FLIGHT", "FAILED_AUTH")
+
 private class InMemoryOutboxStore : MatchOutboxStore {
     private val entries = mutableListOf<OutboxMutationEntity>()
     private var nextId = 1L
@@ -425,7 +555,7 @@ private class InMemoryOutboxStore : MatchOutboxStore {
     }
 
     override suspend fun getPending(): List<OutboxMutationEntity> =
-        entries.filter { it.status == "PENDING" }.sortedBy { it.createdAt }
+        entries.filter { it.status in WAITING }.sortedBy { it.createdAt }
 
     override suspend fun update(mutation: OutboxMutationEntity) {
         val index = entries.indexOfFirst { it.id == mutation.id }
@@ -435,7 +565,7 @@ private class InMemoryOutboxStore : MatchOutboxStore {
     override suspend fun propagateServerMatchId(clientMatchUuid: String, serverMatchId: Int) {
         entries.replaceAll {
             if (it.clientMatchUuid == clientMatchUuid &&
-                it.status in listOf("PENDING", "IN_FLIGHT") &&
+                it.status in WAITING &&
                 it.serverMatchId == null
             ) it.copy(serverMatchId = serverMatchId)
             else it
@@ -447,13 +577,13 @@ private class InMemoryOutboxStore : MatchOutboxStore {
     }
 
     override suspend fun hasPending(): Boolean =
-        entries.any { it.status in listOf("PENDING", "IN_FLIGHT") }
+        entries.any { it.status in WAITING }
 
     override suspend fun dropPendingUpdates(clientMatchUuid: String) {
         entries.removeAll {
             it.clientMatchUuid == clientMatchUuid &&
                 it.type == "UPDATE" &&
-                it.status in listOf("PENDING", "IN_FLIGHT")
+                it.status in WAITING
         }
     }
 

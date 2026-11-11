@@ -64,6 +64,7 @@
     <string name="forced_error">ERROR\nFORZADO</string>
     <string name="unforced_error">ERROR\nNO FORZADO</string>
     <string name="winner_label">Ganador: %1$s</string>
+    <string name="winner_label_female">Ganadora: %1$s</string>
     <string name="finish_match">Finalizar partido</string>
     <string name="finish_reason_prompt">¿Por qué estás finalizando este partido?</string>
     <string name="finish_reason_normal">Finalización normal</string>
