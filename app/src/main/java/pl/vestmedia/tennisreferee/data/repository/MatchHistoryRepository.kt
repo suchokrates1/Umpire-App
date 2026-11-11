@@ -37,9 +37,9 @@ class MatchHistoryRepository(private val matchDao: MatchDao) {
 /**
  * Konwersja MatchState do MatchEntity
  */
-private fun MatchState.toEntity(): MatchEntity {
+internal fun MatchState.toEntity(): MatchEntity {
     return MatchEntity(
-        courtId = courtId.toIntOrNull() ?: 0,
+        courtId = courtNumber(courtId),
         courtName = courtName,
         matchStartTime = matchStartTime,
         matchEndTime = System.currentTimeMillis(),
@@ -73,6 +73,30 @@ private fun MatchState.toEntity(): MatchEntity {
         player2SecondServesIn = player2Stats.secondServesIn,
         player2SecondServesTotal = player2Stats.secondServesTotal,
         isCompleted = true,
-        winnerId = if (player1Sets > player2Sets) player1.id else if (player2Sets > player1Sets) player2.id else null
+        winnerId = winnerId()
     )
+}
+
+/** Court ids look like "t32-3"; the history keeps the number the umpire sees on the court. */
+private val TRAILING_NUMBER = Regex("(\\d+)$")
+
+internal fun courtNumber(courtId: String): Int =
+    TRAILING_NUMBER.find(courtId.trim())?.value?.toIntOrNull() ?: 0
+
+/**
+ * The winner the umpire named when the match ended by retirement, walkover or
+ * disqualification; the sets decide only when nobody was named. Counting sets alone
+ * gave the match to the player who retired while leading.
+ */
+private fun MatchState.winnerId(): Int? {
+    val named = finishWinnerName?.trim().orEmpty()
+    if (named.isNotEmpty()) {
+        if (named == getTeam1FullName() || named == getTeam1DisplayName()) return player1.id
+        if (named == getTeam2FullName() || named == getTeam2DisplayName()) return player2.id
+    }
+    return when {
+        player1Sets > player2Sets -> player1.id
+        player2Sets > player1Sets -> player2.id
+        else -> null
+    }
 }

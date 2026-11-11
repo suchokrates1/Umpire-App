@@ -1,9 +1,16 @@
 package pl.vestmedia.tennisreferee
 
 import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import pl.vestmedia.tennisreferee.data.database.RoomMatchOutboxStore
+import pl.vestmedia.tennisreferee.ui.match.MatchOutboxFlusher
+import pl.vestmedia.tennisreferee.ui.match.RetrofitMatchApiClient
 import pl.vestmedia.tennisreferee.BuildConfig
 import pl.vestmedia.tennisreferee.data.database.TennisDatabase
 import pl.vestmedia.tennisreferee.data.repository.MatchHistoryRepository
@@ -41,7 +48,49 @@ open class TennisRefereeApp : Application() {
         if (shouldStartHealthCheck()) {
             healthCheckManager.start()
         }
+        if (shouldSendOutboxWhenOnline()) {
+            sendOutboxWhenOnline()
+        }
     }
 
     protected open fun shouldStartHealthCheck(): Boolean = true
+
+    protected open fun shouldSendOutboxWhenOnline(): Boolean = true
+
+    /**
+     * What a match could not deliver waits in the outbox. Until now it went out only with
+     * the next point of the next match, so a result finished offline stayed on the tablet
+     * for as long as the umpire did not score again. The network coming back (and the app
+     * starting with a network) now sends it, whatever screen is open.
+     */
+    private fun sendOutboxWhenOnline() {
+        val connectivity = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return
+        try {
+            connectivity.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    backgroundScope.launch { flushOutbox() }
+                }
+            })
+        } catch (e: RuntimeException) {
+            // the system refuses the callback on some devices (too many registered); the
+            // outbox is still sent with the next point, as before
+            AppLogger.error("OutboxNetworkWatch", e)
+        }
+    }
+
+    private suspend fun flushOutbox() {
+        try {
+            val result = MatchOutboxFlusher(
+                outboxStore = RoomMatchOutboxStore(database.outboxMutationDao()),
+                apiClient = RetrofitMatchApiClient(container.apiService),
+            ).flushPending()
+            if (result.flushed > 0 || result.failed > 0) {
+                AppLogger.info("Outbox after network return: sent=${result.flushed} waiting=${result.failed}")
+            }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            AppLogger.error("OutboxNetworkFlush", e)
+        }
+    }
 }

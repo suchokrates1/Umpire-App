@@ -203,6 +203,9 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                     _undoMessage.value = getApplication<Application>().getString(R.string.undo_action_format, result.description)
                     _matchState.value = state
                     _currentView.value = scoringViewFor(state)
+                    // The server and the stream showed the point that was just taken back.
+                    logMatchEvent("undo")
+                    syncMatchWithServer()
                 }
             }
         }
@@ -601,6 +604,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             getApplication<TennisRefereeApp>().healthCheckManager.courtId = courtId
         }
         _matchState.postValue(next)
+        if (command.score != null) {
+            // the corrected state has no undo history (see DirectorCommandApplier)
+            _canUndo.postValue(false)
+        }
         getApplication<TennisRefereeApp>().healthCheckManager.matchId = next.matchId
         getApplication<TennisRefereeApp>().healthCheckManager.clientMatchUuid = next.clientMatchUuid
         AppLogger.action("Match", "DirectorCommand", "id=$commandId court=${next.courtId}")

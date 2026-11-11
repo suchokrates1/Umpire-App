@@ -56,6 +56,13 @@ object DirectorCommandApplier {
             }
         }
         command.score?.let { score ->
+            // Lists of its own: copy() shares them with the state the screen still shows.
+            // The undo history goes: its snapshots predate the correction, and undoing into
+            // them would bring the corrected score back to the wrong one.
+            next = next.copy(
+                setsHistory = next.setsHistory.toMutableList(),
+                actionsHistory = mutableListOf()
+            )
             score.player1Sets?.let { next.player1Sets = it }
             score.player2Sets?.let { next.player2Sets = it }
             score.player1Games?.let { next.player1Games = it }
@@ -68,6 +75,10 @@ object DirectorCommandApplier {
             score.setsHistory?.let { history ->
                 next.setsHistory.clear()
                 next.setsHistory.addAll(history.map { it.toModel() })
+            }
+            if (score.player1Games != null || score.player2Games != null) {
+                // Games played in the current set; the change of ends is decided from it.
+                next.totalGamesPlayed = next.player1Games + next.player2Games
             }
         }
         return next

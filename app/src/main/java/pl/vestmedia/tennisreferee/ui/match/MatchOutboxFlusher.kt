@@ -2,6 +2,8 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import pl.vestmedia.tennisreferee.data.api.dto.MatchDto
@@ -35,9 +37,18 @@ class MatchOutboxFlusher(
         const val STATUS_FAILED = "FAILED"
 
         private fun isRetryable(code: Int): Boolean = code in 500..599 || code == 408 || code == 429
+
+        /**
+         * One flush at a time in the whole process. The match screen and the network
+         * watcher each have a flusher over the same table; two passes at once would send
+         * every row twice.
+         */
+        private val flushLock = Mutex()
     }
 
-    suspend fun flushPending(): FlushResult {
+    suspend fun flushPending(): FlushResult = flushLock.withLock { flushPendingLocked() }
+
+    private suspend fun flushPendingLocked(): FlushResult {
         val pending = outboxStore.getPending()
         if (pending.isEmpty()) return FlushResult(0, 0)
 

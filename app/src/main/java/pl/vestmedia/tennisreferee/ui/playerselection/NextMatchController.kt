@@ -65,8 +65,17 @@ class NextMatchController(
         val scheduleId = getSelectedScheduleId()
         val resumed = activeMatchStore.getLast()
         if (MatchResume.canResume(resumed, getCourtId(), scheduleId, selectedPlayers, isDoublesMatch)) {
-            AppLogger.navigate("PlayerSelection", "Match", "resume uuid=${resumed!!.clientMatchUuid}")
-            matchLauncher.launch(MatchActivity.createIntent(activity, resumed.clientMatchUuid, isDoublesMatch))
+            val reopened = MatchResume.withChosenConfig(resumed!!, config)
+            if (reopened !== resumed) {
+                activeMatchStore.save(reopened)
+            }
+            val format = when {
+                reopened !== resumed -> "format changed before the first point"
+                resumed.matchConfig != config -> "format kept, the match has points"
+                else -> "same format"
+            }
+            AppLogger.navigate("PlayerSelection", "Match", "resume uuid=${reopened.clientMatchUuid} ($format)")
+            matchLauncher.launch(MatchActivity.createIntent(activity, reopened.clientMatchUuid, isDoublesMatch))
             return
         }
         AppLogger.navigate(

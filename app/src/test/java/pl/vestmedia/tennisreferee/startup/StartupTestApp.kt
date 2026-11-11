@@ -5,4 +5,6 @@ import pl.vestmedia.tennisreferee.TennisRefereeApp
 /** Avoids the production heartbeat during JVM cold-start tests. */
 class StartupTestApp : TennisRefereeApp() {
     override fun shouldStartHealthCheck(): Boolean = false
+
+    override fun shouldSendOutboxWhenOnline(): Boolean = false
 }
