@@ -31,6 +31,10 @@ object MatchResume {
             state.totalGamesPlayed == 0 &&
             state.setsHistory.isEmpty() && state.actionsHistory.isEmpty()
 
+    /** Points have been played and the umpire picked a different format. The old one stays. */
+    fun keepsPlayedFormat(saved: MatchState, config: MatchConfig): Boolean =
+        saved.matchConfig != config && !notStarted(saved)
+
     /**
      * The match to reopen when the umpire came back with [config] chosen.
      *
@@ -39,10 +43,6 @@ object MatchResume {
      * client UUID, so the server keeps one row. Once points have been played the format
      * stays as it was; it cannot change in the middle of a set.
      */
-    /** Points have been played and the umpire picked a different format. The old one stays. */
-    fun keepsPlayedFormat(saved: MatchState, config: MatchConfig): Boolean =
-        saved.matchConfig != config && !notStarted(saved)
-
     fun withChosenConfig(saved: MatchState, config: MatchConfig): MatchState {
         if (saved.matchConfig == config || !notStarted(saved)) return saved
         return saved.copy(
