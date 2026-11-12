@@ -220,9 +220,50 @@ class E2EBackendClient(
         return requireNotNull(last)
     }
 
+    private fun officeAuthFor(tournamentId: Int): Pair<Int, String> {
+        val list = postJsonUnauthedOrGet("/api/office/tournaments")
+        val tournaments = list.optJSONArray("tournaments") ?: error("Missing office tournaments list: $list")
+        var slot = -1
+        for (i in 0 until tournaments.length()) {
+            val row = tournaments.getJSONObject(i)
+            if (row.optInt("id") == tournamentId) {
+                slot = row.getInt("slot")
+                break
+            }
+        }
+        check(slot > 0) { "No office slot for tournament $tournamentId" }
+        val auth = postJsonUnauthed("/api/office/$slot/auth", JSONObject().put("password", "test"))
+        val token = auth.optString("token").takeIf { it.isNotBlank() }
+            ?: error("Office auth missing token: $auth")
+        return slot to token
+    }
+
+    private fun postJsonUnauthedOrGet(path: String): JSONObject {
+        val text = execute("GET", path, null, allowFailure = false, withAuth = false)
+        return if (text.isBlank()) JSONObject() else JSONObject(text)
+    }
+
+    private fun postOfficeJson(slot: Int, officeToken: String, path: String, body: JSONObject): JSONObject {
+        val request = Request.Builder()
+            .url("$baseUrl/api/office/$slot$path")
+            .header("Authorization", "Bearer $officeToken")
+            .post(body.toString().toRequestBody(jsonMediaType))
+            .build()
+        client.newCall(request).execute().use { response ->
+            val text = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                throw AssertionError("POST /api/office/$slot$path failed: HTTP ${response.code} $text")
+            }
+            return if (text.isBlank()) JSONObject() else JSONObject(text)
+        }
+    }
+
     private fun createCategory(tournamentId: Int, label: String): Int {
-        val category = postJson(
-            "/admin/api/tournaments/$tournamentId/categories",
+        val (slot, officeToken) = officeAuthFor(tournamentId)
+        val category = postOfficeJson(
+            slot,
+            officeToken,
+            "/categories",
             JSONObject().put("label", label).put("is_doubles", true)
         )
         return when {
@@ -233,8 +274,11 @@ class E2EBackendClient(
     }
 
     private fun createTeam(tournamentId: Int, categoryId: Int, player1Id: Int, player2Id: Int): Int {
-        val response = postJson(
-            "/admin/api/tournaments/$tournamentId/teams",
+        val (slot, officeToken) = officeAuthFor(tournamentId)
+        val response = postOfficeJson(
+            slot,
+            officeToken,
+            "/teams",
             JSONObject()
                 .put("category_id", categoryId)
                 .put("player1_id", player1Id)
@@ -376,6 +420,10 @@ class E2EBackendClient(
 
     private fun ensureAdminToken(allowFailure: Boolean = false) {
         if (!adminToken.isNullOrBlank()) return
+        instrumentationArg("e2e.adminToken")?.let { preissued ->
+            adminToken = preissued
+            return
+        }
         val password = resolveAdminPassword()
         try {
             val response = postJsonUnauthed(
