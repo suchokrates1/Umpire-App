@@ -2,14 +2,10 @@ package pl.vestmedia.tennisreferee.domain.match.model
 
 import kotlinx.serialization.Serializable
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
 /**
  * Konfiguracja formatu meczu — ilość gemów do seta, setów do meczu, opcje tiebreaka
  */
 @Serializable
-@Parcelize
 data class MatchConfig(
     // Ile gemów potrzeba by wygrać seta (np. 3, 4, 6)
     val gamesPerSet: Int = 4,
@@ -34,7 +30,7 @@ data class MatchConfig(
 
     // Przy ilu gemach startuje tiebreak (np. 3 = TB przy 3:3); null = domyślnie dla formatu
     val tiebreakAtGames: Int? = null
-) : Parcelable {
+) {
 
     /** Gemy, przy których obie strony wchodzą w tiebreak seta. */
     val tiebreakAt: Int

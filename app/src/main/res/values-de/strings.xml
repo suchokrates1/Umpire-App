@@ -9,6 +9,11 @@
     <string name="select_tournament">Turnier auswählen</string>
     <string name="no_tournaments_available">Keine aktiven Turniere verfügbar</string>
     <string name="error_loading_tournaments">Fehler beim Laden der Turniere</string>
+    <string name="error_loading_courts">Fehler beim Laden der Plätze</string>
+    <string name="error_loading_players">Fehler beim Laden der Spieler</string>
+    <string name="error_adding_player">Fehler beim Hinzufügen des Spielers</string>
+    <string name="error_suggested_players_unavailable">Die vorgeschlagenen Spieler sind nicht in der Spielerliste verfügbar</string>
+    <string name="error_court_auth_expired">Die Platzsitzung ist abgelaufen. Bitte den Platz erneut autorisieren.</string>
     <string name="select_court">Platz auswählen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="no_courts_available">Keine Plätze verfügbar</string>
@@ -18,6 +23,8 @@
     <string name="court_pin_title">Platzautorisierung</string>
     <string name="court_pin_message">PIN für Platz eingeben: %1$s</string>
     <string name="pin_invalid">Ungültige PIN: %1$s</string>
+    <string name="pin_wrong">Ungültige PIN</string>
+    <string name="pin_throttled">Zu viele falsche PIN-Versuche. Bitte in %1$d Min. erneut versuchen.</string>
     <string name="pin_digit_label">PIN-Ziffer %1$d von %2$d</string>
     <string name="match_players_versus">%1$s gegen %2$s</string>
     <string name="panic_transcript_line">%1$s: %2$s</string>
@@ -64,12 +71,14 @@
     <string name="forced_error">ERZWUNGENER\nFEHLER</string>
     <string name="unforced_error">UNERZWUNGENER\nFEHLER</string>
     <string name="winner_label">Gewinner: %1$s</string>
+    <string name="winner_label_female">Gewinnerin: %1$s</string>
     <string name="finish_match">Spiel beenden</string>
     <string name="finish_reason_prompt">Warum wird dieses Match beendet?</string>
     <string name="finish_reason_normal">Reguläres Ende</string>
     <string name="finish_reason_test">Testeintrag</string>
     <string name="finish_reason_retirement">Aufgabe wegen Verletzung</string>
     <string name="finish_reason_walkover">Walkover</string>
+    <string name="resume_format_kept">Dieses Match hat bereits begonnen, daher bleibt das bisherige Format.</string>
     <string name="finish_retirement_prompt">Welcher Spieler gibt verletzt auf?</string>
     <string name="finish_walkover_prompt">Welcher Spieler gewinnt per Walkover?</string>
     <string name="next_match_same_setup">▶ Nächstes Spiel (gleiche Einstellungen)</string>

@@ -9,6 +9,11 @@
     <string name="select_tournament">Sélectionner le tournoi</string>
     <string name="no_tournaments_available">Aucun tournoi actif disponible</string>
     <string name="error_loading_tournaments">Erreur de chargement des tournois</string>
+    <string name="error_loading_courts">Erreur de chargement des courts</string>
+    <string name="error_loading_players">Erreur de chargement des joueurs</string>
+    <string name="error_adding_player">Erreur lors de l’ajout du joueur</string>
+    <string name="error_suggested_players_unavailable">Les joueurs suggérés ne figurent pas dans la liste</string>
+    <string name="error_court_auth_expired">La session du court a expiré. Veuillez réautoriser le court.</string>
     <string name="select_court">Sélectionner le court</string>
     <string name="refresh">Actualiser</string>
     <string name="no_courts_available">Aucun court disponible</string>
@@ -18,6 +23,8 @@
     <string name="court_pin_title">Autorisation du court</string>
     <string name="court_pin_message">Entrez le code PIN pour le court: %1$s</string>
     <string name="pin_invalid">PIN invalide: %1$s</string>
+    <string name="pin_wrong">PIN invalide</string>
+    <string name="pin_throttled">Trop de tentatives de PIN erronées. Réessayez dans %1$d min.</string>
     <string name="pin_digit_label">Chiffre %1$d sur %2$d du PIN</string>
     <string name="match_players_versus">%1$s contre %2$s</string>
     <string name="panic_transcript_line">%1$s : %2$s</string>
@@ -64,12 +71,14 @@
     <string name="forced_error">ERREUR\nFORCÉE</string>
     <string name="unforced_error">FAUTE\nDIRECTE</string>
     <string name="winner_label">Gagnant: %1$s</string>
+    <string name="winner_label_female">Gagnante: %1$s</string>
     <string name="finish_match">Terminer le match</string>
     <string name="finish_reason_prompt">Pourquoi terminez-vous ce match ?</string>
     <string name="finish_reason_normal">Fin normale</string>
     <string name="finish_reason_test">Saisie de test</string>
     <string name="finish_reason_retirement">Abandon</string>
     <string name="finish_reason_walkover">Forfait</string>
+    <string name="resume_format_kept">Ce match a déjà commencé, donc le format précédent reste.</string>
     <string name="finish_retirement_prompt">Quel joueur abandonne sur blessure ?</string>
     <string name="finish_walkover_prompt">Quel joueur gagne par forfait ?</string>
     <string name="next_match_same_setup">▶ Match suivant (même configuration)</string>

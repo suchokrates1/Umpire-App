@@ -10,8 +10,10 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import pl.vestmedia.tennisreferee.R
+import pl.vestmedia.tennisreferee.data.localJson
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.startup.StartupTestApp
+import pl.vestmedia.tennisreferee.ui.match.MatchActivity
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = StartupTestApp::class, sdk = [34])
@@ -66,12 +68,14 @@ class TutorialScriptRobolectricTest {
         val app = ApplicationProvider.getApplicationContext<StartupTestApp>()
         for (id in listOf("serve", "basic", "server-change", "side-change", "set-break", "tiebreak", "finished")) {
             val snapshot = TutorialSnapshots.load(app, id)!!
+            val intent = MatchActivity.createTutorialIntent(app, snapshot)
             val parcel = Parcel.obtain()
-            parcel.writeParcelable(snapshot.state, 0)
+            intent.writeToParcel(parcel, 0)
             parcel.setDataPosition(0)
-            @Suppress("DEPRECATION")
-            val restored = parcel.readParcelable<MatchState>(MatchState::class.java.classLoader)!!
+            val restoredIntent = android.content.Intent.CREATOR.createFromParcel(parcel)
             parcel.recycle()
+            val restoredJson = restoredIntent.getStringExtra(MatchActivity.EXTRA_MATCH_STATE)!!
+            val restored = localJson.decodeFromString<MatchState>(restoredJson)
             assertEquals(id, snapshot.state.setsHistory.size, restored.setsHistory.size)
             if (snapshot.state.setsHistory.isNotEmpty()) {
                 assertEquals(id, snapshot.state.setsHistory[0].player1Games, restored.setsHistory[0].player1Games)

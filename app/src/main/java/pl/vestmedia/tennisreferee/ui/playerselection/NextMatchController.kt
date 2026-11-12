@@ -3,15 +3,16 @@ package pl.vestmedia.tennisreferee.ui.playerselection
 import android.app.Activity
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.domain.match.MatchResume
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
 import pl.vestmedia.tennisreferee.ui.match.ActiveMatchStore
 import pl.vestmedia.tennisreferee.ui.match.MatchActivity
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshots
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialScreenHost
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
@@ -65,8 +66,28 @@ class NextMatchController(
         val scheduleId = getSelectedScheduleId()
         val resumed = activeMatchStore.getLast()
         if (MatchResume.canResume(resumed, getCourtId(), scheduleId, selectedPlayers, isDoublesMatch)) {
-            AppLogger.navigate("PlayerSelection", "Match", "resume uuid=${resumed!!.clientMatchUuid}")
-            matchLauncher.launch(MatchActivity.createIntent(activity, resumed.clientMatchUuid, isDoublesMatch))
+            val reopened = MatchResume.withChosenConfig(resumed!!, config)
+            if (reopened !== resumed) {
+                activeMatchStore.save(reopened)
+            }
+            val format = when {
+                reopened !== resumed -> "format changed before the first point"
+                resumed.matchConfig != config -> "format kept, the match has points"
+                else -> "same format"
+            }
+            AppLogger.navigate("PlayerSelection", "Match", "resume uuid=${reopened.clientMatchUuid} ($format)")
+            val open = {
+                matchLauncher.launch(MatchActivity.createIntent(activity, reopened.clientMatchUuid, isDoublesMatch))
+            }
+            if (MatchResume.keepsPlayedFormat(resumed, config)) {
+                AlertDialog.Builder(activity)
+                    .setMessage(R.string.resume_format_kept)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> open() }
+                    .setCancelable(false)
+                    .show()
+            } else {
+                open()
+            }
             return
         }
         AppLogger.navigate(
@@ -115,16 +136,9 @@ class NextMatchController(
             matchState.isSuperTiebreak = true
         }
 
-        if (TutorialSession.isActive) {
-            TutorialSession.noteAction("startMatch", activity)
-            if (TutorialSession.canAdvance(activity)) {
-                TutorialSession.goNext(activity)
-            }
-            val snapshot = TutorialSnapshots.load(activity, "serve")
-            if (snapshot != null) {
-                matchLauncher.launch(MatchActivity.createTutorialIntent(activity, snapshot))
-                return
-            }
+        TutorialScreenHost.createMatchStartIntentIfActive(activity)?.let { tutorialIntent ->
+            matchLauncher.launch(tutorialIntent)
+            return
         }
 
         activeMatchStore.save(matchState)

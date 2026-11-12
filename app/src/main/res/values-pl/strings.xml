@@ -9,6 +9,11 @@
     <string name="select_tournament">Wybierz turniej</string>
     <string name="no_tournaments_available">Brak aktywnych turniejów</string>
     <string name="error_loading_tournaments">Błąd wczytywania turniejów</string>
+    <string name="error_loading_courts">Błąd wczytywania kortów</string>
+    <string name="error_loading_players">Błąd wczytywania zawodników</string>
+    <string name="error_adding_player">Błąd dodawania zawodnika</string>
+    <string name="error_suggested_players_unavailable">Sugerowani zawodnicy nie są dostępni na liście</string>
+    <string name="error_court_auth_expired">Sesja kortu wygasła. Zautoryzuj kort ponownie.</string>
     <string name="select_court">Wybierz kort</string>
     <string name="refresh">Odśwież</string>
     <string name="no_courts_available">Brak dostępnych kortów</string>
@@ -53,6 +58,8 @@
     <string name="court_pin_title">Autoryzacja kortu</string>
     <string name="court_pin_message">Wprowadź PIN dla kortu: %1$s</string>
     <string name="pin_invalid">Nieprawidłowy PIN: %1$s</string>
+    <string name="pin_wrong">Nieprawidłowy PIN</string>
+    <string name="pin_throttled">Zbyt wiele błędnych prób PIN. Spróbuj ponownie za %1$d min.</string>
     <string name="pin_digit_label">Cyfra %1$d z %2$d kodu PIN</string>
     <string name="match_players_versus">%1$s – %2$s</string>
     <string name="panic_transcript_line">%1$s: %2$s</string>
@@ -106,6 +113,7 @@
     <string name="finish_reason_test">Wpis testowy</string>
     <string name="finish_reason_retirement">Krecz</string>
     <string name="finish_reason_walkover">Walkower</string>
+    <string name="resume_format_kept">Ten mecz już się zaczął, więc zostaje wcześniejszy format.</string>
     <string name="finish_retirement_prompt">Który zawodnik ma kontuzję?</string>
     <string name="finish_walkover_prompt">Który zawodnik wygrywa walkowerem?</string>
     

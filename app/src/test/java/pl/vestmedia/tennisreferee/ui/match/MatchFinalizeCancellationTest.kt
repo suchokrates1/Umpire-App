@@ -10,6 +10,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -71,6 +73,60 @@ class MatchFinalizeCancellationTest {
 
         assertEquals(listOf("FINISH" to 7), store.saved.map { it.type to it.serverMatchId })
         assertTrue("closing the screen is not a network error: $errors", errors.none { "finish" in it })
+    }
+
+    @Test
+    fun finishWithoutServerMatchIdStillQueuesFinishAndStatsBehindCreate() = runBlocking {
+        val api = object : MatchApiClient {
+            override suspend fun createMatch(match: MatchDto): Response<MatchDto> =
+                Response.error(401, "auth".toResponseBody("text/plain".toMediaType()))
+            override suspend fun updateMatch(matchId: Int, match: MatchDto): Response<MatchDto> =
+                error("no server id yet")
+            override suspend fun finishMatch(matchId: Int, request: FinishMatchRequest): Response<MatchDto> =
+                error("finish must not be called without an id")
+            override suspend fun logMatchEvent(event: MatchEventDto): Response<MatchEventResponseDto> =
+                Response.success(MatchEventResponseDto(success = true))
+            override suspend fun sendMatchStatistics(statistics: MatchStatisticsRequestDto): Response<Unit> =
+                error("stats must wait for create")
+        }
+        val store = RoomLikeOutboxStore()
+        val coordinator = MatchSyncCoordinator(
+            apiClient = api,
+            matchHistorySaver = object : MatchHistorySaver {
+                override suspend fun saveMatch(state: MatchState): Long = 1
+            },
+            batteryInfoProvider = { MatchBatteryInfo(level = 50, isCharging = false) },
+            onSyncStatus = {},
+            onBracketWarning = { _, _ -> },
+            retryDelay = object : RetryDelay {
+                override suspend fun waitBeforeNextAttempt(attemptNumber: Int) = Unit
+            },
+            logger = object : MatchSyncLogger {
+                override fun api(endpoint: String, result: String) = Unit
+                override fun error(context: String, error: Throwable) = Unit
+                override fun error(context: String, message: String) = Unit
+            },
+            outboxFlusher = MatchOutboxFlusher(store, api),
+        )
+        val state = MatchState(
+            player1 = Player(id = 1, name = "Kowalski", firstName = "Jan", lastName = "Kowalski", flag = "PL"),
+            player2 = Player(id = 2, name = "Nowak", firstName = "Adam", lastName = "Nowak", flag = "DE"),
+            courtId = "1",
+            courtName = "Court 1",
+        ).apply {
+            matchId = null
+            isMatchFinished = true
+            player1Sets = 2
+            player2Sets = 0
+            matchStartTime = 1L
+        }
+
+        coordinator.finalizeMatch(state)
+
+        val types = store.saved.map { it.type to it.serverMatchId }
+        assertTrue("CREATE must be queued: $types", types.any { it.first == "CREATE" })
+        assertTrue("FINISH must wait with null id: $types", types.any { it.first == "FINISH" && it.second == null })
+        assertTrue("STATS must wait with null id: $types", types.any { it.first == "STATS" && it.second == null })
     }
 }
 

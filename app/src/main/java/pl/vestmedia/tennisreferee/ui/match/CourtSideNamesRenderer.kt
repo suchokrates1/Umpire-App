@@ -25,14 +25,14 @@ class CourtSideNamesRenderer(
 
     private fun renderDoublesNames(state: MatchState) {
         val leftTeamLabel = if (state.sidesSwapped) {
-            state.getTeam2ServerAwareDisplayName()
+            state.team2ServerAwareDisplayName()
         } else {
-            state.getTeam1ServerAwareDisplayName()
+            state.team1ServerAwareDisplayName()
         }
         val rightTeamLabel = if (state.sidesSwapped) {
-            state.getTeam1ServerAwareDisplayName()
+            state.team1ServerAwareDisplayName()
         } else {
-            state.getTeam2ServerAwareDisplayName()
+            state.team2ServerAwareDisplayName()
         }
 
         renderLeftRightNames(leftTeamLabel, rightTeamLabel)

@@ -5,15 +5,18 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.api.MatchApiPayloadFactory
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto
+import pl.vestmedia.tennisreferee.data.api.dto.DirectorDeviceSnapshotDto
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.database.RoomMatchOutboxStore
@@ -111,10 +114,18 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private var directorPollJob: Job? = null
     private var tutorialMode = false
 
+    @Volatile
+    private var latestDirectorSnapshot: DirectorDeviceSnapshotDto? = null
+
+    private fun refreshDirectorSnapshot(state: MatchState) {
+        latestDirectorSnapshot = MatchApiPayloadFactory.toDirectorSnapshot(state)
+    }
+
     /**
      * Inicjalizuje nowy mecz
      */
     fun initializeMatch(matchState: MatchState) {
+        refreshDirectorSnapshot(matchState)
         _matchState.value = matchState
         if (matchState.isMatchFinished) {
             _currentView.value = MatchView.MATCH_FINISHED
@@ -125,9 +136,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         val app = getApplication<TennisRefereeApp>()
         app.healthCheckManager.matchId = matchState.matchId
         app.healthCheckManager.clientMatchUuid = matchState.clientMatchUuid
-        app.healthCheckManager.snapshotProvider = {
-            _matchState.value?.let { MatchApiPayloadFactory.toDirectorSnapshot(it) }
-        }
+        app.healthCheckManager.snapshotProvider = { latestDirectorSnapshot }
         app.healthCheckManager.sendNow()
         startDirectorPolling()
     }
@@ -201,8 +210,12 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                 is MatchUndoResult.Restored -> {
                     _canUndo.value = result.canUndo
                     _undoMessage.value = getApplication<Application>().getString(R.string.undo_action_format, result.description)
+                    refreshDirectorSnapshot(state)
                     _matchState.value = state
                     _currentView.value = scoringViewFor(state)
+                    // The server and the stream showed the point that was just taken back.
+                    logMatchEvent("undo")
+                    syncMatchWithServer()
                 }
             }
         }
@@ -337,6 +350,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             handlePointResult(state, pointResult)
         }
         handlePointResult(state, result)
+        refreshDirectorSnapshot(state)
         _matchState.value = state
 
         if (result.transitionToRally) {
@@ -358,6 +372,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
 
         result.announcementType?.let { pendingAnnouncementType = it }
         if (result.showAnnouncementImmediately) {
+            refreshDirectorSnapshot(state)
             _matchState.value = state
             _currentView.value = MatchView.ANNOUNCEMENT
         }
@@ -397,6 +412,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             pendingAnnouncementType = result.announcementType
 
             if (result.publishState) {
+                refreshDirectorSnapshot(state)
                 _matchState.value = state
             }
 
@@ -432,34 +448,47 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    /** In-flight finalize so "next match" can wait for the same job instead of cancelling it. */
-    private var finalizeJob: Job? = null
-
     /**
-     * Where a finished match is sent from. Not viewModelScope: leaving the screen while the
-     * finish is in flight would cancel it, and the result would never reach the server.
+     * Where outgoing match sync runs. Not viewModelScope: leaving the screen while a point
+     * or finish is in flight must not cancel it, and one sequential queue keeps events and
+     * score updates in exact order without touching the mutable UI MatchState off-thread.
      */
-    private val finalizeScope = (application as? TennisRefereeApp)?.backgroundScope ?: viewModelScope
+    private val syncScope = (application as? TennisRefereeApp)?.backgroundScope ?: viewModelScope
+
+    private val matchSyncQueue = MatchSyncQueue(
+        scope = syncScope,
+        coordinator = matchSyncCoordinator,
+        onServerMatchIdResolved = { uuid, serverMatchId ->
+            viewModelScope.launch {
+                val current = _matchState.value
+                if (current != null && current.clientMatchUuid == uuid && current.matchId == null) {
+                    current.matchId = serverMatchId
+                    refreshDirectorSnapshot(current)
+                }
+                getApplication<TennisRefereeApp>().healthCheckManager.matchId = serverMatchId
+            }
+        },
+    )
+
+    private fun snapshotForSync(state: MatchState): MatchState =
+        state.detachedCopy(includeActionsHistory = false)
 
     /**
      * Sekwencyjne zakończenie meczu na serwerze.
      * Kolejność: sync → match_end event → finish → statistics → local save
      */
     private fun finalizeMatchOnServer(state: MatchState) {
-        finalizeJob = finalizeScope.launch(Dispatchers.IO) {
-            matchSyncCoordinator.finalizeMatch(state)
-        }
+        matchSyncQueue.enqueueFinalizeOnce(snapshotForSync(state))
     }
 
     fun finishMatchWithOutcome(request: FinishMatchRequest) {
         _matchState.value?.let { state ->
             MatchFinishOutcomeApplier.apply(state, request, System.currentTimeMillis())
+            refreshDirectorSnapshot(state)
             _matchState.value = state
             _currentView.value = MatchView.MATCH_FINISHED
             if (!tutorialMode) {
-                finalizeJob = finalizeScope.launch(Dispatchers.IO) {
-                    matchSyncCoordinator.finalizeMatch(state, request)
-                }
+                matchSyncQueue.enqueueFinalizeOnce(snapshotForSync(state), request)
             }
         }
     }
@@ -478,21 +507,10 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
             onDone()
             return
         }
-        val running = finalizeJob
-        if (running != null && running.isActive) {
-            viewModelScope.launch {
-                running.join()
-                onDone()
-            }
-            return
-        }
-        val finalize = finalizeScope.launch(Dispatchers.IO) {
-            matchSyncCoordinator.finalizeMatch(state)
-        }
-        finalizeJob = finalize
+        val done = matchSyncQueue.enqueueFinalizeOnce(snapshotForSync(state))
         // Only the wait belongs to the screen: if it closes, the match is still sent.
         viewModelScope.launch {
-            finalize.join()
+            done.await()
             onDone()
         }
     }
@@ -503,24 +521,18 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
     private fun logMatchEvent(eventType: String) {
         if (tutorialMode) return
         val state = _matchState.value ?: return
-        
+
         AppLogger.action("Match", eventType, "score=${state.player1Points}-${state.player2Points} games=${state.player1Games}-${state.player2Games} sets=${state.player1Sets}-${state.player2Sets}")
-        
-        viewModelScope.launch(Dispatchers.IO) {
-            matchSyncCoordinator.logMatchEvent(state, eventType)
-        }
+        matchSyncQueue.enqueueEvent(snapshotForSync(state), eventType)
     }
-    
+
     /**
      * Synchronizuje aktualny stan meczu z serwerem
      */
     fun syncMatchWithServer() {
         if (tutorialMode) return
         _matchState.value?.let { state ->
-            viewModelScope.launch(Dispatchers.IO) {
-                matchSyncCoordinator.syncMatch(state)
-                getApplication<TennisRefereeApp>().healthCheckManager.matchId = state.matchId
-            }
+            matchSyncQueue.enqueueSync(snapshotForSync(state))
         }
     }
     
@@ -530,6 +542,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         directorPollJob?.cancel()
+        // queued points and the finish still go out; the worker ends after them
+        matchSyncQueue.close()
         val app = getApplication<TennisRefereeApp>()
         app.healthCheckManager.snapshotProvider = null
         app.healthCheckManager.matchId = null
@@ -541,21 +555,31 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         if (tutorialMode || directorPollJob?.isActive == true) return
         directorPollJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
-                val state = _matchState.value ?: break
-                getApplication<TennisRefereeApp>().healthCheckManager.matchId = state.matchId
-                getApplication<TennisRefereeApp>().healthCheckManager.clientMatchUuid = state.clientMatchUuid
+                val pollTarget = withContext(Dispatchers.Main) {
+                    _matchState.value?.let { Triple(it.matchId, it.clientMatchUuid, it.courtId) }
+                } ?: break
+                val (matchId, clientMatchUuid, courtId) = pollTarget
+                getApplication<TennisRefereeApp>().healthCheckManager.matchId = matchId
+                getApplication<TennisRefereeApp>().healthCheckManager.clientMatchUuid = clientMatchUuid
                 try {
                     val response = getApplication<TennisRefereeApp>().container.apiService.pollDirectorCommands(
-                        matchId = state.matchId,
-                        clientMatchUuid = state.clientMatchUuid,
+                        matchId = matchId,
+                        clientMatchUuid = clientMatchUuid,
                         waitMs = 15_000,
-                        courtId = state.courtId
+                        courtId = courtId
                     )
                     if (response.isSuccessful) {
-                        response.body()?.commands.orEmpty().forEach { applyDirectorCommand(it) }
+                        val commands = response.body()?.commands.orEmpty()
+                        if (commands.isNotEmpty()) {
+                            withContext(Dispatchers.Main) {
+                                commands.forEach { applyDirectorCommandOnMain(it) }
+                            }
+                        }
                     } else {
                         delay(2_000)
                     }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (error: Exception) {
                     AppLogger.error("DirectorPoll", error)
                     delay(2_000)
@@ -564,7 +588,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    internal fun applyDirectorCommand(command: DirectorCommandDto) {
+    internal fun applyDirectorCommandOnMain(command: DirectorCommandDto) {
         val commandId = command.id?.trim().orEmpty()
         if (commandId.isNotEmpty()) {
             synchronized(appliedDirectorCommands) {
@@ -574,28 +598,41 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
         val current = _matchState.value ?: return
         if (!DirectorCommandApplier.appliesTo(current, command)) return
         val next = DirectorCommandApplier.apply(current, command)
-        command.courtToken?.takeIf { it.isNotBlank() }?.let { token ->
-            val courtId = command.courtId ?: next.courtId
-            getApplication<TennisRefereeApp>().container.sessionStore.save(
-                CourtSession(
-                    courtId = courtId,
-                    token = token,
-                    expiresAtMillis = parseSessionExpiry(command.courtTokenExpiresAt)
-                )
-            )
-            getApplication<TennisRefereeApp>().healthCheckManager.courtId = courtId
-        } ?: command.courtId?.trim()?.takeIf { it.isNotEmpty() }?.let { courtId ->
-            getApplication<TennisRefereeApp>().healthCheckManager.courtId = courtId
+        refreshDirectorSnapshot(next)
+        _matchState.value = next
+        if (command.score != null) {
+            // the corrected state has no undo history (see DirectorCommandApplier)
+            _canUndo.value = false
         }
-        _matchState.postValue(next)
-        getApplication<TennisRefereeApp>().healthCheckManager.matchId = next.matchId
-        getApplication<TennisRefereeApp>().healthCheckManager.clientMatchUuid = next.clientMatchUuid
+        val app = getApplication<TennisRefereeApp>()
+        app.healthCheckManager.matchId = next.matchId
+        app.healthCheckManager.clientMatchUuid = next.clientMatchUuid
+        val tokenToSave = command.courtToken?.takeIf { it.isNotBlank() }
+        val resolvedCourtId = command.courtId?.trim()?.takeIf { it.isNotEmpty() } ?: next.courtId
+        if (tokenToSave != null || !command.courtId.isNullOrBlank()) {
+            app.healthCheckManager.courtId = resolvedCourtId
+        }
         AppLogger.action("Match", "DirectorCommand", "id=$commandId court=${next.courtId}")
         viewModelScope.launch(Dispatchers.IO) {
+            if (tokenToSave != null) {
+                app.container.sessionStore.save(
+                    CourtSession(
+                        courtId = resolvedCourtId,
+                        token = tokenToSave,
+                        expiresAtMillis = parseSessionExpiry(command.courtTokenExpiresAt)
+                    )
+                )
+            }
+            // Drop stale UPDATEs first, then flush on this same coroutine so a FAILED_AUTH
+            // final score is not deleted while a parallel flush is already sending it, and
+            // so a flush cannot race ahead of the drop with an older director-corrected score.
             runCatching { outboxStore.dropPendingUpdates(next.clientMatchUuid) }
+            if (tokenToSave != null) {
+                runCatching { app.flushOutboxNow() }
+            }
             if (commandId.isNotEmpty()) {
                 runCatching {
-                    getApplication<TennisRefereeApp>().container.apiService.ackDirectorCommand(commandId)
+                    app.container.apiService.ackDirectorCommand(commandId)
                 }
             }
         }

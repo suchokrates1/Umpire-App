@@ -9,6 +9,11 @@
     <string name="select_tournament">Seleziona torneo</string>
     <string name="no_tournaments_available">Nessun torneo attivo disponibile</string>
     <string name="error_loading_tournaments">Errore nel caricamento dei tornei</string>
+    <string name="error_loading_courts">Errore nel caricamento dei campi</string>
+    <string name="error_loading_players">Errore nel caricamento dei giocatori</string>
+    <string name="error_adding_player">Errore nell’aggiunta del giocatore</string>
+    <string name="error_suggested_players_unavailable">I giocatori suggeriti non sono disponibili nell’elenco</string>
+    <string name="error_court_auth_expired">Sessione del campo scaduta. Autorizza di nuovo il campo.</string>
     <string name="select_court">Seleziona campo</string>
     <string name="refresh">Aggiorna</string>
     <string name="no_courts_available">Nessun campo disponibile</string>
@@ -18,6 +23,8 @@
     <string name="court_pin_title">Autorizzazione campo</string>
     <string name="court_pin_message">Inserisci il PIN per il campo: %1$s</string>
     <string name="pin_invalid">PIN non valido: %1$s</string>
+    <string name="pin_wrong">PIN non valido</string>
+    <string name="pin_throttled">Troppi tentativi PIN errati. Riprova tra %1$d min.</string>
     <string name="pin_digit_label">Cifra %1$d di %2$d del PIN</string>
     <string name="match_players_versus">%1$s contro %2$s</string>
     <string name="panic_transcript_line">%1$s: %2$s</string>
@@ -64,12 +71,14 @@
     <string name="forced_error">ERRORE\nFORZATO</string>
     <string name="unforced_error">ERRORE\nNON FORZATO</string>
     <string name="winner_label">Vincitore: %1$s</string>
+    <string name="winner_label_female">Vincitrice: %1$s</string>
     <string name="finish_match">Termina partita</string>
     <string name="finish_reason_prompt">Perché stai terminando questa partita?</string>
     <string name="finish_reason_normal">Fine normale</string>
     <string name="finish_reason_test">Voce di test</string>
     <string name="finish_reason_retirement">Ritiro</string>
     <string name="finish_reason_walkover">Walkover</string>
+    <string name="resume_format_kept">Questa partita è già iniziata, quindi resta il formato precedente.</string>
     <string name="finish_retirement_prompt">Quale giocatore si ritira per infortunio?</string>
     <string name="finish_walkover_prompt">Quale giocatore vince per walkover?</string>
     <string name="next_match_same_setup">▶ Prossima partita (stessa configurazione)</string>

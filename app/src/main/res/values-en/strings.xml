@@ -9,6 +9,11 @@
     <string name="select_tournament">Select Tournament</string>
     <string name="no_tournaments_available">No active tournaments available</string>
     <string name="error_loading_tournaments">Error loading tournaments</string>
+    <string name="error_loading_courts">Error loading courts</string>
+    <string name="error_loading_players">Error loading players</string>
+    <string name="error_adding_player">Error adding player</string>
+    <string name="error_suggested_players_unavailable">Suggested players are not available in the player list</string>
+    <string name="error_court_auth_expired">Court session expired. Please authorize the court again.</string>
     <string name="select_court">Select Court</string>
     <string name="refresh">Refresh</string>
     <string name="no_courts_available">No courts available</string>
@@ -18,6 +23,8 @@
     <string name="court_pin_title">Court Authorization</string>
     <string name="court_pin_message">Enter PIN for court: %1$s</string>
     <string name="pin_invalid">Invalid PIN: %1$s</string>
+    <string name="pin_wrong">Invalid PIN</string>
+    <string name="pin_throttled">Too many wrong PIN attempts. Try again in %1$d min.</string>
     <string name="pin_digit_label">PIN digit %1$d of %2$d</string>
     <string name="match_players_versus">%1$s vs %2$s</string>
     <string name="panic_transcript_line">%1$s: %2$s</string>
@@ -64,12 +71,14 @@
     <string name="forced_error">FORCED ERROR</string>
     <string name="unforced_error">UNFORCED ERROR</string>
     <string name="winner_label">Winner: %1$s</string>
+    <string name="winner_label_female">Winner: %1$s</string>
     <string name="finish_match">Finish Match</string>
     <string name="finish_reason_prompt">Why are you ending this match?</string>
     <string name="finish_reason_normal">Normal finish</string>
     <string name="finish_reason_test">Test entry</string>
     <string name="finish_reason_retirement">Retirement</string>
     <string name="finish_reason_walkover">Walkover</string>
+    <string name="resume_format_kept">This match has already started, so the earlier format stays.</string>
     <string name="finish_retirement_prompt">Which player retired injured?</string>
     <string name="finish_walkover_prompt">Which player wins by walkover?</string>
     <string name="next_match_same_setup">▶ Next Match (same setup)</string>

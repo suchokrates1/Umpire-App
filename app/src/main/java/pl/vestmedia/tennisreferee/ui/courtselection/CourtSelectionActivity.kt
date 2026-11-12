@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,18 +15,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.model.Court
-import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.databinding.ActivityCourtSelectionBinding
 import pl.vestmedia.tennisreferee.ui.language.LanguageSelectionActivity
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 import pl.vestmedia.tennisreferee.ui.settings.SettingsActivity
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialScreenHost
 import pl.vestmedia.tennisreferee.utils.AppLogger
-import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Activity do wyboru kortu
@@ -47,6 +43,11 @@ class CourtSelectionActivity : AppCompatActivity() {
     private lateinit var adapter: CourtAdapter
     private val repository by lazy { (application as TennisRefereeApp).container.repository() }
     private val pinDialogController by lazy { CourtPinDialogController(this, repository) }
+    private val tutorialHost by lazy {
+        TutorialScreenHost.CourtSelectionSession(this) { court, onShown, onDismissed ->
+            pinDialogController.show(court, onDialogShown = onShown, onDialogDismissed = onDismissed)
+        }
+    }
     private var selectedTournamentId: Int? = null
     private var selectedTournamentName: String? = null
 
@@ -65,8 +66,7 @@ class CourtSelectionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         PanicPrompt.install(this)
         
-        val tutorial = intent.getBooleanExtra(TutorialNavigator.EXTRA_TUTORIAL, false)
-            || TutorialSession.isActive
+        val tutorial = TutorialScreenHost.isActive(this)
 
         // Sprawdź czy język został wybrany, jeśli nie - wróć do wyboru języka
         if (!tutorial && !LanguageSelectionActivity.hasLanguageSelected(this)) {
@@ -103,9 +103,7 @@ class CourtSelectionActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         onBackPressedDispatcher.addCallback(this) {
-            if (tutorial) {
-                TutorialNavigator.goBackScene(this@CourtSelectionActivity)
-            } else {
+            if (!tutorialHost.onBack()) {
                 openTournamentSelection()
             }
         }
@@ -116,41 +114,14 @@ class CourtSelectionActivity : AppCompatActivity() {
         
         if (tutorial) {
             supportActionBar?.subtitle = getString(R.string.tutorial_demo_tournament)
-            adapter.submitList(TutorialCatalog.courts())
+            adapter.submitList(tutorialHost.courts())
             binding.emptyView.visibility = View.GONE
             binding.recyclerViewCourts.visibility = View.VISIBLE
-            attachTutorialOverlay()
-            val step = TutorialSession.currentStep(this)
-            if (step?.scene == "pin") {
-                showTutorialPin(TutorialCatalog.courts().first())
-            }
+            tutorialHost.attachAndMaybeOpenPin()
         } else {
             viewModel.loadCourts(selectedTournamentId)
             TutorialNavigator.maybeShowBanner(this)
         }
-    }
-
-    private var tutorialOverlay: TutorialOverlayController? = null
-
-    private fun attachTutorialOverlay() {
-        tutorialOverlay = TutorialOverlayController(
-            activity = this,
-            onBack = { TutorialNavigator.goBackScene(this) },
-            onNext = {
-                TutorialSession.goNext(this)
-                val step = TutorialSession.currentStep(this)
-                if (step?.scene == "pin") {
-                    tutorialOverlay?.refresh()
-                    showTutorialPin(TutorialCatalog.courts().first())
-                } else if (TutorialNavigator.applyStep(this)) {
-                    finish()
-                } else {
-                    tutorialOverlay?.refresh()
-                }
-            },
-            onSkip = { TutorialNavigator.exit(this) },
-        )
-        tutorialOverlay?.attach()
     }
 
     private fun openTournamentSelection() {
@@ -208,32 +179,8 @@ class CourtSelectionActivity : AppCompatActivity() {
     
     private fun onCourtSelected(court: Court) {
         AppLogger.button("CourtSelection", "CourtTap", "court=${court.id} name=${court.name}")
-        if (TutorialSession.isActive) {
-            if (court.id != TutorialCatalog.COURT_1) return
-            TutorialSession.noteAction("selectCourt", this)
-            if (TutorialSession.canAdvance(this)) {
-                TutorialSession.goNext(this)
-            }
-            tutorialOverlay?.refresh()
-            showTutorialPin(court)
-            return
-        }
+        if (tutorialHost.onCourtTapped(court)) return
         pinDialogController.show(court)
-    }
-
-    private fun showTutorialPin(court: Court) {
-        pinDialogController.show(
-            court,
-            onDialogShown = { dialog ->
-                val host = dialog.findViewById<ViewGroup>(R.id.tutorialPinGuide)
-                    ?: dialog.window?.decorView as? ViewGroup
-                    ?: return@show
-                tutorialOverlay?.reparent(host)
-            },
-            onDialogDismissed = {
-                tutorialOverlay?.reparent(window.decorView as ViewGroup)
-            },
-        )
     }
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -244,9 +191,7 @@ class CourtSelectionActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                if (TutorialSession.isActive) {
-                    TutorialNavigator.goBackScene(this)
-                } else {
+                if (!tutorialHost.onBack()) {
                     openTournamentSelection()
                 }
                 true

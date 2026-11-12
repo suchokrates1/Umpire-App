@@ -2,6 +2,8 @@ package pl.vestmedia.tennisreferee.domain.match
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import pl.vestmedia.tennisreferee.data.api.dto.DirectorCommandDto
@@ -9,6 +11,7 @@ import pl.vestmedia.tennisreferee.data.api.dto.DirectorScoreDto
 import pl.vestmedia.tennisreferee.data.api.dto.MatchConfigDto
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.domain.match.model.SetScore
 
 class DirectorCommandApplierTest {
     private val playerOne = Player(id = 1, name = "Emil Stopierzyński", firstName = "Emil", lastName = "Stopierzyński", flag = "PL")
@@ -51,6 +54,57 @@ class DirectorCommandApplierTest {
         assertEquals(4, next.player2Games)
         assertTrue(next.matchConfig.noAdvantage)
         assertTrue(next.noAdvantage)
+    }
+
+    @Test
+    fun aCorrectedScoreRecountsTheGamesOfTheSetAndLeavesTheShownStateAlone() {
+        val state = MatchState(
+            matchId = 671,
+            clientMatchUuid = "uuid-count",
+            player1 = playerOne,
+            player2 = playerTwo,
+            courtId = "t31-2",
+            courtName = "Kort 2"
+        ).apply {
+            player1Games = 1
+            player2Games = 1
+            totalGamesPlayed = 2
+            setsHistory.add(SetScore(setNumber = 1, player1Games = 4, player2Games = 2))
+        }
+
+        val next = DirectorCommandApplier.apply(
+            state,
+            DirectorCommandDto(
+                matchId = 671,
+                score = DirectorScoreDto(player1Games = 2, player2Games = 1, setsHistory = emptyList())
+            )
+        )
+
+        // three games played: the next game is the fourth, so no change of ends is due after it
+        assertEquals(3, next.totalGamesPlayed)
+        assertTrue(next.setsHistory.isEmpty())
+        assertTrue(next.actionsHistory.isEmpty())
+        assertNotSame(state.actionsHistory, next.actionsHistory)
+        // the state still on screen keeps its own history
+        assertEquals(1, state.setsHistory.size)
+        assertEquals(2, state.totalGamesPlayed)
+    }
+
+    @Test
+    fun aCommandWithoutAScoreKeepsTheGameCountAndTheUndoHistory() {
+        val state = MatchState(
+            matchId = 671,
+            clientMatchUuid = "uuid-move",
+            player1 = playerOne,
+            player2 = playerTwo,
+            courtId = "t31-2",
+            courtName = "Kort 2"
+        ).apply { totalGamesPlayed = 3 }
+
+        val next = DirectorCommandApplier.apply(state, DirectorCommandDto(matchId = 671, courtId = "t31-8"))
+
+        assertEquals(3, next.totalGamesPlayed)
+        assertSame(state.actionsHistory, next.actionsHistory)
     }
 
     @Test

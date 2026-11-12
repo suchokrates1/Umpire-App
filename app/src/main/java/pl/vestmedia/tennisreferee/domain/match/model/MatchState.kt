@@ -1,9 +1,6 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
 import kotlinx.serialization.Serializable
-
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import pl.vestmedia.tennisreferee.data.model.Player
 import java.util.UUID
 
@@ -11,7 +8,6 @@ import java.util.UUID
  * Model stanu meczu podczas rozgrywki
  */
 @Serializable
-@Parcelize
 data class MatchState(
     // Identyfikator meczu na serwerze
     var matchId: Int? = null,
@@ -74,7 +70,7 @@ data class MatchState(
     val player2Stats: MatchStatistics = MatchStatistics(),
     
     // Tryb statystyk (BASIC = uproszczony, ADVANCED = pełny)
-    var statsMode: StatsMode = StatsMode.ADVANCED,
+    var statsMode: StatsMode = matchConfig.statsMode,
     
     // Historia akcji (do cofania)
     val actionsHistory: MutableList<MatchAction> = mutableListOf(),
@@ -84,7 +80,7 @@ data class MatchState(
     var finishWinnerName: String? = null,
     var injuredPlayerName: String? = null,
     var resultNote: String? = null
-) : Parcelable {
+) {
     
     /**
      * Zwraca nazwę zespołu 1 (dla debla) lub imię gracza 1
@@ -151,34 +147,6 @@ data class MatchState(
         }
     }
 
-    fun getTeam1ServerAwareDisplayName(): String {
-        return formatTeamDisplay(player1, player3, currentServer == 1, currentServer == 3)
-    }
-
-    fun getTeam2ServerAwareDisplayName(): String {
-        return formatTeamDisplay(player2, player4, currentServer == 2, currentServer == 4)
-    }
-
-    private fun formatTeamDisplay(
-        primaryPlayer: Player,
-        partnerPlayer: Player?,
-        isPrimaryServer: Boolean,
-        isPartnerServer: Boolean
-    ): String {
-        if (partnerPlayer == null) {
-            return markServer(primaryPlayer.getDisplayName(), isPrimaryServer)
-        }
-
-        return listOf(
-            markServer(primaryPlayer.getDisplayName(), isPrimaryServer),
-            markServer(partnerPlayer.getDisplayName(), isPartnerServer)
-        ).joinToString(" / ")
-    }
-
-    private fun markServer(name: String, isServer: Boolean): String {
-        return if (isServer) "🎾 $name" else name
-    }
-
     /**
      * Zwraca punkty w formacie tenisowym (0, 15, 30, 40, ADV)
      */
@@ -196,7 +164,7 @@ data class MatchState(
         }
         
         // No-Advantage mode: at deuce, show "40-40" (immediate deciding point)
-        if (noAdvantage) {
+        if (isNoAdvantage()) {
             return when(points) {
                 0 -> "0"
                 1 -> "15"
@@ -238,7 +206,7 @@ data class MatchState(
             val stbPts = matchConfig.superTiebreakPoints
             return (player1Points >= stbPts || player2Points >= stbPts) && 
                    kotlin.math.abs(player1Points - player2Points) >= 2
-        } else if (noAdvantage) {
+        } else if (isNoAdvantage()) {
             // No-Advantage: at deuce (3-3), next point wins — first to 4 wins
             return player1Points >= 4 || player2Points >= 4
         } else {
@@ -300,12 +268,24 @@ data class MatchState(
         return player1Games == tbTrigger && player2Games == tbTrigger && !isTiebreak && !isSuperTiebreak
     }
     
+    fun isNoAdvantage(): Boolean = noAdvantage || matchConfig.noAdvantage
+
     /**
      * Sprawdza czy mecz powinien się zakończyć
      */
     fun shouldEndMatch(): Boolean {
         return player1Sets == matchConfig.setsToWin || player2Sets == matchConfig.setsToWin
     }
-    
+
+    /**
+     * A snapshot with its own lists and statistics, safe to read and serialize off the UI
+     * thread while the live match continues to take points on the main thread.
+     */
+    fun detachedCopy(includeActionsHistory: Boolean = true): MatchState = copy(
+        setsHistory = setsHistory.toMutableList(),
+        player1Stats = player1Stats.copy(),
+        player2Stats = player2Stats.copy(),
+        actionsHistory = if (includeActionsHistory) actionsHistory.toMutableList() else mutableListOf(),
+    )
 }
 

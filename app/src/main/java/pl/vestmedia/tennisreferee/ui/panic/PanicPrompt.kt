@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import java.io.IOException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -85,7 +86,9 @@ object PanicPrompt {
                         if (response.isSuccessful) {
                             render(activity, binding, response.body()?.messages.orEmpty())
                         }
-                    } catch (_: IOException) {
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (_: Exception) {
                         showOffline(binding, true)
                     }
                 }
@@ -144,9 +147,14 @@ object PanicPrompt {
                             binding.textWaiting.setText(R.string.panic_failed)
                         }
                     }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (_: IOException) {
                     showOffline(binding, true)
                     binding.waitingRow.visibility = View.GONE
+                } catch (_: Exception) {
+                    binding.progress.visibility = View.GONE
+                    binding.textWaiting.setText(R.string.panic_failed)
                 } finally {
                     binding.buttonSend.isEnabled = true
                 }

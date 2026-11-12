@@ -32,11 +32,12 @@ class MatchFinishOutcomeApplierTest {
         assertTrue(state.isMatchFinished)
         assertEquals(MatchFinishReason.WALKOVER, state.finishReason)
         assertEquals("Adam Nowak", state.finishWinnerName)
+        // a walkover has no score: nothing was played
         assertEquals(0, state.player1Sets)
-        assertEquals(2, state.player2Sets)
-        assertEquals(2, state.setsHistory.size)
-        assertEquals(0, state.setsHistory[0].player1Games)
-        assertEquals(4, state.setsHistory[0].player2Games)
+        assertEquals(0, state.player2Sets)
+        assertEquals(0, state.player1Games)
+        assertEquals(0, state.player2Games)
+        assertTrue(state.setsHistory.isEmpty())
         assertEquals(10_000L, state.matchDuration)
     }
 

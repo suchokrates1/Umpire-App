@@ -3,16 +3,22 @@ package pl.vestmedia.tennisreferee.data.repository
 import kotlinx.coroutines.delay
 import pl.vestmedia.tennisreferee.data.api.TennisApiService
 import pl.vestmedia.tennisreferee.data.api.dto.CourtPinRequestDto
+import pl.vestmedia.tennisreferee.data.api.dto.apiJson
 import pl.vestmedia.tennisreferee.data.api.dto.toDto
 import pl.vestmedia.tennisreferee.data.api.dto.toModel
 import pl.vestmedia.tennisreferee.data.auth.CourtSession
 import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.model.Court
+import pl.vestmedia.tennisreferee.data.model.CourtPinFailure
+import pl.vestmedia.tennisreferee.data.model.CourtSessionExpiredException
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.data.model.TournamentOption
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -70,51 +76,54 @@ class TennisRepository(
      * Weryfikuje PIN dla kortu
      */
     suspend fun verifyCourtPin(courtId: String, pin: String): Result<CourtAuthResponse> {
-        return request { apiService.verifyCourtPin(courtId, CourtPinRequestDto(pin)) }
-            .map { it.toModel() }
-            .fold(
-                onSuccess = { authResponse ->
-                    when {
-                        !authResponse.authorized -> {
-                            Result.failure(Exception(authResponse.error ?: "Authorization failed"))
-                        }
-                        authResponse.courtId != null && authResponse.courtId != courtId -> {
-                            Result.failure(Exception("Authorization response was issued for another court"))
-                        }
-                        authResponse.token.isNullOrBlank() && authResponse.expiresAt == null -> {
-                            // Old servers do not issue a token. Keep the fallback PIN encrypted and
-                            // use it only for the legacy player-creation request.
-                            sessionStore.save(CourtSession(courtId = courtId, legacyPin = pin))
-                            Result.success(authResponse)
-                        }
-                        authResponse.token.isNullOrBlank() || authResponse.expiresAt.isNullOrBlank() -> {
-                            Result.failure(Exception("Authorization response is missing a complete court session"))
-                        }
-                        else -> {
-                            val expiresAtMillis = parseSessionExpiry(authResponse.expiresAt)
-                            if (expiresAtMillis == null || expiresAtMillis <= System.currentTimeMillis()) {
-                                Result.failure(Exception("Authorization response contains an invalid or expired session"))
-                            } else {
-                                sessionStore.save(
-                                    CourtSession(
-                                        courtId = courtId,
-                                        token = authResponse.token,
-                                        expiresAtMillis = expiresAtMillis
-                                    )
-                                )
-                                Result.success(authResponse)
-                            }
-                        }
-                    }
-                },
-                onFailure = { Result.failure(it) }
-            )
+        val response = try {
+            apiService.verifyCourtPin(courtId, CourtPinRequestDto(pin))
+        } catch (e: Exception) {
+            return Result.failure(CourtPinFailure.Other(e.message ?: "Network request failed"))
+        }
+
+        if (!response.isSuccessful) {
+            return Result.failure(response.toCourtPinFailure())
+        }
+
+        val authResponse = response.body()?.toModel()
+            ?: return Result.failure(CourtPinFailure.Other("Empty response body"))
+
+        return when {
+            !authResponse.authorized -> {
+                if (authResponse.error == "invalid-pin" || authResponse.error.isNullOrBlank()) {
+                    Result.failure(CourtPinFailure.InvalidPin())
+                } else {
+                    Result.failure(CourtPinFailure.Other(authResponse.error))
+                }
+            }
+            authResponse.courtId != null && authResponse.courtId != courtId -> {
+                Result.failure(CourtPinFailure.Other("Authorization response was issued for another court"))
+            }
+            authResponse.token.isNullOrBlank() || authResponse.expiresAt.isNullOrBlank() -> {
+                Result.failure(CourtPinFailure.Other("Authorization response is missing a complete court session"))
+            }
+            else -> {
+                val expiresAtMillis = parseSessionExpiry(authResponse.expiresAt)
+                if (expiresAtMillis == null || expiresAtMillis <= System.currentTimeMillis()) {
+                    Result.failure(CourtPinFailure.Other("Authorization response contains an invalid or expired session"))
+                } else {
+                    sessionStore.save(
+                        CourtSession(
+                            courtId = courtId,
+                            token = authResponse.token,
+                            expiresAtMillis = expiresAtMillis
+                        )
+                    )
+                    Result.success(authResponse)
+                }
+            }
+        }
     }
     
     /**
-     * Dodaje nowego zawodnika
-     * Modern API authorization is provided by [BearerAuthInterceptor]. An encrypted PIN is
-     * included only for a server that did not issue a token during court authorization.
+     * Dodaje nowego zawodnika. Autoryzacja sesji kortu idzie nagłówkiem Bearer
+     * ([BearerAuthInterceptor]), a `kort_id` wskazuje serwerowi turniej powiązany z kortem.
      */
     suspend fun addPlayer(
         firstName: String,
@@ -124,23 +133,18 @@ class TennisRepository(
         courtId: String
     ): Result<Player> {
         return try {
-            val playerRequest = mutableMapOf(
+            val playerRequest = mapOf(
+                "kort_id" to courtId,
                 "first_name" to firstName,
                 "last_name" to lastName,
-                "name" to "$firstName $lastName".trim(),  // backward compat
+                "name" to "$firstName $lastName".trim(),
                 "flag_code" to flagCode.uppercase(),
-                "group_category" to category  // v1 używa "group_category"
+                "group_category" to category
             )
-            
-            val legacyPin = sessionStore.current()
-                ?.takeIf { it.courtId == courtId && !it.hasValidToken() }
-                ?.legacyPin
-            if (!legacyPin.isNullOrBlank()) {
-                playerRequest["kort_id"] = courtId
-                playerRequest["pin"] = legacyPin
-            }
-            
-            request { apiService.addPlayer(playerRequest) }
+
+            // One attempt only: a 5xx may arrive after the server already saved the player,
+            // and repeating the POST would add the same person twice.
+            request(maxAttempts = 1) { apiService.addPlayer(playerRequest) }
                 .map { it.toModel() }
                 .fold(
                 onSuccess = { addPlayerResponse ->
@@ -167,7 +171,7 @@ class TennisRepository(
                 if (response.isSuccessful || !response.shouldRetry()) {
                     return response.toResult()
                 }
-                lastFailure = Exception(response.toErrorMessage())
+                lastFailure = response.toFailureException()
             } catch (e: Exception) {
                 lastFailure = e
             }
@@ -189,8 +193,15 @@ class TennisRepository(
                 Result.failure(Exception("Empty response body"))
             }
         } else {
-            Result.failure(Exception(toErrorMessage()))
+            Result.failure(toFailureException())
         }
+    }
+
+    private fun Response<*>.toFailureException(): Exception {
+        if (code() == 401) {
+            return CourtSessionExpiredException()
+        }
+        return Exception(toErrorMessage())
     }
 
     private fun Response<*>.shouldRetry(): Boolean {
@@ -201,7 +212,34 @@ class TennisRepository(
         if (code() == 401) {
             return "Authorization failed or the court session expired. Please authorize the court again."
         }
-        return "Error: ${code()} - ${message()}"
+        val bodyError = extractErrorField()
+        if (!bodyError.isNullOrBlank()) {
+            return bodyError
+        }
+        val statusText = message().trim()
+        return if (statusText.isNotEmpty()) "Error: ${code()} - $statusText" else "HTTP ${code()}"
+    }
+
+    private fun Response<*>.toCourtPinFailure(): CourtPinFailure {
+        if (code() == 429) {
+            val seconds = headers()["Retry-After"]?.trim()?.toLongOrNull() ?: 900L
+            val minutes = ((seconds + 59L) / 60L).coerceAtLeast(1L).toInt()
+            return CourtPinFailure.Throttled(minutes)
+        }
+        val bodyError = extractErrorField()
+        if (code() == 403 || bodyError == "invalid-pin") {
+            return CourtPinFailure.InvalidPin()
+        }
+        return CourtPinFailure.Other(bodyError ?: "HTTP ${code()}")
+    }
+
+    private fun Response<*>.extractErrorField(): String? {
+        val raw = runCatching { errorBody()?.string() }.getOrNull()?.trim().orEmpty()
+        if (raw.isEmpty()) return null
+        return runCatching {
+            val obj = apiJson.decodeFromString<JsonObject>(raw)
+            obj["error"]?.jsonPrimitive?.contentOrNull?.trim()?.takeIf { it.isNotEmpty() }
+        }.getOrNull()
     }
 
     private fun cacheKey(courtId: String?): String = courtId ?: "__all__"

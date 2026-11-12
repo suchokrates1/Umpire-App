@@ -125,9 +125,20 @@ class MatchApiPayloadFactoryTest {
     }
 
     @Test
-    fun skipsStatisticsPayloadBeforeMatchIsFinishedOrSynced() {
+    fun skipsStatisticsPayloadBeforeMatchIsFinished() {
         assertNull(MatchApiPayloadFactory.toStatisticsRequest(singlesState().apply { matchId = 12 }))
-        assertNull(MatchApiPayloadFactory.toStatisticsRequest(singlesState().apply { isMatchFinished = true }))
+    }
+
+    @Test
+    fun finishedMatchWithoutServerIdStillBuildsStatisticsForTheOutbox() {
+        val payload = MatchApiPayloadFactory.toStatisticsRequest(
+            singlesState().apply {
+                isMatchFinished = true
+                player1Sets = 2
+            }
+        )
+        assertEquals(0, payload?.matchId)
+        assertEquals("Jan Kowalski", payload?.winner)
     }
 
     @Test

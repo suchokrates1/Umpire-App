@@ -3,7 +3,6 @@ package pl.vestmedia.tennisreferee.ui.playerselection
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -24,13 +23,11 @@ import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.databinding.ActivityPlayerSelectionBinding
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.ui.match.ActiveMatchStore
-import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
-import pl.vestmedia.tennisreferee.utils.AppLogger
 import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
+import pl.vestmedia.tennisreferee.ui.tournamentselection.TournamentSelectionStore
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialScreenHost
+import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * Activity do wyboru zawodników (singiel lub debel)
@@ -46,11 +43,10 @@ class PlayerSelectionActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_COURT_ID = "court_id"
         const val EXTRA_COURT_NAME = "court_name"
-        const val EXTRA_MATCH_CONFIG = "match_config"
 
         fun createTutorialIntent(context: Context): Intent {
             return Intent(context, PlayerSelectionActivity::class.java).apply {
-                putExtra(EXTRA_COURT_ID, TutorialCatalog.COURT_1)
+                putExtra(EXTRA_COURT_ID, TutorialScreenHost.COURT_1_ID)
                 putExtra(EXTRA_COURT_NAME, "1")
                 putExtra(TutorialNavigator.EXTRA_TUTORIAL, true)
             }
@@ -63,6 +59,9 @@ class PlayerSelectionActivity : AppCompatActivity() {
     private var selectedScheduleId: Int? = null
     private var savedMatchConfig: MatchConfig? = null
     private lateinit var activeMatchStore: ActiveMatchStore
+    private val tutorialHost by lazy {
+        TutorialScreenHost.PlayerSelectionSession(this) { proceedToNextScreen() }
+    }
 
     private lateinit var suggestedMatchController: SuggestedMatchController
     private lateinit var addPlayerDialogController: AddPlayerDialogController
@@ -90,14 +89,6 @@ class PlayerSelectionActivity : AppCompatActivity() {
         courtName = intent.getStringExtra(EXTRA_COURT_NAME) ?: ""
         selectedTournamentId = TournamentSelectionStore.getSelectedTournamentIdForToday(this)
         
-        // Sprawdź czy przekazano konfigurację z poprzedniego meczu
-        savedMatchConfig = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_MATCH_CONFIG, MatchConfig::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_MATCH_CONFIG)
-        }
-        
         if (courtId.isEmpty()) {
             Toast.makeText(this, getString(R.string.error_no_court_data), Toast.LENGTH_LONG).show()
             finish()
@@ -110,39 +101,13 @@ class PlayerSelectionActivity : AppCompatActivity() {
         setupObservers()
         setupListeners()
         
-        val tutorial = intent.getBooleanExtra(TutorialNavigator.EXTRA_TUTORIAL, false)
-            || TutorialSession.isActive
-        if (tutorial) {
-            viewModel.setTutorialPlayers(TutorialCatalog.players(this))
-            attachTutorialOverlay()
+        if (TutorialScreenHost.isActive(this)) {
+            viewModel.setDemoPlayers(courtId, tutorialHost.players())
+            tutorialHost.attach()
         } else {
             viewModel.loadPlayers(courtId)
             viewModel.loadSuggestedMatch(courtId, selectedTournamentId)
         }
-    }
-
-    private var tutorialOverlay: TutorialOverlayController? = null
-
-    private fun attachTutorialOverlay() {
-        tutorialOverlay = TutorialOverlayController(
-            activity = this,
-            onBack = { TutorialNavigator.goBackScene(this) },
-            onNext = {
-                val step = TutorialSession.currentStep(this)
-                if (step?.scene == "players" || step?.scene == "config") {
-                    proceedToNextScreen()
-                    return@TutorialOverlayController
-                }
-                TutorialSession.goNext(this)
-                if (TutorialNavigator.applyStep(this)) {
-                    finish()
-                } else {
-                    tutorialOverlay?.refresh()
-                }
-            },
-            onSkip = { TutorialNavigator.exit(this) },
-        )
-        tutorialOverlay?.attach()
     }
 
     private fun setupControllers() {
@@ -246,14 +211,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
             // Auto-przejście gdy wybrano wymaganą ilość graczy
             val requiredCount = if (viewModel.isDoubles.value == true) 4 else 2
             if (selectedPlayers.size == requiredCount) {
-                if (TutorialSession.isActive) {
-                    TutorialSession.noteAction("selectPlayers", this)
-                    if (TutorialSession.canAdvance(this)) {
-                        TutorialSession.goNext(this)
-                    }
-                    proceedToNextScreen()
-                    tutorialOverlay?.refresh()
-                } else {
+                if (!tutorialHost.onRequiredPlayersSelected()) {
                     binding.buttonNext.postDelayed({
                         proceedToNextScreen()
                     }, 300)
@@ -351,9 +309,7 @@ class PlayerSelectionActivity : AppCompatActivity() {
         
         binding.buttonBack.setOnClickListener {
             AppLogger.button("PlayerSelection", "Back")
-            if (TutorialSession.isActive) {
-                TutorialNavigator.goBackScene(this)
-            } else {
+            if (!tutorialHost.onBack()) {
                 finish()
             }
         }
