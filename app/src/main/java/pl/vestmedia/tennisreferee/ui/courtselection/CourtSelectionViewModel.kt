@@ -6,9 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
+import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * ViewModel dla ekranu wyboru kortu
@@ -39,7 +41,8 @@ class CourtSelectionViewModel(application: Application) : AndroidViewModel(appli
                 _courts.value = courtsList
                 _isLoading.value = false
             }.onFailure { exception ->
-                _error.value = exception.message ?: "Unknown error"
+                AppLogger.error("CourtSelection", exception)
+                _error.value = getApplication<Application>().getString(R.string.error_loading_courts)
                 _isLoading.value = false
             }
         }

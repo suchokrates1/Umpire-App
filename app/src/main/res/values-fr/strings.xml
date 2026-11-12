@@ -9,6 +9,11 @@
     <string name="select_tournament">Sélectionner le tournoi</string>
     <string name="no_tournaments_available">Aucun tournoi actif disponible</string>
     <string name="error_loading_tournaments">Erreur de chargement des tournois</string>
+    <string name="error_loading_courts">Erreur de chargement des courts</string>
+    <string name="error_loading_players">Erreur de chargement des joueurs</string>
+    <string name="error_adding_player">Erreur lors de l’ajout du joueur</string>
+    <string name="error_suggested_players_unavailable">Les joueurs suggérés ne figurent pas dans la liste</string>
+    <string name="error_court_auth_expired">La session du court a expiré. Veuillez réautoriser le court.</string>
     <string name="select_court">Sélectionner le court</string>
     <string name="refresh">Actualiser</string>
     <string name="no_courts_available">Aucun court disponible</string>

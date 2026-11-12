@@ -11,6 +11,7 @@ import pl.vestmedia.tennisreferee.data.auth.CourtSessionStore
 import pl.vestmedia.tennisreferee.data.auth.parseSessionExpiry
 import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.model.CourtPinFailure
+import pl.vestmedia.tennisreferee.data.model.CourtSessionExpiredException
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.CourtAuthResponse
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
@@ -99,12 +100,6 @@ class TennisRepository(
             authResponse.courtId != null && authResponse.courtId != courtId -> {
                 Result.failure(CourtPinFailure.Other("Authorization response was issued for another court"))
             }
-            authResponse.token.isNullOrBlank() && authResponse.expiresAt == null -> {
-                // Old servers do not issue a token. Keep the fallback PIN encrypted and
-                // use it only for the legacy player-creation request.
-                sessionStore.save(CourtSession(courtId = courtId, legacyPin = pin))
-                Result.success(authResponse)
-            }
             authResponse.token.isNullOrBlank() || authResponse.expiresAt.isNullOrBlank() -> {
                 Result.failure(CourtPinFailure.Other("Authorization response is missing a complete court session"))
             }
@@ -127,9 +122,8 @@ class TennisRepository(
     }
     
     /**
-     * Dodaje nowego zawodnika
-     * Modern API authorization is provided by [BearerAuthInterceptor]. An encrypted PIN is
-     * included only for a server that did not issue a token during court authorization.
+     * Dodaje nowego zawodnika. Autoryzacja sesji kortu idzie nagłówkiem Bearer
+     * ([BearerAuthInterceptor]), a `kort_id` wskazuje serwerowi turniej powiązany z kortem.
      */
     suspend fun addPlayer(
         firstName: String,
@@ -139,22 +133,15 @@ class TennisRepository(
         courtId: String
     ): Result<Player> {
         return try {
-            val playerRequest = mutableMapOf(
+            val playerRequest = mapOf(
+                "kort_id" to courtId,
                 "first_name" to firstName,
                 "last_name" to lastName,
-                "name" to "$firstName $lastName".trim(),  // backward compat
+                "name" to "$firstName $lastName".trim(),
                 "flag_code" to flagCode.uppercase(),
-                "group_category" to category  // v1 używa "group_category"
+                "group_category" to category
             )
-            
-            val legacyPin = sessionStore.current()
-                ?.takeIf { it.courtId == courtId && !it.hasValidToken() }
-                ?.legacyPin
-            if (!legacyPin.isNullOrBlank()) {
-                playerRequest["kort_id"] = courtId
-                playerRequest["pin"] = legacyPin
-            }
-            
+
             // One attempt only: a 5xx may arrive after the server already saved the player,
             // and repeating the POST would add the same person twice.
             request(maxAttempts = 1) { apiService.addPlayer(playerRequest) }
@@ -184,7 +171,7 @@ class TennisRepository(
                 if (response.isSuccessful || !response.shouldRetry()) {
                     return response.toResult()
                 }
-                lastFailure = Exception(response.toErrorMessage())
+                lastFailure = response.toFailureException()
             } catch (e: Exception) {
                 lastFailure = e
             }
@@ -206,8 +193,15 @@ class TennisRepository(
                 Result.failure(Exception("Empty response body"))
             }
         } else {
-            Result.failure(Exception(toErrorMessage()))
+            Result.failure(toFailureException())
         }
+    }
+
+    private fun Response<*>.toFailureException(): Exception {
+        if (code() == 401) {
+            return CourtSessionExpiredException()
+        }
+        return Exception(toErrorMessage())
     }
 
     private fun Response<*>.shouldRetry(): Boolean {

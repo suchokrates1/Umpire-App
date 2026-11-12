@@ -5,3 +5,5 @@ sealed class CourtPinFailure(message: String) : Exception(message) {
     class Throttled(val retryAfterMinutes: Int) : CourtPinFailure("too-many-attempts:$retryAfterMinutes")
     class Other(val detail: String) : CourtPinFailure(detail)
 }
+
+class CourtSessionExpiredException : Exception("court-session-expired")

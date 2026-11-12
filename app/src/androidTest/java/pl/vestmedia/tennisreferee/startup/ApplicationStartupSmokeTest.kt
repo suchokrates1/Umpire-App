@@ -63,7 +63,6 @@ class ApplicationStartupSmokeTest {
             courtId = "t1-3",
             token = "instrumented-token",
             expiresAtMillis = 1_900_000_000_000L,
-            legacyPin = "1234"
         )
         KeystoreCourtSessionStore(context).save(session)
         try {

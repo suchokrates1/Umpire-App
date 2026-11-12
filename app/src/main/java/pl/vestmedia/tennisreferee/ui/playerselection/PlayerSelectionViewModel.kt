@@ -6,11 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
+import pl.vestmedia.tennisreferee.data.model.CourtSessionExpiredException
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
+import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
  * ViewModel zarządzający wyborem graczy
@@ -70,7 +73,8 @@ class PlayerSelectionViewModel(application: Application) : AndroidViewModel(appl
                 _players.value = playersList
                 _isLoading.value = false
             }.onFailure { exception ->
-                _error.value = exception.message ?: "Unknown error"
+                AppLogger.error("PlayerSelection", exception)
+                _error.value = localizedErrorMessage(exception, R.string.error_loading_players)
                 _isLoading.value = false
             }
         }
@@ -119,7 +123,7 @@ class PlayerSelectionViewModel(application: Application) : AndroidViewModel(appl
     fun applySuggestedMatch(suggestion: ScheduleSuggestion): Boolean {
         val selectedPlayers = ScheduleSuggestionSelector.selectPlayers(_players.value.orEmpty(), suggestion)
         if (selectedPlayers == null) {
-            _error.value = "Suggested players are not available in the player list"
+            _error.value = getApplication<Application>().getString(R.string.error_suggested_players_unavailable)
             return false
         }
 
@@ -218,13 +222,24 @@ class PlayerSelectionViewModel(application: Application) : AndroidViewModel(appl
                     
                     _isLoading.value = false
                 }.onFailure { exception ->
-                    _error.value = exception.message ?: "Error loading players"
+                    AppLogger.error("PlayerSelection", exception)
+                    _error.value = localizedErrorMessage(exception, R.string.error_loading_players)
                     _isLoading.value = false
                 }
             }.onFailure { exception ->
-                _error.value = exception.message ?: "Error adding player"
+                AppLogger.error("PlayerSelection", exception)
+                _error.value = localizedErrorMessage(exception, R.string.error_adding_player)
                 _isLoading.value = false
             }
         }
+    }
+
+    private fun localizedErrorMessage(exception: Throwable, fallbackResId: Int): String {
+        val resId = if (exception is CourtSessionExpiredException) {
+            R.string.error_court_auth_expired
+        } else {
+            fallbackResId
+        }
+        return getApplication<Application>().getString(resId)
     }
 }

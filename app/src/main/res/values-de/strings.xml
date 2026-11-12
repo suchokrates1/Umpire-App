@@ -9,6 +9,11 @@
     <string name="select_tournament">Turnier auswählen</string>
     <string name="no_tournaments_available">Keine aktiven Turniere verfügbar</string>
     <string name="error_loading_tournaments">Fehler beim Laden der Turniere</string>
+    <string name="error_loading_courts">Fehler beim Laden der Plätze</string>
+    <string name="error_loading_players">Fehler beim Laden der Spieler</string>
+    <string name="error_adding_player">Fehler beim Hinzufügen des Spielers</string>
+    <string name="error_suggested_players_unavailable">Die vorgeschlagenen Spieler sind nicht in der Spielerliste verfügbar</string>
+    <string name="error_court_auth_expired">Die Platzsitzung ist abgelaufen. Bitte den Platz erneut autorisieren.</string>
     <string name="select_court">Platz auswählen</string>
     <string name="refresh">Aktualisieren</string>
     <string name="no_courts_available">Keine Plätze verfügbar</string>

@@ -9,6 +9,11 @@
     <string name="select_tournament">Pasirinkite turnyrą</string>
     <string name="no_tournaments_available">Nėra aktyvių turnyrų</string>
     <string name="error_loading_tournaments">Klaida įkeliant turnyrus</string>
+    <string name="error_loading_courts">Klaida įkeliant kortus</string>
+    <string name="error_loading_players">Klaida įkeliant žaidėjus</string>
+    <string name="error_adding_player">Klaida pridedant žaidėją</string>
+    <string name="error_suggested_players_unavailable">Siūlomų žaidėjų sąraše nėra</string>
+    <string name="error_court_auth_expired">Korto sesija baigėsi. Autorizuokite kortą iš naujo.</string>
     <string name="select_court">Pasirinkite kortą</string>
     <string name="refresh">Atnaujinti</string>
     <string name="no_courts_available">Nėra galimų kortų</string>

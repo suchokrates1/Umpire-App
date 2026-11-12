@@ -18,7 +18,7 @@ object MatchProgressReducer {
         val events = mutableListOf<MatchProgressEvent>()
 
         if (!state.isGameWon()) {
-            if (state.noAdvantage && state.player1Points == 3 && state.player2Points == 3
+            if (state.isNoAdvantage() && state.player1Points == 3 && state.player2Points == 3
                 && !state.isTiebreak && !state.isSuperTiebreak) {
                 return MatchProgressResult(
                     announcementType = ANNOUNCEMENT_DECIDING_POINT,

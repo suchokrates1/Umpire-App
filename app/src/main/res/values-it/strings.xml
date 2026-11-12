@@ -9,6 +9,11 @@
     <string name="select_tournament">Seleziona torneo</string>
     <string name="no_tournaments_available">Nessun torneo attivo disponibile</string>
     <string name="error_loading_tournaments">Errore nel caricamento dei tornei</string>
+    <string name="error_loading_courts">Errore nel caricamento dei campi</string>
+    <string name="error_loading_players">Errore nel caricamento dei giocatori</string>
+    <string name="error_adding_player">Errore nell’aggiunta del giocatore</string>
+    <string name="error_suggested_players_unavailable">I giocatori suggeriti non sono disponibili nell’elenco</string>
+    <string name="error_court_auth_expired">Sessione del campo scaduta. Autorizza di nuovo il campo.</string>
     <string name="select_court">Seleziona campo</string>
     <string name="refresh">Aggiorna</string>
     <string name="no_courts_available">Nessun campo disponibile</string>

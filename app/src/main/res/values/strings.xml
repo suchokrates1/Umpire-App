@@ -9,6 +9,11 @@
     <string name="select_tournament">Select Tournament</string>
     <string name="no_tournaments_available">No active tournaments available</string>
     <string name="error_loading_tournaments">Error loading tournaments</string>
+    <string name="error_loading_courts">Error loading courts</string>
+    <string name="error_loading_players">Error loading players</string>
+    <string name="error_adding_player">Error adding player</string>
+    <string name="error_suggested_players_unavailable">Suggested players are not available in the player list</string>
+    <string name="error_court_auth_expired">Court session expired. Please authorize the court again.</string>
     <string name="select_court">Select Court</string>
     <string name="refresh">Refresh</string>
     <string name="no_courts_available">No courts available</string>

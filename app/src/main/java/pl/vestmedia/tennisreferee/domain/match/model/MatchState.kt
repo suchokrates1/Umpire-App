@@ -74,7 +74,7 @@ data class MatchState(
     val player2Stats: MatchStatistics = MatchStatistics(),
     
     // Tryb statystyk (BASIC = uproszczony, ADVANCED = pełny)
-    var statsMode: StatsMode = StatsMode.ADVANCED,
+    var statsMode: StatsMode = matchConfig.statsMode,
     
     // Historia akcji (do cofania)
     val actionsHistory: MutableList<MatchAction> = mutableListOf(),
@@ -196,7 +196,7 @@ data class MatchState(
         }
         
         // No-Advantage mode: at deuce, show "40-40" (immediate deciding point)
-        if (noAdvantage) {
+        if (isNoAdvantage()) {
             return when(points) {
                 0 -> "0"
                 1 -> "15"
@@ -238,7 +238,7 @@ data class MatchState(
             val stbPts = matchConfig.superTiebreakPoints
             return (player1Points >= stbPts || player2Points >= stbPts) && 
                    kotlin.math.abs(player1Points - player2Points) >= 2
-        } else if (noAdvantage) {
+        } else if (isNoAdvantage()) {
             // No-Advantage: at deuce (3-3), next point wins — first to 4 wins
             return player1Points >= 4 || player2Points >= 4
         } else {
@@ -300,6 +300,8 @@ data class MatchState(
         return player1Games == tbTrigger && player2Games == tbTrigger && !isTiebreak && !isSuperTiebreak
     }
     
+    fun isNoAdvantage(): Boolean = noAdvantage || matchConfig.noAdvantage
+
     /**
      * Sprawdza czy mecz powinien się zakończyć
      */

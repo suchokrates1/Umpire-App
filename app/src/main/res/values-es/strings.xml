@@ -9,6 +9,11 @@
     <string name="select_tournament">Seleccionar torneo</string>
     <string name="no_tournaments_available">No hay torneos activos disponibles</string>
     <string name="error_loading_tournaments">Error al cargar torneos</string>
+    <string name="error_loading_courts">Error al cargar las pistas</string>
+    <string name="error_loading_players">Error al cargar los jugadores</string>
+    <string name="error_adding_player">Error al añadir el jugador</string>
+    <string name="error_suggested_players_unavailable">Los jugadores sugeridos no están disponibles en la lista</string>
+    <string name="error_court_auth_expired">La sesión de la pista ha caducado. Autoriza la pista de nuevo.</string>
     <string name="select_court">Seleccionar pista</string>
     <string name="refresh">Actualizar</string>
     <string name="no_courts_available">No hay pistas disponibles</string>
