@@ -49,6 +49,7 @@ class ActiveMatchStoreMigrationTest {
     @After
     fun clearStore() {
         prefs.edit().clear().commit()
+        store.resetInMemoryForTests()
     }
 
     @Test
@@ -57,6 +58,7 @@ class ActiveMatchStoreMigrationTest {
             .putString("match_${match.clientMatchUuid}", Gson().toJson(match))
             .putString("last_match_uuid", match.clientMatchUuid)
             .commit()
+        store.resetInMemoryForTests()
 
         val restored = store.getLast()
 
@@ -78,6 +80,7 @@ class ActiveMatchStoreMigrationTest {
             .putString("match_${match.clientMatchUuid}", "{\"this\":\"is not a match\"}")
             .putString("last_match_uuid", match.clientMatchUuid)
             .commit()
+        store.resetInMemoryForTests()
 
         assertNull(store.getLast())
     }

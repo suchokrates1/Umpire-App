@@ -306,6 +306,16 @@ data class MatchState(
     fun shouldEndMatch(): Boolean {
         return player1Sets == matchConfig.setsToWin || player2Sets == matchConfig.setsToWin
     }
-    
+
+    /**
+     * A snapshot with its own lists and statistics, safe to read and serialize off the UI
+     * thread while the live match continues to take points on the main thread.
+     */
+    fun detachedCopy(includeActionsHistory: Boolean = true): MatchState = copy(
+        setsHistory = setsHistory.toMutableList(),
+        player1Stats = player1Stats.copy(),
+        player2Stats = player2Stats.copy(),
+        actionsHistory = if (includeActionsHistory) actionsHistory.toMutableList() else mutableListOf(),
+    )
 }
 

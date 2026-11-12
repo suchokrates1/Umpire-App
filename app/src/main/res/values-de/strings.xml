@@ -18,6 +18,8 @@
     <string name="court_pin_title">Platzautorisierung</string>
     <string name="court_pin_message">PIN für Platz eingeben: %1$s</string>
     <string name="pin_invalid">Ungültige PIN: %1$s</string>
+    <string name="pin_wrong">Ungültige PIN</string>
+    <string name="pin_throttled">Zu viele falsche PIN-Versuche. Bitte in %1$d Min. erneut versuchen.</string>
     <string name="pin_digit_label">PIN-Ziffer %1$d von %2$d</string>
     <string name="match_players_versus">%1$s gegen %2$s</string>
     <string name="panic_transcript_line">%1$s: %2$s</string>

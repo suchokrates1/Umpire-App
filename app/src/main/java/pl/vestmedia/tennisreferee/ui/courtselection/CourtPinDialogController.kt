@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.model.Court
+import pl.vestmedia.tennisreferee.data.model.CourtPinFailure
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
@@ -88,7 +89,7 @@ class CourtPinDialogController(
                             it.isEnabled = true
                         }
                         digit1.requestFocus()
-                        Toast.makeText(activity, activity.getString(R.string.pin_invalid, ""), Toast.LENGTH_LONG).show()
+                        Toast.makeText(activity, activity.getString(R.string.pin_wrong), Toast.LENGTH_LONG).show()
                         return@launch
                     }
                     TutorialSession.noteAction("enterPin", activity)
@@ -123,9 +124,15 @@ class CourtPinDialogController(
                             it.isEnabled = true
                         }
                         digit1.requestFocus()
+                        val toastText = when (error) {
+                            is CourtPinFailure.InvalidPin -> activity.getString(R.string.pin_wrong)
+                            is CourtPinFailure.Throttled -> activity.getString(R.string.pin_throttled, error.retryAfterMinutes)
+                            is CourtPinFailure.Other -> activity.getString(R.string.pin_invalid, error.detail)
+                            else -> activity.getString(R.string.pin_wrong)
+                        }
                         Toast.makeText(
                             activity,
-                            activity.getString(R.string.pin_invalid, error.message),
+                            toastText,
                             Toast.LENGTH_LONG
                         ).show()
                     }

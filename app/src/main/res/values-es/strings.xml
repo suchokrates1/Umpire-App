@@ -18,6 +18,8 @@
     <string name="court_pin_title">Autorización de pista</string>
     <string name="court_pin_message">Introduce el PIN de la pista: %1$s</string>
     <string name="pin_invalid">PIN inválido: %1$s</string>
+    <string name="pin_wrong">Código PIN inválido</string>
+    <string name="pin_throttled">Demasiados intentos de PIN fallidos. Inténtalo de nuevo en %1$d min.</string>
     <string name="pin_digit_label">Dígito %1$d de %2$d del PIN</string>
     <string name="match_players_versus">%1$s vs. %2$s</string>
     <string name="panic_transcript_line">%1$s: %2$s</string>
