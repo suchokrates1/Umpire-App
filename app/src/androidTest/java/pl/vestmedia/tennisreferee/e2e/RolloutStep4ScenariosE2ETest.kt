@@ -277,13 +277,13 @@ class RolloutStep4ScenariosE2ETest {
                 )
             }
             waitUntil("PIN dialog visible", 10_000) {
-                onView(withId(R.id.pinDigit1)).check(matches(isDisplayed()))
+                onView(withId(R.id.pinDigit1)).inRoot(isDialog()).check(matches(isDisplayed()))
                 true
             }
-            onView(withId(R.id.pinDigit1)).perform(replaceText("2"))
-            onView(withId(R.id.pinDigit2)).perform(replaceText("4"))
-            onView(withId(R.id.pinDigit3)).perform(replaceText("6"))
-            onView(withId(R.id.pinDigit4)).perform(replaceText("8"))
+            onView(withId(R.id.pinDigit1)).inRoot(isDialog()).perform(replaceText("2"))
+            onView(withId(R.id.pinDigit2)).inRoot(isDialog()).perform(replaceText("4"))
+            onView(withId(R.id.pinDigit3)).inRoot(isDialog()).perform(replaceText("6"))
+            onView(withId(R.id.pinDigit4)).inRoot(isDialog()).perform(replaceText("8"))
 
             val art2 = backend.waitForFinishedArtifacts(fixture.marker, state2.getTeam1FullName(), state2.getTeam2FullName())
             assertEquals("finished", art2.match.optString("status"))
@@ -299,8 +299,6 @@ class RolloutStep4ScenariosE2ETest {
     @Test
     fun formatResumeNoticeDirectorSideChangeAndPinThrottleToast() {
         val court1 = fixture.courtIdFor(0)
-        val court3 = fixture.courtIdFor(2)
-        backend.setCourtPin(court3, "9876")
         backend.seedAppCourtSession(court1)
 
         // --- Scenario 6: Resume format before & after first point ---
@@ -368,15 +366,25 @@ class RolloutStep4ScenariosE2ETest {
             )
         }
 
-        // --- Scenario 4: 11 wrong PIN attempts on Court 3 -> CourtPinFailure.Throttled ---
+        // --- Scenario 4: 11 wrong PIN attempts on a fresh court -> CourtPinFailure.Throttled ---
+        // Use court 8 (index 7): earlier scenarios never touch it, so leftover in-memory throttle
+        // from a previous emulator run against the same E2E stack cannot poison attempt 1.
+        val throttleCourt = fixture.courtIdFor(7)
+        backend.setCourtPin(throttleCourt, "1357")
         val repo = app.container.repository()
+        app.container.sessionStore.clear()
+        assertEquals("1357", backend.fetchCourtPin(throttleCourt))
         var eleventhFailure: Throwable? = null
         runBlocking {
             repeat(10) {
-                val res = repo.verifyCourtPin(court3, "0001")
-                assertTrue("Attempt ${it + 1} should fail with InvalidPin", res.exceptionOrNull() is CourtPinFailure.InvalidPin)
+                val res = repo.verifyCourtPin(throttleCourt, "0001")
+                val failure = res.exceptionOrNull()
+                assertTrue(
+                    "Attempt ${it + 1} should fail with InvalidPin on $throttleCourt, got success=${res.isSuccess} failure=$failure",
+                    failure is CourtPinFailure.InvalidPin,
+                )
             }
-            eleventhFailure = repo.verifyCourtPin(court3, "0001").exceptionOrNull()
+            eleventhFailure = repo.verifyCourtPin(throttleCourt, "0001").exceptionOrNull()
         }
         assertTrue(
             "11th wrong PIN must return CourtPinFailure.Throttled, got $eleventhFailure",
