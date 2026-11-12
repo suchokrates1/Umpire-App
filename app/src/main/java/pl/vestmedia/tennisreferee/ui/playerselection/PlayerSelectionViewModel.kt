@@ -11,8 +11,6 @@ import pl.vestmedia.tennisreferee.TennisRefereeApp
 import pl.vestmedia.tennisreferee.data.model.CourtSessionExpiredException
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.data.model.ScheduleSuggestion
-import pl.vestmedia.tennisreferee.data.repository.TennisRepository
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
@@ -55,8 +53,8 @@ class PlayerSelectionViewModel(application: Application) : AndroidViewModel(appl
     /**
      * Ładuje listę zawodników z serwera
      */
-    fun setTutorialPlayers(players: List<Player>) {
-        currentCourtId = TutorialCatalog.COURT_1
+    fun setDemoPlayers(courtId: String, players: List<Player>) {
+        currentCourtId = courtId
         _players.value = players
         _isLoading.value = false
         _error.value = null

@@ -31,8 +31,8 @@ class ScoreboardRenderer(
         if (state.isDoubles) {
             binding.textPlayer1Flag.text = "👥"
             binding.textPlayer2Flag.text = "👥"
-            binding.textPlayer1Name.text = state.getTeam1ServerAwareDisplayName()
-            binding.textPlayer2Name.text = state.getTeam2ServerAwareDisplayName()
+            binding.textPlayer1Name.text = state.team1ServerAwareDisplayName()
+            binding.textPlayer2Name.text = state.team2ServerAwareDisplayName()
             return
         }
 

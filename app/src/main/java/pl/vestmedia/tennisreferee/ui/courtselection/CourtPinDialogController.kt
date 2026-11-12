@@ -24,8 +24,7 @@ import pl.vestmedia.tennisreferee.data.model.Court
 import pl.vestmedia.tennisreferee.data.model.CourtPinFailure
 import pl.vestmedia.tennisreferee.data.repository.TennisRepository
 import pl.vestmedia.tennisreferee.ui.playerselection.PlayerSelectionActivity
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialCatalog
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialScreenHost
 import pl.vestmedia.tennisreferee.utils.AppLogger
 
 /**
@@ -60,11 +59,9 @@ class CourtPinDialogController(
             })
         }
 
-        textMessage.text = if (TutorialSession.isActive) {
-            TutorialSession.stringFor(activity, "tutorialPinBody")
-        } else {
-            activity.getString(R.string.court_pin_message, court.getDisplayName(activity))
-        }
+        val tutorialPrompt = TutorialScreenHost.pinPromptMessage(activity)
+        textMessage.text = tutorialPrompt
+            ?: activity.getString(R.string.court_pin_message, court.getDisplayName(activity))
 
         val dialog = AlertDialog.Builder(activity)
             .setTitle(activity.getString(R.string.court_pin_title))
@@ -81,9 +78,9 @@ class CourtPinDialogController(
             listOf(digit1, digit2, digit3, digit4).forEach { it.isEnabled = false }
 
             activity.lifecycleScope.launch {
-                if (TutorialSession.isActive) {
-                    progressBar.visibility = View.GONE
-                    if (pin != TutorialCatalog.PIN) {
+                when (TutorialScreenHost.checkCourtPin(activity, pin)) {
+                    TutorialScreenHost.PinCheckResult.WrongPin -> {
+                        progressBar.visibility = View.GONE
                         listOf(digit1, digit2, digit3, digit4).forEach {
                             it.setText("")
                             it.isEnabled = true
@@ -92,13 +89,12 @@ class CourtPinDialogController(
                         Toast.makeText(activity, activity.getString(R.string.pin_wrong), Toast.LENGTH_LONG).show()
                         return@launch
                     }
-                    TutorialSession.noteAction("enterPin", activity)
-                    if (TutorialSession.canAdvance(activity)) {
-                        TutorialSession.goNext(activity)
+                    TutorialScreenHost.PinCheckResult.Accepted -> {
+                        progressBar.visibility = View.GONE
+                        dialog.dismiss()
+                        return@launch
                     }
-                    dialog.dismiss()
-                    activity.startActivity(PlayerSelectionActivity.createTutorialIntent(activity))
-                    return@launch
+                    TutorialScreenHost.PinCheckResult.NotInTutorial -> Unit
                 }
                 val result = withContext(Dispatchers.IO) {
                     repository.verifyCourtPin(court.id, pin)
@@ -161,7 +157,7 @@ class CourtPinDialogController(
         digit3.addTextChangedListener(createDigitWatcher(digit4, digit2))
         digit4.addTextChangedListener(createDigitWatcher(null, digit3))
 
-        if (TutorialSession.isActive) {
+        if (tutorialPrompt != null) {
             dialogView.findViewById<View>(R.id.tutorialPinGuide)?.visibility = View.VISIBLE
             dialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         }

@@ -141,15 +141,8 @@ class MultiCourtUmpireE2ETest {
         assertEquals(expectedCourtId, artifacts.match.optString("court_id"))
     }
 
-    private fun intentFor(matchState: MatchState): Intent {
-        val extras = Bundle().apply {
-            classLoader = MatchState::class.java.classLoader
-            putParcelable(MatchActivity.EXTRA_MATCH_STATE, matchState)
-            putBoolean(MatchActivity.EXTRA_IS_DOUBLES, matchState.isDoubles)
-        }
-        return Intent(ApplicationProvider.getApplicationContext(), MatchActivity::class.java)
-            .putExtras(extras)
-    }
+    private fun intentFor(matchState: MatchState): Intent =
+        MatchActivity.createStateIntent(ApplicationProvider.getApplicationContext(), matchState)
 
     companion object {
         @JvmStatic

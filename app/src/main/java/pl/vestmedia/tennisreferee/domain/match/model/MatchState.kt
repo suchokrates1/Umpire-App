@@ -1,9 +1,6 @@
 package pl.vestmedia.tennisreferee.domain.match.model
 
 import kotlinx.serialization.Serializable
-
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import pl.vestmedia.tennisreferee.data.model.Player
 import java.util.UUID
 
@@ -11,7 +8,6 @@ import java.util.UUID
  * Model stanu meczu podczas rozgrywki
  */
 @Serializable
-@Parcelize
 data class MatchState(
     // Identyfikator meczu na serwerze
     var matchId: Int? = null,
@@ -84,7 +80,7 @@ data class MatchState(
     var finishWinnerName: String? = null,
     var injuredPlayerName: String? = null,
     var resultNote: String? = null
-) : Parcelable {
+) {
     
     /**
      * Zwraca nazwę zespołu 1 (dla debla) lub imię gracza 1
@@ -149,34 +145,6 @@ data class MatchState(
             4 -> player4?.getDisplayName() ?: player2.getDisplayName()
             else -> player1.getDisplayName()
         }
-    }
-
-    fun getTeam1ServerAwareDisplayName(): String {
-        return formatTeamDisplay(player1, player3, currentServer == 1, currentServer == 3)
-    }
-
-    fun getTeam2ServerAwareDisplayName(): String {
-        return formatTeamDisplay(player2, player4, currentServer == 2, currentServer == 4)
-    }
-
-    private fun formatTeamDisplay(
-        primaryPlayer: Player,
-        partnerPlayer: Player?,
-        isPrimaryServer: Boolean,
-        isPartnerServer: Boolean
-    ): String {
-        if (partnerPlayer == null) {
-            return markServer(primaryPlayer.getDisplayName(), isPrimaryServer)
-        }
-
-        return listOf(
-            markServer(primaryPlayer.getDisplayName(), isPrimaryServer),
-            markServer(partnerPlayer.getDisplayName(), isPartnerServer)
-        ).joinToString(" / ")
-    }
-
-    private fun markServer(name: String, isServer: Boolean): String {
-        return if (isServer) "🎾 $name" else name
     }
 
     /**

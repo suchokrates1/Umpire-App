@@ -2,14 +2,10 @@ package pl.vestmedia.tennisreferee.domain.match.model
 
 import kotlinx.serialization.Serializable
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
 /**
  * Model reprezentujący szczegółowe statystyki gracza w meczu
  */
 @Serializable
-@Parcelize
 data class MatchStatistics(
     var aces: Int = 0,
     var doubleFaults: Int = 0,
@@ -20,7 +16,7 @@ data class MatchStatistics(
     var firstServesTotal: Int = 0,
     var secondServesIn: Int = 0,
     var secondServesTotal: Int = 0
-) : Parcelable {
+) {
     
     fun getFirstServePercentage(): Int {
         return if (firstServesTotal > 0) {

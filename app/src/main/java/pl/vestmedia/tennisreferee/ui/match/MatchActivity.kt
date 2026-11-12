@@ -2,15 +2,16 @@ package pl.vestmedia.tennisreferee.ui.match
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.serialization.encodeToString
 import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.TennisRefereeApp
+import pl.vestmedia.tennisreferee.data.localJson
 import pl.vestmedia.tennisreferee.databinding.ActivityMatchBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutAnnouncementBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutBasicScoringBinding
@@ -20,12 +21,10 @@ import pl.vestmedia.tennisreferee.databinding.LayoutScoreboardBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutServeBinding
 import pl.vestmedia.tennisreferee.databinding.LayoutServerSelectionBinding
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialNavigator
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialOverlayController
-import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSession
+import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
+import pl.vestmedia.tennisreferee.ui.tutorial.TutorialScreenHost
 import pl.vestmedia.tennisreferee.ui.tutorial.TutorialSnapshot
 import pl.vestmedia.tennisreferee.utils.AppLogger
-import pl.vestmedia.tennisreferee.ui.panic.PanicPrompt
 
 /**
  * Match activity that drives the live scoring flow.
@@ -54,6 +53,7 @@ class MatchActivity : AppCompatActivity() {
     private lateinit var activeMatchStore: ActiveMatchStore
     private var activeMatchUuid: String? = null
     private val viewModel: MatchViewModel by viewModels()
+    private val tutorialHost by lazy { TutorialScreenHost.MatchScreenSession(this) }
     
     companion object {
         private const val EXTRA_MATCH_UUID = "match_uuid"
@@ -81,7 +81,18 @@ class MatchActivity : AppCompatActivity() {
                 putExtra(EXTRA_TUTORIAL_VIEW, snapshot.view.name)
                 putExtra(EXTRA_TUTORIAL_ANNOUNCEMENT, snapshot.pendingAnnouncementType)
                 putExtra(EXTRA_TUTORIAL_CAN_UNDO, snapshot.canUndo)
-                putExtra(EXTRA_MATCH_STATE, snapshot.state)
+                putExtra(EXTRA_MATCH_STATE, localJson.encodeToString(snapshot.state))
+            }
+        }
+
+        fun createStateIntent(context: Context, state: MatchState): Intent {
+            return Intent(context, MatchActivity::class.java).apply {
+                putExtra(EXTRA_MATCH_STATE, localJson.encodeToString(state))
+                if (state.isDoubles) {
+                    putExtra(EXTRA_IS_DOUBLES, true)
+                    putExtra(EXTRA_TEAM1_COLOR, R.color.team1_color)
+                    putExtra(EXTRA_TEAM2_COLOR, R.color.team2_color)
+                }
             }
         }
 
@@ -128,24 +139,12 @@ class MatchActivity : AppCompatActivity() {
             activity = this,
             onUndoConfirmed = {
                 viewModel.undoLastAction()
-                if (isTutorial()) {
-                    TutorialNavigator.afterRequiredAction(this, "undo") {
-                        tutorialOverlay?.refresh()
-                    }
-                }
+                tutorialHost.noteAction("undo")
             },
             getMatchState = { viewModel.matchState.value },
             onFinishConfirmed = { request ->
                 viewModel.finishMatchWithOutcome(request)
-                if (isTutorial()) {
-                    TutorialSession.noteAction("pickRetirement", this)
-                    TutorialSession.jumpToLast(this)
-                    if (TutorialNavigator.applyStep(this)) {
-                        finish()
-                    } else {
-                        tutorialOverlay?.refresh()
-                    }
-                }
+                tutorialHost.onRetirementPicked()
             },
             onExitConfirmed = { finish() },
             onBracketWarningCleared = { viewModel.clearBracketWarning() }
@@ -161,9 +160,7 @@ class MatchActivity : AppCompatActivity() {
             activity = this,
             binding = matchFinishedBinding,
             onNextMatch = { action ->
-                if (isTutorial()) {
-                    TutorialNavigator.exit(this)
-                } else {
+                if (!tutorialHost.onNextMatch()) {
                     // Wait for PUT+finish before leaving — otherwise viewModelScope
                     // dies with the Activity and the match stays in_progress on the server.
                     matchFinishedBinding.buttonNextMatchSameSetup.isEnabled = false
@@ -189,7 +186,7 @@ class MatchActivity : AppCompatActivity() {
             onUnforcedError = { viewModel.handleUnforcedError(it) },
             onBasicWin = { winner ->
                 viewModel.handleBasicWin(winner)
-                noteTutorialAction("awardPoint")
+                tutorialHost.noteAction("awardPoint")
             },
             onBasicFault = {
                 val faultAction = if (viewModel.matchState.value?.isFirstServe ?: true) {
@@ -198,7 +195,7 @@ class MatchActivity : AppCompatActivity() {
                     "doubleFault"
                 }
                 viewModel.handleBasicFault()
-                noteTutorialAction(faultAction)
+                tutorialHost.noteAction(faultAction)
             },
             onButtonLogged = { action, detail -> AppLogger.button("Match", action, detail) }
         )
@@ -215,22 +212,14 @@ class MatchActivity : AppCompatActivity() {
             binding = serverSelectionBinding,
             getState = { viewModel.matchState.value },
             onServerSelected = { server ->
-                if (isTutorial()) {
-                    TutorialNavigator.afterRequiredAction(this, "chooseServer") {
-                        tutorialOverlay?.refresh()
-                    }
-                } else {
+                if (!tutorialHost.noteAction("chooseServer")) {
                     viewModel.setFirstServer(server)
                 }
             },
             onSwapSides = {
                 courtSideSwapAnimator.animate()
                 viewModel.swapSides()
-                if (isTutorial()) {
-                    TutorialNavigator.afterRequiredAction(this, "swapSides") {
-                        tutorialOverlay?.refresh()
-                    }
-                }
+                tutorialHost.noteAction("swapSides")
             },
             onButtonLogged = { AppLogger.button("Match", it) }
         )
@@ -258,15 +247,10 @@ class MatchActivity : AppCompatActivity() {
         
         activeMatchUuid = matchState.clientMatchUuid
         if (viewModel.matchState.value == null) {
-            if (intent.getBooleanExtra(EXTRA_TUTORIAL, false)) {
-                val viewName = intent.getStringExtra(EXTRA_TUTORIAL_VIEW) ?: MatchView.SERVER_SELECTION.name
-                val view = runCatching { MatchView.valueOf(viewName) }.getOrDefault(MatchView.SERVER_SELECTION)
-                viewModel.restoreTutorial(
-                    matchState,
-                    view,
-                    intent.getStringExtra(EXTRA_TUTORIAL_ANNOUNCEMENT),
-                    intent.getBooleanExtra(EXTRA_TUTORIAL_CAN_UNDO, false),
-                )
+            val tutorialRestore = tutorialHost.initialRestoreParams()
+            if (tutorialRestore != null) {
+                val (view, announcement, canUndo) = tutorialRestore
+                viewModel.restoreTutorial(matchState, view, announcement, canUndo)
             } else {
                 viewModel.initializeMatch(matchState)
             }
@@ -283,11 +267,7 @@ class MatchActivity : AppCompatActivity() {
         // Obsługa przycisku wstecz - potwierdzenie podczas meczu
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (isTutorial()) {
-                    TutorialNavigator.goBackScene(this@MatchActivity)
-                    tutorialOverlay?.refresh()
-                    return
-                }
+                if (tutorialHost.onBackPressed()) return
                 val state = viewModel.matchState.value
                 if (state?.isMatchFinished == true) {
                     finish()
@@ -296,9 +276,7 @@ class MatchActivity : AppCompatActivity() {
                 }
             }
         })
-        if (intent.getBooleanExtra(EXTRA_TUTORIAL, false)) {
-            attachTutorialOverlay()
-        }
+        tutorialHost.attachIfTutorialIntent()
     }
     
     private fun setupObservers() {
@@ -353,52 +331,12 @@ class MatchActivity : AppCompatActivity() {
             activeMatchStore.get(matchUuid)?.let { return it }
         }
 
-        intent.extras?.classLoader = MatchState::class.java.classLoader
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_MATCH_STATE, MatchState::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_MATCH_STATE)
-        }?.also {
-            if (!intent.getBooleanExtra(EXTRA_TUTORIAL, false)) activeMatchStore.save(it)
-        }
-    }
-
-    private var tutorialOverlay: TutorialOverlayController? = null
-
-    private fun isTutorial(): Boolean =
-        intent.getBooleanExtra(EXTRA_TUTORIAL, false) ||
-            TutorialSession.isActive
-
-    private fun noteTutorialAction(action: String) {
-        if (!isTutorial()) return
-        TutorialNavigator.afterRequiredAction(this, action) {
-            tutorialOverlay?.refresh()
-        }
-    }
-
-    private fun attachTutorialOverlay() {
-        tutorialOverlay = TutorialOverlayController(
-            activity = this,
-            onBack = {
-                TutorialNavigator.goBackScene(this)
-                tutorialOverlay?.refresh()
-            },
-            onNext = {
-                if (TutorialSession.isLast(this)) {
-                    TutorialNavigator.exit(this)
-                    return@TutorialOverlayController
-                }
-                TutorialSession.goNext(this)
-                if (TutorialNavigator.applyStep(this)) {
-                    finish()
-                } else {
-                    tutorialOverlay?.refresh()
-                }
-            },
-            onSkip = { TutorialNavigator.exit(this) },
-        )
-        tutorialOverlay?.attach()
+        val stateJson = intent.getStringExtra(EXTRA_MATCH_STATE) ?: return null
+        return runCatching { localJson.decodeFromString<MatchState>(stateJson) }
+            .getOrNull()
+            ?.also {
+                if (!intent.getBooleanExtra(EXTRA_TUTORIAL, false)) activeMatchStore.save(it)
+            }
     }
 
     private fun finishWithResult(action: String) {
@@ -415,9 +353,9 @@ class MatchActivity : AppCompatActivity() {
         // Przycisk Cofnij z potwierdzeniem (w tutorialu od razu, jak w PWA)
         binding.buttonUndo.setOnClickListener {
             AppLogger.button("Match", "Undo")
-            if (isTutorial()) {
+            if (tutorialHost.active) {
                 viewModel.undoLastAction()
-                noteTutorialAction("undo")
+                tutorialHost.noteAction("undo")
             } else {
                 matchDialogsController.showUndoConfirmation()
             }
@@ -427,7 +365,7 @@ class MatchActivity : AppCompatActivity() {
         binding.buttonBack.setOnClickListener {
             AppLogger.button("Match", "FinishMatch")
             matchDialogsController.showFinishMatchConfirmation()
-            noteTutorialAction("openFinish")
+            tutorialHost.noteAction("openFinish")
         }
         
     }

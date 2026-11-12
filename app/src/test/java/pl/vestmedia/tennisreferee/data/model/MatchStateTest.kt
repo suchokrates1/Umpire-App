@@ -6,6 +6,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
 import pl.vestmedia.tennisreferee.domain.match.model.MatchState
+import pl.vestmedia.tennisreferee.ui.match.team1ServerAwareDisplayName
+import pl.vestmedia.tennisreferee.ui.match.team2ServerAwareDisplayName
 
 class MatchStateTest {
 
@@ -204,8 +206,8 @@ class MatchStateTest {
         }
 
         assertEquals("Kowalski / Lis", state.getTeam1DisplayName())
-        assertEquals("Kowalski / 🎾 Lis", state.getTeam1ServerAwareDisplayName())
-        assertEquals("Nowak / Wojcik", state.getTeam2ServerAwareDisplayName())
+        assertEquals("Kowalski / 🎾 Lis", state.team1ServerAwareDisplayName())
+        assertEquals("Nowak / Wojcik", state.team2ServerAwareDisplayName())
     }
 
     private fun matchState(

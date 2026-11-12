@@ -158,13 +158,7 @@ class ExpiredCourtSessionFinalizeTest {
             statsMode = StatsMode.BASIC,
             matchConfig = MatchConfig(gamesPerSet = 4, setsToWin = 2, statsMode = StatsMode.BASIC),
         )
-        val matchIntent = Intent(ApplicationProvider.getApplicationContext(), MatchActivity::class.java).apply {
-            putExtras(Bundle().apply {
-                classLoader = MatchState::class.java.classLoader
-                putParcelable(MatchActivity.EXTRA_MATCH_STATE, state)
-                putBoolean(MatchActivity.EXTRA_IS_DOUBLES, false)
-            })
-        }
+        val matchIntent = MatchActivity.createStateIntent(ApplicationProvider.getApplicationContext(), state)
 
         ActivityScenario.launch<MatchActivity>(matchIntent).use {
             UmpireRobot.waitForView(R.id.buttonPlayer1Serves)
@@ -230,6 +224,9 @@ class ExpiredCourtSessionFinalizeTest {
             }
 
             val app = ApplicationProvider.getApplicationContext<TennisRefereeApp>()
+            waitUntil("outbox rows deleted after HTTP response completes", 5_000) {
+                runBlocking { app.database.outboxMutationDao().getPending().isEmpty() }
+            }
             val remaining = runBlocking { app.database.outboxMutationDao().getPending() }
             assertTrue("outbox should be empty after PIN re-auth, got $remaining", remaining.isEmpty())
         }

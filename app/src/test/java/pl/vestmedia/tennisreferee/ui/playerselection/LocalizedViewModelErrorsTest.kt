@@ -49,7 +49,7 @@ class LocalizedViewModelErrorsTest {
     @Test
     fun playerAndCourtErrorsUseLocalizedStringsWithoutLeakingRawServerText() {
         val playerVm = PlayerSelectionViewModel(app)
-        playerVm.setTutorialPlayers(emptyList())
+        playerVm.setDemoPlayers("t1-1", emptyList())
         val applied = playerVm.applySuggestedMatch(
             ScheduleSuggestion(
                 id = 1,
