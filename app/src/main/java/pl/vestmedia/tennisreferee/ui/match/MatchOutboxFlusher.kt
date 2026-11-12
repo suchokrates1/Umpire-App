@@ -191,7 +191,15 @@ class MatchOutboxFlusher(
                 apiClient.finishMatch(serverId, request)
             }
             "EVENT" -> apiClient.logMatchEvent(json.decodeFromString<MatchEventDto>(mutation.payloadJson))
-            "STATS" -> apiClient.sendMatchStatistics(json.decodeFromString<MatchStatisticsRequestDto>(mutation.payloadJson))
+            "STATS" -> {
+                val serverId = mutation.serverMatchId
+                    ?: resolvedIds[mutation.clientMatchUuid]
+                    ?: return null
+                val stats = json.decodeFromString<MatchStatisticsRequestDto>(mutation.payloadJson)
+                apiClient.sendMatchStatistics(
+                    if (stats.matchId == serverId) stats else stats.copy(matchId = serverId)
+                )
+            }
             else -> null
         }
     }

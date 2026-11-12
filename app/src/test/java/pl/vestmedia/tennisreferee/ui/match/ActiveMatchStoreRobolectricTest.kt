@@ -60,6 +60,25 @@ class ActiveMatchStoreRobolectricTest {
     }
 
     @Test
+    fun aSecondStoreInstanceSeesTheInMemoryHandOffBeforePrefsSettle() {
+        val writer = ActiveMatchStore(context, dispatcher = Dispatchers.Unconfined)
+        val live = MatchState(
+            clientMatchUuid = "handoff-1",
+            player1 = playerOne,
+            player2 = playerTwo,
+            courtId = "t9-1",
+            courtName = "Court 1",
+        ).apply { player1Points = 3 }
+        writer.save(live)
+
+        // MatchActivity constructs its own ActiveMatchStore; the UUID must be readable
+        // from process memory even if a different instance wrote it.
+        val reader = ActiveMatchStore(context, dispatcher = Dispatchers.Unconfined)
+        assertEquals("handoff-1", reader.getLast()?.clientMatchUuid)
+        assertEquals(3, reader.get("handoff-1")?.player1Points)
+    }
+
+    @Test
     fun mutatingLiveMatchAfterSaveDoesNotCorruptStoredSnapshot() {
         val live = MatchState(
             clientMatchUuid = "snap-1",

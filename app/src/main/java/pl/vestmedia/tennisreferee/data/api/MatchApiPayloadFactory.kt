@@ -95,7 +95,7 @@ object MatchApiPayloadFactory {
     }
 
     fun toStatisticsRequest(state: MatchState): MatchStatisticsRequestDto? {
-        if (state.matchId == null || !state.isMatchFinished) return null
+        if (!state.isMatchFinished) return null
         if (state.finishReason == MatchFinishReason.TEST) return null
 
         // The winner the umpire named (walkover, retirement) comes first; a walkover has no sets.
@@ -108,8 +108,10 @@ object MatchApiPayloadFactory {
             else -> null
         }
 
+        // matchId may still be null when CREATE is waiting in the outbox; 0 is a placeholder
+        // the flusher rewrites from serverMatchId once CREATE succeeds.
         return MatchStatisticsRequestDto(
-            matchId = state.matchId!!,
+            matchId = state.matchId ?: 0,
             player1Name = state.player1.getFullName(),
             player2Name = state.player2.getFullName(),
             player1Stats = PlayerStatsDto(

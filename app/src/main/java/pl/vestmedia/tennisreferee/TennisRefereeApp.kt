@@ -86,6 +86,9 @@ open class TennisRefereeApp : Application() {
         backgroundScope.launch { flushOutbox() }
     }
 
+    /** Same flush, awaited on the caller's coroutine (used after dropPendingUpdates). */
+    suspend fun flushOutboxNow() = flushOutbox()
+
     private suspend fun flushOutbox() {
         try {
             val result = MatchOutboxFlusher(

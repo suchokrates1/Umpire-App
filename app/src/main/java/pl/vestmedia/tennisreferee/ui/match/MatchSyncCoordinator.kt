@@ -153,7 +153,7 @@ class MatchSyncCoordinator(
             }
 
             if (state.matchId == null) {
-                logger.error("finalizeMatch", "match id missing after final sync")
+                logger.error("finalizeMatch", "match id missing after final sync — queueing FINISH/STATS behind CREATE")
             }
 
             try {
@@ -173,29 +173,38 @@ class MatchSyncCoordinator(
                 logger.error("finalizeMatch", "match_end event: ${e.message}")
             }
 
-            state.matchId?.let { matchId ->
+            val finishMatchId = state.matchId
+            if (finishMatchId != null) {
                 try {
-                    val response = requestWithRetry("finish match") { apiClient.finishMatch(matchId, finishRequest) }
+                    val response = requestWithRetry("finish match") { apiClient.finishMatch(finishMatchId, finishRequest) }
                     if (!response.isSuccessful) {
-                        enqueueIfRetryable(response.code(), state.clientMatchUuid, "FINISH", matchId, finishRequest)
+                        enqueueIfRetryable(response.code(), state.clientMatchUuid, "FINISH", finishMatchId, finishRequest)
                     }
                 } catch (e: Exception) {
                     if (e !is CancellationException) logger.error("finalizeMatch", "finish: ${e.message}")
-                    enqueueToOutbox(state.clientMatchUuid, "FINISH", matchId, finishRequest)
+                    enqueueToOutbox(state.clientMatchUuid, "FINISH", finishMatchId, finishRequest)
                     e.rethrowIfCancelled()
                 }
+            } else {
+                // CREATE is waiting in the outbox (e.g. 401 before the first server id).
+                // FINISH must sit behind it with a null serverMatchId so flush can propagate the id.
+                enqueueToOutbox(state.clientMatchUuid, "FINISH", null, finishRequest)
             }
 
             if (finishRequest.finishReason != MatchFinishReason.TEST) MatchApiPayloadFactory.toStatisticsRequest(state)?.let { statisticsRequest ->
-                try {
-                    val response = requestWithRetry("send statistics") { apiClient.sendMatchStatistics(statisticsRequest) }
-                    if (!response.isSuccessful) {
-                        enqueueIfRetryable(response.code(), state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
+                if (state.matchId == null) {
+                    enqueueToOutbox(state.clientMatchUuid, "STATS", null, statisticsRequest)
+                } else {
+                    try {
+                        val response = requestWithRetry("send statistics") { apiClient.sendMatchStatistics(statisticsRequest) }
+                        if (!response.isSuccessful) {
+                            enqueueIfRetryable(response.code(), state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
+                        }
+                    } catch (e: Exception) {
+                        if (e !is CancellationException) logger.error("finalizeMatch", "statistics: ${e.message}")
+                        enqueueToOutbox(state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
+                        e.rethrowIfCancelled()
                     }
-                } catch (e: Exception) {
-                    if (e !is CancellationException) logger.error("finalizeMatch", "statistics: ${e.message}")
-                    enqueueToOutbox(state.clientMatchUuid, "STATS", state.matchId, statisticsRequest)
-                    e.rethrowIfCancelled()
                 }
             }
         } catch (e: Exception) {

@@ -622,9 +622,14 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         expiresAtMillis = parseSessionExpiry(command.courtTokenExpiresAt)
                     )
                 )
-                app.flushOutboxInBackground()
             }
+            // Drop stale UPDATEs first, then flush on this same coroutine so a FAILED_AUTH
+            // final score is not deleted while a parallel flush is already sending it, and
+            // so a flush cannot race ahead of the drop with an older director-corrected score.
             runCatching { outboxStore.dropPendingUpdates(next.clientMatchUuid) }
+            if (tokenToSave != null) {
+                runCatching { app.flushOutboxNow() }
+            }
             if (commandId.isNotEmpty()) {
                 runCatching {
                     app.container.apiService.ackDirectorCommand(commandId)
