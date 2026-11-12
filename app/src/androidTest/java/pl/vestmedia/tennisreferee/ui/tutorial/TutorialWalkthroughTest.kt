@@ -11,7 +11,9 @@ import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
+import android.widget.Button
 import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -24,6 +26,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.instanceOf
 import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -129,7 +132,13 @@ class TutorialWalkthroughTest {
 
     private fun see(title: Int) {
         waitUntil("tutorial title ${InstrumentationRegistry.getInstrumentation().targetContext.getString(title)}", 15_000) {
-            onView(allOf(withText(title), not(withId(R.id.textTitle)))).check(matches(isDisplayed()))
+            onView(
+                allOf(
+                    withText(title),
+                    hasSibling(withText(R.string.tutorial_title)),
+                    not(instanceOf(Button::class.java)),
+                )
+            ).check(matches(isDisplayed()))
             true
         }
     }

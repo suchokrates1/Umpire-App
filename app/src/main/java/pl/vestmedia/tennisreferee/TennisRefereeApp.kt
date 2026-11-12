@@ -68,7 +68,7 @@ open class TennisRefereeApp : Application() {
         try {
             connectivity.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
-                    backgroundScope.launch { flushOutbox() }
+                    flushOutboxInBackground()
                 }
             })
         } catch (e: RuntimeException) {
@@ -76,6 +76,14 @@ open class TennisRefereeApp : Application() {
             // outbox is still sent with the next point, as before
             AppLogger.error("OutboxNetworkWatch", e)
         }
+    }
+
+    /**
+     * Triggers an immediate outbox pass in the background (e.g. right after a court PIN is
+     * re-entered for an expired session, when Wi-Fi stayed connected so onAvailable will not fire).
+     */
+    fun flushOutboxInBackground() {
+        backgroundScope.launch { flushOutbox() }
     }
 
     private suspend fun flushOutbox() {

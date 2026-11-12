@@ -620,6 +620,7 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
                         expiresAtMillis = parseSessionExpiry(command.courtTokenExpiresAt)
                     )
                 )
+                app.flushOutboxInBackground()
             }
             runCatching { outboxStore.dropPendingUpdates(next.clientMatchUuid) }
             if (commandId.isNotEmpty()) {

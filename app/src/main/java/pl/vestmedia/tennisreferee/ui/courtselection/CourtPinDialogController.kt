@@ -108,7 +108,9 @@ class CourtPinDialogController(
                     progressBar.visibility = View.GONE
                     result.onSuccess {
                         AppLogger.action("CourtSelection", "PIN_OK", "court=${court.id}")
-                        (activity.application as TennisRefereeApp).healthCheckManager.courtId = court.id
+                        val app = activity.application as TennisRefereeApp
+                        app.healthCheckManager.courtId = court.id
+                        app.flushOutboxInBackground()
                         dialog.dismiss()
                         val courtDisplayName = court.getDisplayName(activity)
                         val intent = Intent(activity, PlayerSelectionActivity::class.java).apply {
