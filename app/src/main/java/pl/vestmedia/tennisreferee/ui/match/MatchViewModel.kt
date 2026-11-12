@@ -542,6 +542,8 @@ class MatchViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         directorPollJob?.cancel()
+        // queued points and the finish still go out; the worker ends after them
+        matchSyncQueue.close()
         val app = getApplication<TennisRefereeApp>()
         app.healthCheckManager.snapshotProvider = null
         app.healthCheckManager.matchId = null

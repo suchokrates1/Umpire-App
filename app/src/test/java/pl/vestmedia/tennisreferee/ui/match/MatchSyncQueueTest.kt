@@ -131,6 +131,59 @@ class MatchSyncQueueTest {
         }
     }
 
+    @Test
+    fun aClosedQueueStillSendsWhatWasQueuedThenItsWorkerEnds() = runBlocking {
+        val gate = CompletableDeferred<Unit>()
+        val api = QueueTestApiClient(createGate = gate, createStarted = CompletableDeferred())
+        val coordinator = MatchSyncCoordinator(
+            apiClient = api,
+            matchHistorySaver = object : MatchHistorySaver {
+                override suspend fun saveMatch(state: MatchState): Long = 1L
+            },
+            batteryInfoProvider = { MatchBatteryInfo(level = 75, isCharging = false) },
+            onSyncStatus = {},
+            onBracketWarning = { _, _ -> },
+            retryDelay = object : RetryDelay {
+                override suspend fun waitBeforeNextAttempt(attemptNumber: Int) = Unit
+            },
+            logger = object : MatchSyncLogger {
+                override fun api(endpoint: String, result: String) = Unit
+                override fun error(context: String, error: Throwable) = Unit
+                override fun error(context: String, message: String) = Unit
+            },
+        )
+        val job = SupervisorJob()
+        val scope = CoroutineScope(job + Dispatchers.Default)
+        try {
+            val queue = MatchSyncQueue(scope = scope, coordinator = coordinator)
+            val finished = MatchState(
+                clientMatchUuid = "closing-1",
+                player1 = playerOne,
+                player2 = playerTwo,
+                courtId = "1",
+                courtName = "Court 1",
+            ).apply {
+                player1Sets = 2
+                isMatchFinished = true
+            }
+            val done = queue.enqueueFinalizeOnce(finished.detachedCopy(includeActionsHistory = false))
+
+            // the umpire leaves the match screen while the finish is still waiting for the network
+            queue.close()
+            gate.complete(Unit)
+            withTimeout(5_000) { done.await() }
+
+            assertTrue("the finish was sent: ${api.calls}", api.calls.any { it.startsWith("finish:501") })
+            withTimeout(5_000) { job.children.forEach { it.join() } }
+            assertTrue("the worker ended", job.children.none { it.isActive })
+            // nothing more is taken, and nobody waits forever for it
+            withTimeout(5_000) { queue.enqueueFlush().await() }
+            withTimeout(5_000) { queue.enqueueFinalizeOnce(finished.detachedCopy(includeActionsHistory = false)).await() }
+        } finally {
+            scope.cancel()
+        }
+    }
+
     private inner class QueueTestApiClient(
         private val createGate: CompletableDeferred<Unit>,
         private val createStarted: CompletableDeferred<Unit>,

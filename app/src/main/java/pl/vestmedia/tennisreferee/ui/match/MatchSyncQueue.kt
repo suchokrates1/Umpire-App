@@ -68,18 +68,29 @@ class MatchSyncQueue(
         request: FinishMatchRequest? = null,
     ): CompletableDeferred<Unit> {
         val done = CompletableDeferred<Unit>()
-        if (finalizedUuids.add(snapshot.clientMatchUuid)) {
-            channel.trySend(Task.Finalize(snapshot, request, done))
+        val task = if (finalizedUuids.add(snapshot.clientMatchUuid)) {
+            Task.Finalize(snapshot, request, done)
         } else {
-            channel.trySend(Task.Flush(done))
+            Task.Flush(done)
         }
+        // a closed queue takes nothing more; the caller must not wait for it forever
+        if (channel.trySend(task).isFailure) done.complete(Unit)
         return done
     }
 
     fun enqueueFlush(): CompletableDeferred<Unit> {
         val done = CompletableDeferred<Unit>()
-        channel.trySend(Task.Flush(done))
+        if (channel.trySend(Task.Flush(done)).isFailure) done.complete(Unit)
         return done
+    }
+
+    /**
+     * No more work will be queued: the match screen is gone. What is already queued is
+     * still sent, then the worker ends. Without this the worker waits on the channel for
+     * as long as the app lives and keeps its ViewModel with it, one per match played.
+     */
+    fun close() {
+        channel.close()
     }
 
     private suspend fun process(task: Task) {
