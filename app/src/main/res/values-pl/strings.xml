@@ -106,6 +106,7 @@
     <string name="finish_reason_test">Wpis testowy</string>
     <string name="finish_reason_retirement">Krecz</string>
     <string name="finish_reason_walkover">Walkower</string>
+    <string name="resume_format_kept">Ten mecz już się zaczął, więc zostaje wcześniejszy format.</string>
     <string name="finish_retirement_prompt">Który zawodnik ma kontuzję?</string>
     <string name="finish_walkover_prompt">Który zawodnik wygrywa walkowerem?</string>
     

@@ -71,6 +71,7 @@
     <string name="finish_reason_test">Voce di test</string>
     <string name="finish_reason_retirement">Ritiro</string>
     <string name="finish_reason_walkover">Walkover</string>
+    <string name="resume_format_kept">Questa partita è già iniziata, quindi resta il formato precedente.</string>
     <string name="finish_retirement_prompt">Quale giocatore si ritira per infortunio?</string>
     <string name="finish_walkover_prompt">Quale giocatore vince per walkover?</string>
     <string name="next_match_same_setup">▶ Prossima partita (stessa configurazione)</string>

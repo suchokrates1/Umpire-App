@@ -81,6 +81,8 @@ class MatchResumeTest {
         ).apply { player1Points = 1 }
 
         assertSame(saved, MatchResume.withChosenConfig(saved, MatchConfig(gamesPerSet = 6)))
+        assertTrue(MatchResume.keepsPlayedFormat(saved, MatchConfig(gamesPerSet = 6)))
+        assertFalse(MatchResume.keepsPlayedFormat(saved, saved.matchConfig))
     }
 
     @Test

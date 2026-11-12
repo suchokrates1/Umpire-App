@@ -76,6 +76,9 @@ object MatchProgressReducer {
             state.sidesSwapped = !state.sidesSwapped
             state.totalGamesPlayed = 0
             pendingAnnouncementType = ANNOUNCEMENT_SIDE_CHANGE
+            // The tie-break is the last game of the set, including when that set ends the match.
+            events.add(MatchProgressEvent.Game)
+            events.add(MatchProgressEvent.Set)
 
             if (state.shouldEndMatch()) {
                 state.isMatchFinished = true
@@ -116,8 +119,8 @@ object MatchProgressReducer {
 
         if (!completedTiebreak) {
             TiebreakServeRule.rotate(state)
+            events.add(MatchProgressEvent.Game)
         }
-        events.add(MatchProgressEvent.Game)
 
         if (state.isSetWon()) {
             val setWinner = if (state.player1Games > state.player2Games) 1 else 2

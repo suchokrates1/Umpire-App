@@ -3,7 +3,9 @@ package pl.vestmedia.tennisreferee.ui.playerselection
 import android.app.Activity
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import pl.vestmedia.tennisreferee.R
 import pl.vestmedia.tennisreferee.data.model.Player
 import pl.vestmedia.tennisreferee.domain.match.MatchResume
 import pl.vestmedia.tennisreferee.domain.match.model.MatchConfig
@@ -75,7 +77,18 @@ class NextMatchController(
                 else -> "same format"
             }
             AppLogger.navigate("PlayerSelection", "Match", "resume uuid=${reopened.clientMatchUuid} ($format)")
-            matchLauncher.launch(MatchActivity.createIntent(activity, reopened.clientMatchUuid, isDoublesMatch))
+            val open = {
+                matchLauncher.launch(MatchActivity.createIntent(activity, reopened.clientMatchUuid, isDoublesMatch))
+            }
+            if (MatchResume.keepsPlayedFormat(resumed, config)) {
+                AlertDialog.Builder(activity)
+                    .setMessage(R.string.resume_format_kept)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> open() }
+                    .setCancelable(false)
+                    .show()
+            } else {
+                open()
+            }
             return
         }
         AppLogger.navigate(

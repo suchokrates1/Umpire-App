@@ -62,6 +62,31 @@ class MatchProgressReducerTest {
         assertEquals("0", state.getPlayer2PointsDisplay())
         assertEquals("2 : 1", MatchScoreSummary.sets(state))
         assertEquals("10:8", MatchScoreSummary.setBySet(state))
+        assertEquals(listOf(MatchProgressEvent.Game, MatchProgressEvent.Set), result.events)
+        assertFalse(result.syncMatch)
+    }
+
+    @Test
+    fun setWonByTiebreakEmitsGameAndSet() {
+        val state = matchState(matchConfig = MatchConfig(gamesPerSet = 6, setsToWin = 2)).apply {
+            isTiebreak = true
+            player1Games = 6
+            player2Games = 6
+            player1Points = 7
+            player2Points = 5
+        }
+
+        val result = MatchProgressReducer.reduceAfterPoint(state, currentAnnouncementType = null, nowMs = 9_000L)
+
+        assertEquals(1, state.player1Sets)
+        assertEquals(0, state.player1Games)
+        assertEquals(0, state.player2Games)
+        assertEquals(7, state.setsHistory.single().player1Games)
+        assertEquals(6, state.setsHistory.single().player2Games)
+        assertEquals(5, state.setsHistory.single().tiebreakLoserPoints)
+        assertEquals(listOf(MatchProgressEvent.Game, MatchProgressEvent.Set), result.events)
+        assertTrue(result.syncMatch)
+        assertFalse(result.finalizeMatch)
     }
 
     @Test

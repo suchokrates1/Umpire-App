@@ -71,6 +71,7 @@
     <string name="finish_reason_test">Testeintrag</string>
     <string name="finish_reason_retirement">Aufgabe wegen Verletzung</string>
     <string name="finish_reason_walkover">Walkover</string>
+    <string name="resume_format_kept">Dieses Match hat bereits begonnen, daher bleibt das bisherige Format.</string>
     <string name="finish_retirement_prompt">Welcher Spieler gibt verletzt auf?</string>
     <string name="finish_walkover_prompt">Welcher Spieler gewinnt per Walkover?</string>
     <string name="next_match_same_setup">▶ Nächstes Spiel (gleiche Einstellungen)</string>

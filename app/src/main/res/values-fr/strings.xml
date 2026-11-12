@@ -71,6 +71,7 @@
     <string name="finish_reason_test">Saisie de test</string>
     <string name="finish_reason_retirement">Abandon</string>
     <string name="finish_reason_walkover">Forfait</string>
+    <string name="resume_format_kept">Ce match a déjà commencé, donc le format précédent reste.</string>
     <string name="finish_retirement_prompt">Quel joueur abandonne sur blessure ?</string>
     <string name="finish_walkover_prompt">Quel joueur gagne par forfait ?</string>
     <string name="next_match_same_setup">▶ Match suivant (même configuration)</string>

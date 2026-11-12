@@ -106,6 +106,7 @@
     <string name="finish_reason_test">Bandomasis įrašas</string>
     <string name="finish_reason_retirement">Pasitraukimas</string>
     <string name="finish_reason_walkover">Walkover</string>
+    <string name="resume_format_kept">Šios varžybos jau prasidėjo, todėl lieka ankstesnis formatas.</string>
     <string name="finish_retirement_prompt">Kuri pusė pasitraukia dėl traumos?</string>
     <string name="finish_walkover_prompt">Kuri pusė laimi walkover?</string>
 

@@ -71,6 +71,7 @@
     <string name="finish_reason_test">Test entry</string>
     <string name="finish_reason_retirement">Retirement</string>
     <string name="finish_reason_walkover">Walkover</string>
+    <string name="resume_format_kept">This match has already started, so the earlier format stays.</string>
     <string name="finish_retirement_prompt">Which player retired injured?</string>
     <string name="finish_walkover_prompt">Which player wins by walkover?</string>
     <string name="next_match_same_setup">▶ Next Match (same setup)</string>
